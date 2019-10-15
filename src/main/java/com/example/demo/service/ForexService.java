@@ -1,13 +1,14 @@
 package com.example.demo.service;
 
-import java.math.BigDecimal;
-import java.util.Map;
+import java.util.List;
 
-import org.springframework.stereotype.Service;
+import com.example.demo.repository.dao.ForexModel;
 
 public interface ForexService {
 
-	Map<String, BigDecimal> getExchangeRates();
+	void updateExchangeRates();
+	
+	List<ForexModel> getExchangeRates();
 
 	// TODO : need more methods for calculating amount, login, sending sms, email, and updating vendor details
 }
