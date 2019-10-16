@@ -57,10 +57,10 @@ public class ForexServiceImpl implements ForexService {
 		ResponseEntity<ForexModel> response = null;
 		try {
 			response = restTemplate
-					.getForEntity("https://api.exchangerate-api.com/v4/lates/INR", ForexModel.class);
+					.getForEntity("https://api.exchangerate-api.com/v4/latest/INR", ForexModel.class);
 			
 		} catch(Exception e) {
-			logger.error("Error fetching data from exchange rate api, trying again after 5 minutes");
+			logger.error("Error fetching data from exchange rate api @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
 		}
 		
 		return Optional.of(response.getBody());
