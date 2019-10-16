@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +34,14 @@ public class ForexServiceImpl implements ForexService {
 	ForexRepository repository;
 
 	private static Optional<ForexModel> forexValue = getExchangeRateResponse();
+	
+	@PostConstruct
+	public void onStartup() {
+		updateExchangeRates();
+	}
 
 	@Scheduled(cron = "0 0 2 * * *")
-	public void testScheduleTask() {
+	public void scheduledTask() {
 		logger.info("Updating Database with latest Rates @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
 		forexValue = getExchangeRateResponse();
 		updateExchangeRates();
@@ -42,14 +49,8 @@ public class ForexServiceImpl implements ForexService {
 
 	@Override
 	public void updateExchangeRates() {
-		Map<String, BigDecimal> responseMap = forexValue.get().getRates();
-
-		responseMap.entrySet().forEach(entry -> entry.setValue(
+		forexValue.get().getRates().entrySet().forEach(entry -> entry.setValue(
 				BigDecimal.valueOf(1 / entry.getValue().doubleValue()).setScale(4, BigDecimal.ROUND_HALF_EVEN)));
-
-		forexValue.get().getRates().entrySet().forEach(rate -> {
-			rate.setValue(responseMap.get(rate.getKey()));
-		});
 	}
 
 	private static Optional<ForexModel> getExchangeRateResponse() {
