@@ -1,7 +1,7 @@
 package com.example.demo.web;
 
 import com.example.demo.repository.dao.ForexModel;
-import com.example.demo.repository.dao.UserDetail;
+import com.example.demo.repository.dao.UserData;
 import com.example.demo.service.ForexService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class ForexController {
     @PutMapping(path = "/update/rates")
     public ResponseEntity<String> getExchangeRates() {
         forexService.updateExchangeRates();
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>("Rates have been updated", HttpStatus.CREATED);
     }
 
     @GetMapping(path = "/rates")
@@ -33,28 +33,28 @@ public class ForexController {
     }
 
     @PostMapping(path = "/signUp")
-    public ResponseEntity<String> signUpUser(@RequestBody UserDetail userDetail) {
-        if (userDetail.getEmailId().matches(EMAIL_REGEX)) {
-            forexService.signUpUser(userDetail);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<String> signUpUser(@RequestBody UserData userData) {
+        if (userData.getEmailId().matches(EMAIL_REGEX)) {
+            try {
+                return new ResponseEntity<>(forexService.signUpUser(userData), HttpStatus.CREATED);
+            } catch (Exception e) {
+                return new ResponseEntity<>("Invalid Details, user already exists", HttpStatus.BAD_REQUEST);
+            }
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Invalid Email", HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping(path = "/login")
-    public ResponseEntity<String> login(@RequestParam String emailId,
+    public ResponseEntity<String> login(@RequestParam(required = false) String userName,
+                                        @RequestParam(required = false) String emailId,
                                         @RequestParam String password) {
-        if (forexService.login(emailId, password)) {
-            return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            if (forexService.login(userName, emailId, password)) {
+                return new ResponseEntity<>("Login success", HttpStatus.OK);
+            }
+            return new ResponseEntity<>("Incorrect Password", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error, details do not exist", HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
-    @GetMapping(path = "/checkUserExists")
-    public ResponseEntity<String> checkUserExists(@RequestParam String emailId) {
-        if (forexService.checkUserExists(emailId)) {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

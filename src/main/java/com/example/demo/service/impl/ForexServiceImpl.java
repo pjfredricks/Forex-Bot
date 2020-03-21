@@ -2,8 +2,9 @@ package com.example.demo.service.impl;
 
 import com.example.demo.repository.ForexRepository;
 import com.example.demo.repository.dao.ForexModel;
-import com.example.demo.repository.dao.UserDetail;
+import com.example.demo.repository.dao.UserData;
 import com.example.demo.service.ForexService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -55,7 +57,7 @@ public class ForexServiceImpl implements ForexService {
     @Override
     public void updateExchangeRates() {
         forexValue.get().getRates().entrySet().forEach(entry -> entry.setValue(
-                BigDecimal.valueOf(1 / entry.getValue().doubleValue()).setScale(4, BigDecimal.ROUND_HALF_EVEN)));
+                BigDecimal.valueOf(1 / entry.getValue().doubleValue()).setScale(3, RoundingMode.HALF_EVEN)));
     }
 
     private static Optional<ForexModel> getExchangeRateResponse() {
@@ -81,48 +83,43 @@ public class ForexServiceImpl implements ForexService {
 
     @Override
     @Transactional
-    public Boolean signUpUser(UserDetail userDetail) {
-        if (checkUserExists(userDetail.getEmailId())) {
-            return modifyExistingUser(userDetail);
-        }
-        userDetail.setPassword(bCryptPasswordEncoder.encode(userDetail.getPassword()));
-        userDetail.setCreate_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
-        repository.save(userDetail);
-        return true;
+    public String signUpUser(UserData userData) throws Exception {
+        userData.setPassword(bCryptPasswordEncoder.encode(userData.getPassword()));
+        userData.setCreate_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+        return String.valueOf(repository.save(userData).getId());
     }
 
     @Override
-    public Boolean login(String emailId, String password) {
-        if (checkUserExists(emailId)) {
-            return checkPasswordsMatch(password, getPasswordFromDb(emailId));
-        }
-        return false;
+    public Boolean login(String userName, String emailId, String password) throws Exception {
+        UserData userData = StringUtils.isEmpty(userName) ? getUserDataByEmail(emailId) : getUserDataByUserName(userName);
+        return checkPasswordsMatch(password, userData.getPassword());
     }
 
-    @Override
-    public Boolean checkUserExists(String emailId) {
-        return repository.existsByEmailId(emailId);
+    private UserData getUserDataByUserName(String userName) {
+        return repository.findUserDetailByName(userName);
+    }
+
+    private UserData getUserDataByEmail(String emailId) {
+        return repository.findUserDetailByEmailId(emailId);
     }
 
     private Boolean checkPasswordsMatch(String enteredPassword, String passwordFromDb) {
         return bCryptPasswordEncoder.matches(enteredPassword, passwordFromDb);
     }
 
-    private String getPasswordFromDb(String emailId) {
-        return repository.findUserDetailByEmailId(emailId).getPassword();
-    }
+    // TODO: add update password
+    private UserData updatePassword(UserData userData) {
+        UserData userDataFromDb = StringUtils.isEmpty(userData.getName())
+                ? getUserDataByEmail(userData.getEmailId()) : getUserDataByUserName(userData.getName());
 
-    private Boolean modifyExistingUser(UserDetail userDetail) {
-        if (checkPasswordsMatch(
-                userDetail.getPassword(),
-                getPasswordFromDb(userDetail.getEmailId()))) {
+        if (checkPasswordsMatch(userData.getPassword(), userDataFromDb.getPassword())) {
             // Executed only when user entered password and db password match
-            userDetail.setPassword(bCryptPasswordEncoder.encode(userDetail.getPassword()));
-            userDetail.setModified_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
-            return true;
+            userData.setPassword(bCryptPasswordEncoder.encode(userData.getPassword()));
+            userData.setModified_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+            return userData;
         } else {
             // User password does not match
-            return false;
+            return null;
         }
     }
 }

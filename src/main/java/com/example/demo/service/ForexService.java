@@ -1,7 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.repository.dao.ForexModel;
-import com.example.demo.repository.dao.UserDetail;
+import com.example.demo.repository.dao.UserData;
 
 import java.util.List;
 
@@ -11,11 +11,9 @@ public interface ForexService {
 	
 	List<ForexModel> getExchangeRates();
 
-	Boolean signUpUser(UserDetail userDetail);
+	String signUpUser(UserData userData) throws Exception;
 
-	Boolean login(String emailId, String password);
-
-	Boolean checkUserExists(String emailId);
+	Boolean login(String userName, String emailId, String password) throws Exception;
 
 	// TODO : need more methods for calculating amount, sending sms and email, and updating vendor details
 }
