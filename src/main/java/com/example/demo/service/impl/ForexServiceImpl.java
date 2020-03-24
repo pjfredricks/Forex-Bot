@@ -2,7 +2,8 @@ package com.example.demo.service.impl;
 
 import com.example.demo.repository.ForexRepository;
 import com.example.demo.repository.dao.ForexModel;
-import com.example.demo.repository.dao.UserData;
+import com.example.demo.repository.dao.UserDataRequest;
+import com.example.demo.repository.dao.UserDataResponse;
 import com.example.demo.service.ForexService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -83,23 +84,27 @@ public class ForexServiceImpl implements ForexService {
 
     @Override
     @Transactional
-    public String signUpUser(UserData userData) throws Exception {
-        userData.setPassword(bCryptPasswordEncoder.encode(userData.getPassword()));
-        userData.setCreate_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
-        return String.valueOf(repository.save(userData).getId());
+    public UserDataResponse signUpUser(UserDataRequest userDataRequest) throws Exception {
+        userDataRequest.setPassword(bCryptPasswordEncoder.encode(userDataRequest.getPassword()));
+        userDataRequest.setCreate_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+        userDataRequest.setId(repository.save(userDataRequest).getId());
+        return UserDataResponse.map(userDataRequest);
     }
 
     @Override
-    public Boolean login(String userName, String emailId, String password) throws Exception {
-        UserData userData = StringUtils.isEmpty(userName) ? getUserDataByEmail(emailId) : getUserDataByUserName(userName);
-        return checkPasswordsMatch(password, userData.getPassword());
+    public UserDataResponse login(String userName, String emailId, String password) throws Exception {
+        UserDataRequest userDataRequest = StringUtils.isEmpty(userName) ? getUserDataByEmail(emailId) : getUserDataByUserName(userName);
+        if (checkPasswordsMatch(password, userDataRequest.getPassword())) {
+            return UserDataResponse.map(userDataRequest);
+        }
+        return null;
     }
 
-    private UserData getUserDataByUserName(String userName) {
+    private UserDataRequest getUserDataByUserName(String userName) {
         return repository.findUserDetailByName(userName);
     }
 
-    private UserData getUserDataByEmail(String emailId) {
+    private UserDataRequest getUserDataByEmail(String emailId) {
         return repository.findUserDetailByEmailId(emailId);
     }
 
@@ -108,15 +113,15 @@ public class ForexServiceImpl implements ForexService {
     }
 
     // TODO: add update password
-    private UserData updatePassword(UserData userData) {
-        UserData userDataFromDb = StringUtils.isEmpty(userData.getName())
-                ? getUserDataByEmail(userData.getEmailId()) : getUserDataByUserName(userData.getName());
+    private UserDataRequest updatePassword(UserDataRequest userDataRequest) {
+        UserDataRequest userDataRequestFromDb = StringUtils.isEmpty(userDataRequest.getName())
+                ? getUserDataByEmail(userDataRequest.getEmailId()) : getUserDataByUserName(userDataRequest.getName());
 
-        if (checkPasswordsMatch(userData.getPassword(), userDataFromDb.getPassword())) {
+        if (checkPasswordsMatch(userDataRequest.getPassword(), userDataRequestFromDb.getPassword())) {
             // Executed only when user entered password and db password match
-            userData.setPassword(bCryptPasswordEncoder.encode(userData.getPassword()));
-            userData.setModified_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
-            return userData;
+            userDataRequest.setPassword(bCryptPasswordEncoder.encode(userDataRequest.getPassword()));
+            userDataRequest.setModified_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+            return userDataRequest;
         } else {
             // User password does not match
             return null;

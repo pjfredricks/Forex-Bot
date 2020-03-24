@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 @Table(name = "userDetail")
 @Entity
-public class UserDetail {
+public class UserDataRequest {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -17,12 +17,20 @@ public class UserDetail {
 	private int id;
 
 	@NotNull
-	@Column(name = "emailId")
+	@Column(name = "name")
+	private String name;
+
+	@NotNull
+	@Column(name = "emailId", unique = true)
 	private String emailId;
 
 	@NotNull
 	@Column(name = "password")
 	private String password;
+
+	@NotNull
+	@Column(name = "mobileNum", unique = true)
+	private String mobileNum;
 
 	@NotNull
 	@ApiModelProperty(hidden = true)
@@ -33,7 +41,7 @@ public class UserDetail {
 	@Column(name = "modifiedDate")
 	private String modified_date;
 
-	public UserDetail() {
+	public UserDataRequest() {
 		super();
 	}
 
@@ -45,12 +53,28 @@ public class UserDetail {
 		this.id = id;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public String getEmailId() {
 		return emailId;
 	}
 
 	public void setEmailId(String emailId) {
 		this.emailId = emailId;
+	}
+
+	public String getMobileNum() {
+		return mobileNum;
+	}
+
+	public void setMobileNum(String mobileNum) {
+		this.mobileNum = mobileNum;
 	}
 
 	public String getPassword() {
