@@ -21,7 +21,7 @@ public class ForexController {
     @PutMapping(path = "/update/rates")
     public ResponseWrapper getExchangeRates() {
         forexService.updateExchangeRates();
-        return new ResponseWrapper( HttpStatus.OK.getReasonPhrase(), "Rates have been updated", null);
+        return new ResponseWrapper(HttpStatus.OK.getReasonPhrase(), "Rates have been updated", null);
     }
 
     @GetMapping(path = "/rates")

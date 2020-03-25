@@ -1,7 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.repository.ForexRepository;
-import com.example.demo.repository.dao.ForexModel;
+import com.example.demo.repository.dao.ForexRates;
 import com.example.demo.repository.dao.UserDataRequest;
 import com.example.demo.repository.dao.UserDataResponse;
 import com.example.demo.service.ForexService;
@@ -21,10 +21,8 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ForexServiceImpl implements ForexService {
@@ -36,7 +34,8 @@ public class ForexServiceImpl implements ForexService {
     private final ForexRepository repository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private static Optional<ForexModel> forexValue = getExchangeRateResponse();
+    private static Map<String, Double> forexValue = getExchangeRateResponse();
+    private static List<ForexRates> rates;
 
     public ForexServiceImpl(ForexRepository repository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.repository = repository;
@@ -45,41 +44,47 @@ public class ForexServiceImpl implements ForexService {
 
     @PostConstruct
     public void onStartup() {
-        updateExchangeRates();
+        rates = updateExchangeRates();
     }
 
     @Scheduled(cron = "0 0 2 * * *")
     public void scheduledTask() {
         logger.info("Updating Database with latest Rates @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
         forexValue = getExchangeRateResponse();
-        updateExchangeRates();
+        rates = updateExchangeRates();
     }
 
     @Override
-    public void updateExchangeRates() {
-        forexValue.get().getRates().entrySet().forEach(entry -> entry.setValue(
-                BigDecimal.valueOf(1 / entry.getValue().doubleValue()).setScale(3, RoundingMode.HALF_EVEN)));
+    public List<ForexRates> updateExchangeRates() {
+        ForexRates rate = new ForexRates();
+        forexValue.remove("INR");
+        return forexValue.entrySet()
+                .stream()
+                .map(forexValue -> new ForexRates(Currency.getInstance(forexValue.getKey()).getDisplayName(),
+                        BigDecimal.valueOf(1 / forexValue.getValue()).setScale(3, RoundingMode.HALF_EVEN),
+                        null))
+                .collect(Collectors.toList());
     }
 
-    private static Optional<ForexModel> getExchangeRateResponse() {
+    private static Map<String, Double> getExchangeRateResponse() {
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ForexModel> response = null;
+        ResponseEntity<LinkedHashMap> response = null;
         try {
             response = restTemplate
-                    .getForEntity("https://api.exchangerate-api.com/v4/latest/INR", ForexModel.class);
+                    .getForEntity("https://api.exchangerate-api.com/v4/latest/INR", LinkedHashMap.class);
         } catch (Exception e) {
             logger.error("Error fetching data from exchange rate api @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
         }
 
-        return Optional.of(response.getBody());
+        return (Map<String, Double>) response.getBody().get("rates");
     }
 
     @Override
-    public List<ForexModel> getExchangeRates() {
-        if (!forexValue.isPresent()) {
+    public List<ForexRates> getExchangeRates() {
+        if (rates.isEmpty()) {
             return new ArrayList<>();
         }
-        return Arrays.asList(forexValue.get());
+        return rates;
     }
 
     @Override
