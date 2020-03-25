@@ -1,7 +1,6 @@
 package com.example.demo.repository.dao;
 
-import java.math.BigDecimal;
-import java.util.Map;
+import java.util.List;
 
 public class ForexModel {
 
@@ -13,13 +12,13 @@ public class ForexModel {
 
 	private String time_last_updated;
 
-	private Map<String, BigDecimal> rates;
+	private List<ForexRates> rates;
 
 	public ForexModel() {
 		super();
 	}
 
-	public ForexModel(String base, String date, String time_last_updated, Map<String, BigDecimal> rates) {
+	public ForexModel(String base, String date, String time_last_updated, List<ForexRates> rates) {
 		super();
 		this.base = base;
 		this.date = date;
@@ -51,11 +50,11 @@ public class ForexModel {
 		this.time_last_updated = time_last_updated;
 	}
 
-	public Map<String, BigDecimal> getRates() {
+	public List<ForexRates> getRates() {
 		return rates;
 	}
 
-	public void setRates(Map<String, BigDecimal> rates) {
+	public void setRates(List<ForexRates> rates) {
 		this.rates = rates;
 	}
 
