@@ -34,7 +34,7 @@ public class ForexServiceImpl implements ForexService {
     private final ForexRepository repository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private static Map<String, Double> forexValue = getExchangeRateResponse();
+    private static Map<String, Object> forexValue = (Map<String, Object>) getExchangeRateResponse();
     private static List<ForexRates> rates;
 
     public ForexServiceImpl(ForexRepository repository, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -50,7 +50,6 @@ public class ForexServiceImpl implements ForexService {
     @Scheduled(cron = "0 0 2 * * *")
     public void scheduledTask() {
         logger.info("Updating Database with latest Rates @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
-        forexValue = getExchangeRateResponse();
         rates = updateExchangeRates();
     }
 
@@ -61,12 +60,17 @@ public class ForexServiceImpl implements ForexService {
         return forexValue.entrySet()
                 .stream()
                 .map(forexValue -> new ForexRates(Currency.getInstance(forexValue.getKey()).getDisplayName(),
-                        BigDecimal.valueOf(1 / forexValue.getValue()).setScale(3, RoundingMode.HALF_EVEN),
+                        convertRate(forexValue.getValue().toString()),
                         null))
                 .collect(Collectors.toList());
     }
 
-    private static Map<String, Double> getExchangeRateResponse() {
+    private BigDecimal convertRate(String rate) {
+        double convertedRate = Double.valueOf(rate);
+        return BigDecimal.valueOf(1 / convertedRate).setScale(3, RoundingMode.HALF_EVEN);
+    }
+
+    private static Object getExchangeRateResponse() {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<LinkedHashMap> response = null;
         try {
@@ -76,7 +80,7 @@ public class ForexServiceImpl implements ForexService {
             logger.error("Error fetching data from exchange rate api @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
         }
 
-        return (Map<String, Double>) response.getBody().get("rates");
+        return response.getBody().get("rates");
     }
 
     @Override
