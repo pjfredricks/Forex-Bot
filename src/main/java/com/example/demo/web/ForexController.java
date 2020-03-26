@@ -2,8 +2,10 @@ package com.example.demo.web;
 
 import com.example.demo.repository.dao.ResponseWrapper;
 import com.example.demo.repository.dao.UserDataRequest;
+import com.example.demo.repository.dao.UserDataResponse;
 import com.example.demo.service.ForexService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,34 +21,39 @@ public class ForexController {
     }
 
     @PutMapping(path = "/update/rates")
-    public ResponseWrapper getExchangeRates() {
+    public ResponseEntity<ResponseWrapper> getExchangeRates() {
         forexService.updateExchangeRates();
-        return new ResponseWrapper(HttpStatus.OK.getReasonPhrase(), "Rates have been updated", null);
+        return new ResponseEntity<>(new ResponseWrapper("SUCCESS", "Rates have been updated", null), HttpStatus.OK);
     }
 
     @GetMapping(path = "/rates")
-    public ResponseWrapper getExchangeRatesFromDb() {
-        return new ResponseWrapper(HttpStatus.OK.getReasonPhrase(), "Rates have been fetched", forexService.getExchangeRates());
+    public ResponseEntity<ResponseWrapper> getExchangeRatesFromDb() {
+        return new ResponseEntity<>(new ResponseWrapper("SUCCESS", "Rates have been fetched", forexService.getExchangeRates()), HttpStatus.OK);
     }
 
     @PostMapping(path = "/signUp")
-    public ResponseWrapper signUpUser(@RequestBody UserDataRequest userDataRequest) {
+    public ResponseEntity<ResponseWrapper> signUpUser(@RequestBody UserDataRequest userDataRequest) {
         if (userDataRequest.getEmailId().matches(EMAIL_REGEX)) {
             try {
-                return new ResponseWrapper(HttpStatus.OK.getReasonPhrase(), "User signed Up successfully", forexService.signUpUser(userDataRequest));
+                return new ResponseEntity<>(new ResponseWrapper("SUCCESS", "User signed Up successfully", forexService.signUpUser(userDataRequest)), HttpStatus.OK);
             } catch (Exception e) {
-                return new ResponseWrapper(HttpStatus.OK.getReasonPhrase(), "Invalid Details, user already exists", null);
+                return new ResponseEntity<>(new ResponseWrapper("ERROR", "Invalid Details, user already exists", null), HttpStatus.BAD_REQUEST);
             }
         }
-        return new ResponseWrapper(HttpStatus.OK.getReasonPhrase(), "Invalid Email", null);
+        return new ResponseEntity<>(new ResponseWrapper("SUCCESS", "Invalid Email", null), HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping(path = "/login")
-    public ResponseWrapper login(@RequestBody UserDataRequest userDataRequest) {
+    public ResponseEntity<ResponseWrapper> login(@RequestBody UserDataRequest userDataRequest) {
+        UserDataResponse userDataResponse = null;
         try {
-            return new ResponseWrapper(HttpStatus.OK.getReasonPhrase(), "Login success" , forexService.login(userDataRequest.getName(), userDataRequest.getEmailId(), userDataRequest.getPassword()));
+            userDataResponse = forexService.login(userDataRequest.getName(), userDataRequest.getEmailId(), userDataRequest.getPassword());
         } catch (Exception e) {
-            return new ResponseWrapper(HttpStatus.OK.getReasonPhrase(), "Incorrect Password", null);
+            e.printStackTrace();
         }
+        if (userDataResponse != null) {
+                return new ResponseEntity<>(new ResponseWrapper("SUCCESS", "Login success", userDataResponse), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new ResponseWrapper("ERROR", "Incorrect Password", null), HttpStatus.NOT_FOUND);
     }
 }
