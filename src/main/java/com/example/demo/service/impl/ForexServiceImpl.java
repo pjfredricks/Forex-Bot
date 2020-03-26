@@ -61,7 +61,8 @@ public class ForexServiceImpl implements ForexService {
         forexValue.keySet().retainAll(countryList);
         return forexValue.entrySet()
                 .stream()
-                .map(forexValue -> new ForexRates(Currency.getInstance(forexValue.getKey()).getDisplayName(),
+                .map(forexValue -> new ForexRates(forexValue.getKey(),
+                        Currency.getInstance(forexValue.getKey()).getDisplayName(),
                         convertRate(forexValue.getValue().toString()),
                         null))
                 .collect(Collectors.toList());

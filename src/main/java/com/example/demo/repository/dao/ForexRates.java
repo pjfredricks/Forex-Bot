@@ -4,25 +4,35 @@ import java.math.BigDecimal;
 
 public class ForexRates {
 
-    private String country;
+    private String countryCode;
+    private String countryName;
     private BigDecimal buyRate;
     private BigDecimal sellRate;
 
     public ForexRates() {
     }
 
-    public ForexRates(String country, BigDecimal buyRate, BigDecimal sellRate) {
-        this.country = country;
+    public ForexRates(String countryCode, String countryName, BigDecimal buyRate, BigDecimal sellRate) {
+        this.countryCode = countryCode;
+        this.countryName = countryName;
         this.buyRate = buyRate;
         this.sellRate = sellRate;
     }
 
-    public String getCountry() {
-        return country;
+    public String getCountryCode() {
+        return countryCode;
     }
 
-    public void setCountry(String country) {
-        this.country = country;
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    public String getCountryName() {
+        return countryName;
+    }
+
+    public void setCountryName(String countryName) {
+        this.countryName = countryName;
     }
 
     public BigDecimal getBuyRate() {
