@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class ForexRates {
 
+    private Boolean isCarousel;
     private String countryCode;
     private String countryName;
     private BigDecimal buyRate;
@@ -12,11 +13,20 @@ public class ForexRates {
     public ForexRates() {
     }
 
-    public ForexRates(String countryCode, String countryName, BigDecimal buyRate, BigDecimal sellRate) {
+    public ForexRates(Boolean isCarousel, String countryCode, String countryName, BigDecimal buyRate, BigDecimal sellRate) {
+        this.isCarousel = isCarousel;
         this.countryCode = countryCode;
         this.countryName = countryName;
         this.buyRate = buyRate;
         this.sellRate = sellRate;
+    }
+
+    public Boolean isCarousel() {
+        return isCarousel;
+    }
+
+    public void setCarousel(Boolean carousel) {
+        isCarousel = carousel;
     }
 
     public String getCountryCode() {

@@ -37,6 +37,10 @@ public class ForexServiceImpl implements ForexService {
 
     private static Map<String, Object> forexValue = (Map<String, Object>) getExchangeRateResponse();
     private static List<ForexRates> rates;
+    private static final Set<String> countryList = Stream.of("USD", "AUD", "GBP", "EUR", "CAD",
+            "CNY", "SAR", "SGD", "MYR", "THB",
+            "IDR", "ILS", "JPY", "KRW", "CHF",
+            "PHP", "FJD", "HKD", "ZAR").collect(Collectors.toSet());
 
     public ForexServiceImpl(ForexRepository repository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.repository = repository;
@@ -56,12 +60,11 @@ public class ForexServiceImpl implements ForexService {
 
     @Override
     public List<ForexRates> updateExchangeRates() {
-        ForexRates rate = new ForexRates();
-        Set<String> countryList = Stream.of("USD", "AUD", "GBP", "EUR", "CAD", "CNY", "SAR", "SGD", "MYR", "THB", "IDR").collect(Collectors.toSet());
         forexValue.keySet().retainAll(countryList);
         return forexValue.entrySet()
                 .stream()
-                .map(forexValue -> new ForexRates(forexValue.getKey(),
+                .map(forexValue -> new ForexRates(true,
+                        forexValue.getKey(),
                         Currency.getInstance(forexValue.getKey()).getDisplayName(),
                         convertRate(forexValue.getValue().toString()),
                         null))
