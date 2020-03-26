@@ -23,6 +23,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ForexServiceImpl implements ForexService {
@@ -56,7 +57,8 @@ public class ForexServiceImpl implements ForexService {
     @Override
     public List<ForexRates> updateExchangeRates() {
         ForexRates rate = new ForexRates();
-        forexValue.remove("INR");
+        Set<String> countryList = Stream.of("USD", "AUD", "GBP", "EUR", "CAD", "CNY", "SAR", "SGD", "MYR", "THB", "IDR").collect(Collectors.toSet());
+        forexValue.keySet().retainAll(countryList);
         return forexValue.entrySet()
                 .stream()
                 .map(forexValue -> new ForexRates(Currency.getInstance(forexValue.getKey()).getDisplayName(),
