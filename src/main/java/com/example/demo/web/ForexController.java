@@ -37,10 +37,10 @@ public class ForexController {
             try {
                 return new ResponseEntity<>(new ResponseWrapper("SUCCESS", "User signed Up successfully", forexService.signUpUser(userDataRequest)), HttpStatus.OK);
             } catch (Exception e) {
-                return new ResponseEntity<>(new ResponseWrapper("ERROR", "Invalid Details, user already exists", null), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(new ResponseWrapper("ERROR", "Invalid Details, user already exists", null), HttpStatus.OK);
             }
         }
-        return new ResponseEntity<>(new ResponseWrapper("SUCCESS", "Invalid Email", null), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ResponseWrapper("SUCCESS", "Invalid Email", null), HttpStatus.OK);
     }
 
     @PostMapping(path = "/login")
@@ -54,6 +54,6 @@ public class ForexController {
         if (userDataResponse != null) {
                 return new ResponseEntity<>(new ResponseWrapper("SUCCESS", "Login success", userDataResponse), HttpStatus.OK);
         }
-        return new ResponseEntity<>(new ResponseWrapper("ERROR", "Incorrect Password", null), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new ResponseWrapper("ERROR", "Incorrect Password", null), HttpStatus.OK);
     }
 }
