@@ -14,7 +14,7 @@ public interface ForexService {
 
 	UserDataResponse signUpUser(UserDataRequest userDataRequest) throws Exception;
 
-	UserDataResponse login(String userName, String emailId, String password) throws Exception;
+	UserDataResponse login(UserDataRequest userDataRequest) throws Exception;
 
 	// TODO : need more methods for calculating amount, sending sms and email, and updating vendor details
 }

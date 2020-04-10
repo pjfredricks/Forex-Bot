@@ -1,19 +1,19 @@
 package com.example.demo.repository;
 
-import com.example.demo.repository.dao.UserDataRequest;
+import com.example.demo.repository.dao.UserData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ForexRepository extends JpaRepository<UserDataRequest, Integer> {
+public interface ForexRepository extends JpaRepository<UserData, Integer> {
 
-    UserDataRequest findUserDetailByName(String userName);
+    UserData getUserDataByName(String userName);
 
-    UserDataRequest findUserDetailByEmailId(String emailId);
+    UserData getUserDataByEmailIdOrMobileNum(String emailId, String mobileNum);
 
-    List<UserDataRequest> findAll();
+    List<UserData> findAll();
 
-    UserDataRequest save(UserDataRequest userDataRequest);
+    UserData save(UserData userData);
 }

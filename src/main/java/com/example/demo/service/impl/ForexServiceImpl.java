@@ -2,6 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.repository.ForexRepository;
 import com.example.demo.repository.dao.ForexRates;
+import com.example.demo.repository.dao.UserData;
 import com.example.demo.repository.dao.UserDataRequest;
 import com.example.demo.repository.dao.UserDataResponse;
 import com.example.demo.service.ForexService;
@@ -28,7 +29,7 @@ import java.util.stream.Stream;
 @Service
 public class ForexServiceImpl implements ForexService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ForexServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ForexServiceImpl.class);
 
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
@@ -40,6 +41,8 @@ public class ForexServiceImpl implements ForexService {
     private static final Set<String> countryList = Stream.of("USD", "AUD", "GBP", "EUR", "CAD",
             "CNY", "SAR", "SGD", "MYR", "THB",
             "IDR", "ILS", "JPY", "KRW", "CHF",
+            "PHP", "FJD", "HKD", "ZAR").collect(Collectors.toSet());
+    private static final Set<String> carouselFalse = Stream.of("ILS", "JPY", "KRW", "CHF",
             "PHP", "FJD", "HKD", "ZAR").collect(Collectors.toSet());
 
     public ForexServiceImpl(ForexRepository repository, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -54,14 +57,14 @@ public class ForexServiceImpl implements ForexService {
 
     @Scheduled(cron = "0 0 2 * * *")
     public void scheduledTask() {
-        logger.info("Updating Database with latest Rates @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
+        LOGGER.info("Updating Database with latest Rates @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
         rates = updateExchangeRates();
     }
 
     @Override
     public List<ForexRates> updateExchangeRates() {
         forexValue.keySet().retainAll(countryList);
-        return forexValue.entrySet()
+        List<ForexRates> rates = forexValue.entrySet()
                 .stream()
                 .map(forexValue -> new ForexRates(true,
                         forexValue.getKey(),
@@ -69,6 +72,13 @@ public class ForexServiceImpl implements ForexService {
                         convertRate(forexValue.getValue().toString()),
                         null))
                 .collect(Collectors.toList());
+        rates.forEach(forexRates -> {
+            if (carouselFalse.contains(forexRates.getCountryCode())) {
+                forexRates.setCarousel(false);
+            }
+        });
+
+        return rates;
     }
 
     private BigDecimal convertRate(String rate) {
@@ -83,7 +93,7 @@ public class ForexServiceImpl implements ForexService {
             response = restTemplate
                     .getForEntity("https://api.exchangerate-api.com/v4/latest/INR", LinkedHashMap.class);
         } catch (Exception e) {
-            logger.error("Error fetching data from exchange rate api @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
+            LOGGER.error("Error fetching data from exchange rate api @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
         }
 
         return response.getBody().get("rates");
@@ -99,44 +109,73 @@ public class ForexServiceImpl implements ForexService {
 
     @Override
     @Transactional
-    public UserDataResponse signUpUser(UserDataRequest userDataRequest) throws Exception {
-        userDataRequest.setPassword(bCryptPasswordEncoder.encode(userDataRequest.getPassword()));
-        userDataRequest.setCreate_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
-        userDataRequest.setId(repository.save(userDataRequest).getId());
-        return UserDataResponse.map(userDataRequest);
+    public UserDataResponse signUpUser(UserDataRequest userDataRequest) {
+        UserData userData = mapRequestToData(userDataRequest);
+        userData.setId(repository.save(userData).getId());
+
+        return mapDataToResponse(userData);
     }
 
     @Override
-    public UserDataResponse login(String userName, String emailId, String password) throws Exception {
-        UserDataRequest userDataRequest = StringUtils.isEmpty(userName) ? getUserDataByEmail(emailId) : getUserDataByUserName(userName);
-        if (checkPasswordsMatch(password, userDataRequest.getPassword())) {
-            return UserDataResponse.map(userDataRequest);
+    public UserDataResponse login(UserDataRequest userDataRequest) throws Exception {
+        UserData userData = null;
+
+        if (StringUtils.isEmpty(userDataRequest.getName())) {
+            userData = getUserDataByEmailIdOrMobileNum(userDataRequest.getEmailId(), userDataRequest.getMobileNum());
+        } else {
+            userData = getUserDataByName(userDataRequest.getName());
+        }
+
+        if (checkPasswordsMatch(userDataRequest.getPassword(), userData.getPassword())) {
+            return mapDataToResponse(userData);
         }
         return null;
     }
 
-    private UserDataRequest getUserDataByUserName(String userName) {
-        return repository.findUserDetailByName(userName);
+    private UserData getUserDataByName(String userName) {
+        return repository.getUserDataByName(userName);
     }
 
-    private UserDataRequest getUserDataByEmail(String emailId) {
-        return repository.findUserDetailByEmailId(emailId);
+    private UserData getUserDataByEmailIdOrMobileNum(String emailId, String mobileNum) {
+        return repository.getUserDataByEmailIdOrMobileNum(emailId, mobileNum);
     }
 
     private Boolean checkPasswordsMatch(String enteredPassword, String passwordFromDb) {
         return bCryptPasswordEncoder.matches(enteredPassword, passwordFromDb);
     }
 
-    // TODO: add update password
-    private UserDataRequest updatePassword(UserDataRequest userDataRequest) {
-        UserDataRequest userDataRequestFromDb = StringUtils.isEmpty(userDataRequest.getName())
-                ? getUserDataByEmail(userDataRequest.getEmailId()) : getUserDataByUserName(userDataRequest.getName());
+    public UserData mapRequestToData(UserDataRequest userRequest) {
+        UserData userData = new UserData();
 
-        if (checkPasswordsMatch(userDataRequest.getPassword(), userDataRequestFromDb.getPassword())) {
+        userData.setUserId(UUID.randomUUID());
+        userData.setEmailId(userRequest.getEmailId());
+        userData.setMobileNum(userRequest.getMobileNum());
+        userData.setName(userRequest.getName());
+        userData.setPassword(bCryptPasswordEncoder.encode(userRequest.getPassword()));
+        userData.setCreate_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+        return userData;
+    }
+
+    public UserDataResponse mapDataToResponse(UserData userData) {
+        UserDataResponse response = new UserDataResponse();
+
+        response.setUserId(userData.getUserId().toString());
+        response.setEmailId(userData.getEmailId());
+        response.setMobileNum(userData.getMobileNum());
+        response.setName(userData.getName());
+        return response;
+    }
+
+    // TODO: add update password
+    private UserData updatePassword(UserDataRequest userDataRequest) {
+        UserData userDataFromDb = StringUtils.isEmpty(userDataRequest.getName())
+                ? getUserDataByEmailIdOrMobileNum(userDataRequest.getEmailId(), null) : getUserDataByName(userDataRequest.getName());
+
+        if (checkPasswordsMatch(userDataRequest.getPassword(), userDataFromDb.getPassword())) {
             // Executed only when user entered password and db password match
-            userDataRequest.setPassword(bCryptPasswordEncoder.encode(userDataRequest.getPassword()));
-            userDataRequest.setModified_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
-            return userDataRequest;
+            userDataFromDb.setPassword(bCryptPasswordEncoder.encode(userDataRequest.getPassword()));
+            userDataFromDb.setModified_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+            return userDataFromDb;
         } else {
             // User password does not match
             return null;

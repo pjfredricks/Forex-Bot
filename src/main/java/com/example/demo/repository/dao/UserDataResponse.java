@@ -2,7 +2,7 @@ package com.example.demo.repository.dao;
 
 public class UserDataResponse {
 
-	private int id;
+	private String userId;
 	private String name;
 	private String emailId;
 	private String mobileNum;
@@ -11,21 +11,12 @@ public class UserDataResponse {
 		super();
 	}
 
-	public static UserDataResponse map(UserDataRequest userDataRequest) {
-		UserDataResponse response = new UserDataResponse();
-		response.setId(userDataRequest.getId());
-		response.setEmailId(userDataRequest.getEmailId());
-		response.setMobileNum(userDataRequest.getMobileNum());
-		response.setName(userDataRequest.getName());
-		return response;
+	public String getUserId() {
+		return userId;
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getName() {
