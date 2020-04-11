@@ -9,7 +9,6 @@ import com.example.demo.service.ForexService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,13 +35,13 @@ public class ForexServiceImpl implements ForexService {
     private final ForexRepository repository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private static Map<String, Object> forexValue = (Map<String, Object>) getExchangeRateResponse();
-    private static List<ForexRates> rates;
+    private static Map<String, Double> currencyValues = new HashMap<>();
+    private static List<ForexRates> forexRates = new ArrayList<>();
     private static final Set<String> countryList = Stream.of("USD", "AUD", "GBP", "EUR", "CAD",
             "CNY", "SAR", "SGD", "MYR", "THB",
             "IDR", "ILS", "JPY", "KRW", "CHF",
             "PHP", "FJD", "HKD", "ZAR").collect(Collectors.toSet());
-    private static final Set<String> carouselFalse = Stream.of("ILS", "JPY", "KRW", "CHF",
+    private static final Set<String> noCarouselCountryList = Stream.of("ILS", "JPY", "KRW", "CHF",
             "PHP", "FJD", "HKD", "ZAR").collect(Collectors.toSet());
 
     public ForexServiceImpl(ForexRepository repository, BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -52,59 +51,49 @@ public class ForexServiceImpl implements ForexService {
 
     @PostConstruct
     public void onStartup() {
-        rates = updateExchangeRates();
+        updateForexRates();
     }
 
     @Scheduled(cron = "0 0 2 * * *")
     public void scheduledTask() {
         LOGGER.info("Updating Database with latest Rates @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
-        rates = updateExchangeRates();
+        updateForexRates();
     }
 
     @Override
-    public List<ForexRates> updateExchangeRates() {
-        forexValue.keySet().retainAll(countryList);
-        List<ForexRates> rates = forexValue.entrySet()
+    public void updateForexRates() {
+        // Removes old values from both collections
+        forexRates.clear();
+        currencyValues.clear();
+
+        // Updates latest forex currency values
+        getCurrencyForexValues();
+
+        currencyValues.keySet().retainAll(countryList);
+        currencyValues.replaceAll((countryCode, currencyValue) -> convertRate(currencyValue));
+        currencyValues.replaceAll((countryCode, currencyValue) -> applyReduction(currencyValue));
+
+        forexRates = currencyValues.entrySet()
                 .stream()
-                .map(forexValue -> new ForexRates(true,
-                        forexValue.getKey(),
-                        Currency.getInstance(forexValue.getKey()).getDisplayName(),
-                        convertRate(forexValue.getValue().toString()),
+                .map(forexRate -> new ForexRates(true,
+                        forexRate.getKey(),
+                        Currency.getInstance(forexRate.getKey()).getDisplayName(),
+                        forexRate.getValue(),
                         null))
                 .collect(Collectors.toList());
-        rates.forEach(forexRates -> {
-            if (carouselFalse.contains(forexRates.getCountryCode())) {
-                forexRates.setCarousel(false);
+        forexRates.forEach(forexRate -> {
+            if (noCarouselCountryList.contains(forexRate.getCountryCode())) {
+                forexRate.setCarousel(false);
             }
         });
-
-        return rates;
-    }
-
-    private BigDecimal convertRate(String rate) {
-        double convertedRate = Double.valueOf(rate);
-        return BigDecimal.valueOf(1 / convertedRate).setScale(3, RoundingMode.HALF_EVEN);
-    }
-
-    private static Object getExchangeRateResponse() {
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<LinkedHashMap> response = null;
-        try {
-            response = restTemplate
-                    .getForEntity("https://api.exchangerate-api.com/v4/latest/INR", LinkedHashMap.class);
-        } catch (Exception e) {
-            LOGGER.error("Error fetching data from exchange rate api @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
-        }
-
-        return response.getBody().get("rates");
     }
 
     @Override
     public List<ForexRates> getExchangeRates() {
-        if (rates.isEmpty()) {
-            return new ArrayList<>();
+        if (forexRates.isEmpty()) {
+            updateForexRates();
         }
-        return rates;
+        return forexRates;
     }
 
     @Override
@@ -132,6 +121,34 @@ public class ForexServiceImpl implements ForexService {
         return null;
     }
 
+    private Double applyReduction(Double currencyValue) {
+        int percent = 2;
+
+        if (currencyValue < 5.000) percent = 6;
+        else
+        if (currencyValue < 30.000) percent = 5;
+        else
+        if (currencyValue < 80.000) percent = 3;
+
+        currencyValue =  currencyValue - (currencyValue/100) * percent;
+        return BigDecimal.valueOf(currencyValue).setScale(3, RoundingMode.HALF_EVEN).doubleValue();
+    }
+
+    private Double convertRate(Double currencyValue) {
+        return BigDecimal.valueOf(1 / currencyValue).setScale(3, RoundingMode.HALF_EVEN).doubleValue();
+    }
+
+    private static void getCurrencyForexValues() {
+        try {
+            currencyValues = (Map<String, Double>) new RestTemplate()
+                    .getForEntity("https://api.exchangerate-api.com/v4/latest/INR", LinkedHashMap.class)
+                    .getBody()
+                    .get("rates");
+        } catch (Exception e) {
+            LOGGER.error("Error fetching data from exchange rate api @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
+        }
+    }
+
     private UserData getUserDataByName(String userName) {
         return repository.getUserDataByName(userName);
     }
@@ -144,7 +161,7 @@ public class ForexServiceImpl implements ForexService {
         return bCryptPasswordEncoder.matches(enteredPassword, passwordFromDb);
     }
 
-    public UserData mapRequestToData(UserDataRequest userRequest) {
+    private UserData mapRequestToData(UserDataRequest userRequest) {
         UserData userData = new UserData();
 
         userData.setUserId(UUID.randomUUID());
@@ -156,7 +173,7 @@ public class ForexServiceImpl implements ForexService {
         return userData;
     }
 
-    public UserDataResponse mapDataToResponse(UserData userData) {
+    private UserDataResponse mapDataToResponse(UserData userData) {
         UserDataResponse response = new UserDataResponse();
 
         response.setUserId(userData.getUserId().toString());

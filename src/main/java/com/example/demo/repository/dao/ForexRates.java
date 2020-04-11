@@ -1,19 +1,17 @@
 package com.example.demo.repository.dao;
 
-import java.math.BigDecimal;
-
 public class ForexRates {
 
     private Boolean isCarousel;
     private String countryCode;
     private String countryName;
-    private BigDecimal buyRate;
-    private BigDecimal sellRate;
+    private Double buyRate;
+    private Double sellRate;
 
     public ForexRates() {
     }
 
-    public ForexRates(Boolean isCarousel, String countryCode, String countryName, BigDecimal buyRate, BigDecimal sellRate) {
+    public ForexRates(Boolean isCarousel, String countryCode, String countryName, Double buyRate, Double sellRate) {
         this.isCarousel = isCarousel;
         this.countryCode = countryCode;
         this.countryName = countryName;
@@ -45,19 +43,19 @@ public class ForexRates {
         this.countryName = countryName;
     }
 
-    public BigDecimal getBuyRate() {
+    public Double getBuyRate() {
         return buyRate;
     }
 
-    public void setBuyRate(BigDecimal buyRate) {
+    public void setBuyRate(Double buyRate) {
         this.buyRate = buyRate;
     }
 
-    public BigDecimal getSellRate() {
+    public Double getSellRate() {
         return sellRate;
     }
 
-    public void setSellRate(BigDecimal sellRate) {
+    public void setSellRate(Double sellRate) {
         this.sellRate = sellRate;
     }
 }

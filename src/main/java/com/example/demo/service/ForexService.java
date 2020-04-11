@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ForexService {
 
-	List<ForexRates> updateExchangeRates();
+	void updateForexRates();
 	
 	List<ForexRates> getExchangeRates();
 

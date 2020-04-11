@@ -22,7 +22,7 @@ public class ForexController {
 
     @PutMapping(path = "/update/rates")
     public ResponseEntity<ResponseWrapper> getExchangeRates() {
-        forexService.updateExchangeRates();
+        forexService.updateForexRates();
         return new ResponseEntity<>(new ResponseWrapper(
                 "SUCCESS",
                 "Rates have been updated",
