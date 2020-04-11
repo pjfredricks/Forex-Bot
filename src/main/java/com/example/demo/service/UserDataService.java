@@ -1,16 +1,9 @@
 package com.example.demo.service;
 
-import com.example.demo.repository.dao.ForexRates;
-import com.example.demo.repository.dao.UserDataRequest;
-import com.example.demo.repository.dao.UserDataResponse;
+import com.example.demo.repository.dao.UserData.UserDataRequest;
+import com.example.demo.repository.dao.UserData.UserDataResponse;
 
-import java.util.List;
-
-public interface ForexService {
-
-	void updateForexRates();
-	
-	List<ForexRates> getExchangeRates();
+public interface UserDataService {
 
 	UserDataResponse signUpUser(UserDataRequest userDataRequest) throws Exception;
 

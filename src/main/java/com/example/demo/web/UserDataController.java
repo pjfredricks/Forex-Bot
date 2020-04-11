@@ -1,40 +1,23 @@
 package com.example.demo.web;
 
 import com.example.demo.repository.dao.ResponseWrapper;
-import com.example.demo.repository.dao.UserDataRequest;
-import com.example.demo.repository.dao.UserDataResponse;
-import com.example.demo.service.ForexService;
+import com.example.demo.repository.dao.UserData.UserDataRequest;
+import com.example.demo.repository.dao.UserData.UserDataResponse;
+import com.example.demo.service.UserDataService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
-public class ForexController {
+@RequestMapping("/api/v1")
+public class UserDataController {
 
     private static final String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
 
-    private final ForexService forexService;
+    private UserDataService userDataService;
 
-    public ForexController(ForexService forexService) {
-        this.forexService = forexService;
-    }
-
-    @PutMapping(path = "/update/rates")
-    public ResponseEntity<ResponseWrapper> getExchangeRates() {
-        forexService.updateForexRates();
-        return new ResponseEntity<>(new ResponseWrapper(
-                "SUCCESS",
-                "Rates have been updated",
-                null), HttpStatus.OK);
-    }
-
-    @GetMapping(path = "/rates")
-    public ResponseEntity<ResponseWrapper> getExchangeRatesFromDb() {
-        return new ResponseEntity<>(new ResponseWrapper(
-                "SUCCESS",
-                "Rates have been fetched",
-                forexService.getExchangeRates()), HttpStatus.OK);
+    public UserDataController(UserDataService userDataService) {
+        this.userDataService = userDataService;
     }
 
     @PostMapping(path = "/signUp")
@@ -43,12 +26,12 @@ public class ForexController {
             try {
                 return new ResponseEntity<>(new ResponseWrapper(
                         "SUCCESS",
-                        "User signed Up successfully",
-                        forexService.signUpUser(userDataRequest)), HttpStatus.OK);
+                        "UserData signed Up successfully",
+                        userDataService.signUpUser(userDataRequest)), HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(new ResponseWrapper(
                         "ERROR",
-                        "User details already exist for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
+                        "UserData details already exist for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
                         null), HttpStatus.OK);
             }
         }
@@ -62,7 +45,7 @@ public class ForexController {
     public ResponseEntity<ResponseWrapper> login(@RequestBody UserDataRequest userDataRequest) {
         UserDataResponse userDataResponse = null;
         try {
-            userDataResponse = forexService.login(userDataRequest);
+            userDataResponse = userDataService.login(userDataRequest);
         } catch (Exception e) {
             e.printStackTrace();
         }

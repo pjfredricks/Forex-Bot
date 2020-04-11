@@ -1,4 +1,4 @@
-package com.example.demo.repository.dao;
+package com.example.demo.repository.dao.UserData;
 
 public class UserDataRequest {
 	private String name;
