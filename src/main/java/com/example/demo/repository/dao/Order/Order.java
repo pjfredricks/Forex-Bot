@@ -22,6 +22,7 @@ public class Order {
     private UUID userId;
 
     @NotNull
+    @ApiModelProperty(hidden = true)
     @Column(name = "trackingNumber", unique = true)
     private String trackingNumber;
 
@@ -44,11 +45,19 @@ public class Order {
     private String create_date;
 
     @NotNull
-    @ApiModelProperty(hidden = true)
     @Column(name = "couponCode")
     private String couponCode;
 
     // TODO: Add more fields for amount, country..etc
+
+
+    public String getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    public void setTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
+    }
 
     public int getId() {
         return id;

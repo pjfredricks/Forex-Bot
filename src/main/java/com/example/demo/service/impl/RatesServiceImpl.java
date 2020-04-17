@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.repository.dao.ForexRates;
+import com.example.demo.repository.dao.Order.OrderType;
 import com.example.demo.service.RatesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +80,23 @@ public class RatesServiceImpl implements RatesService {
         return exchangeRates;
     }
 
+    public Double getRateByCountryCodeAndType(String countryCode, OrderType orderType) {
+        ForexRates rates = exchangeRates.stream()
+                .filter(forexRates -> forexRates.getCountryCode()
+                        .equals(countryCode))
+                .findAny()
+                .get();
+
+        switch (orderType) {
+            case SELL:
+                return rates.getSellRate();
+            case BUY:
+                return rates.getBuyRate();
+            default:
+                return 0.00d;
+        }
+    }
+
     private Double applyReduction(Double currencyValue) {
         int percent = 2;
 
@@ -89,11 +107,11 @@ public class RatesServiceImpl implements RatesService {
         if (currencyValue < 80.000) percent = 3;
 
         currencyValue =  currencyValue - (currencyValue/100) * percent;
-        return BigDecimal.valueOf(currencyValue).setScale(3, RoundingMode.HALF_EVEN).doubleValue();
+        return BigDecimal.valueOf(currencyValue).setScale(7, RoundingMode.HALF_EVEN).doubleValue();
     }
 
     private Double convertRate(Double currencyValue) {
-        return BigDecimal.valueOf(1 / currencyValue).setScale(3, RoundingMode.HALF_EVEN).doubleValue();
+        return BigDecimal.valueOf(1 / currencyValue).setScale(7, RoundingMode.HALF_EVEN).doubleValue();
     }
 
     private static void getCurrencyForexValues() {

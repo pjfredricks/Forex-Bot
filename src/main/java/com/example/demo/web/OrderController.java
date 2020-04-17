@@ -1,6 +1,7 @@
 package com.example.demo.web;
 
 import com.example.demo.repository.dao.Order.Order;
+import com.example.demo.repository.dao.Order.CalculateRequest;
 import com.example.demo.repository.dao.ResponseWrapper;
 import com.example.demo.service.OrderService;
 import org.springframework.http.HttpStatus;
@@ -63,18 +64,12 @@ public class OrderController {
     }
 
     // TODO: need to create new entity
-    @PostMapping(path = "/order/calculate")
-    public ResponseEntity<ResponseWrapper> calculateOrder(@RequestBody Object object) {
+    @PostMapping(path = "/order/calculateAmount")
+    public ResponseEntity<ResponseWrapper> calculateOrder(@RequestBody CalculateRequest request) {
         return new ResponseEntity<>(new ResponseWrapper(
                 "SUCCESS",
                 "Order amount calculated",
-                orderService.calculateOrder(object)),
+                orderService.calculateOrder(request)),
                 HttpStatus.OK);
-    }
-
-    // TODO:need to implement logic
-    @PostMapping(path = "/order/prepare")
-    public boolean prepareOrder(@RequestBody Order order) {
-        return orderService.prepareOrder(order);
     }
 }
