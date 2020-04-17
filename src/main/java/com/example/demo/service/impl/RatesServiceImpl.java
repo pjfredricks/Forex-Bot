@@ -107,11 +107,11 @@ public class RatesServiceImpl implements RatesService {
         if (currencyValue < 80.000) percent = 3;
 
         currencyValue =  currencyValue - (currencyValue/100) * percent;
-        return BigDecimal.valueOf(currencyValue).setScale(7, RoundingMode.HALF_EVEN).doubleValue();
+        return BigDecimal.valueOf(currencyValue).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
 
     private Double convertRate(Double currencyValue) {
-        return BigDecimal.valueOf(1 / currencyValue).setScale(7, RoundingMode.HALF_EVEN).doubleValue();
+        return BigDecimal.valueOf(1 / currencyValue).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
 
     private static void getCurrencyForexValues() {

@@ -44,7 +44,7 @@ public class OrderServiceImpl implements OrderService {
         double discountAmount = 0.00d;
         double forexTotal = calculateForexTotal(rate, request.getForexAmount());
         double gstAmount = calculateGstAmount(forexTotal);
-        double salesTotal = forexTotal + gstAmount - discountAmount;
+        int salesTotal = (int) (forexTotal + gstAmount - discountAmount);
 
         CalculateResponse response = new CalculateResponse();
         response.setUserId(request.getUserId());
@@ -61,6 +61,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Double calculateGstAmount(double forexTotal) {
-        return forexTotal + (forexTotal / 100) * 18;
+        return forexTotal / 100 * 18;
     }
 }
