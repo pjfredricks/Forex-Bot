@@ -70,6 +70,7 @@ public class RatesServiceImpl implements RatesService {
                 forexRate.setCarousel(false);
             }
         });
+        exchangeRates.sort((o1, o2) -> o1.getCountryName().compareTo(o2.getCountryName()));
     }
 
     @Override
