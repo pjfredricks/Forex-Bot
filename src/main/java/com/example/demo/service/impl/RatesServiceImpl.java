@@ -32,7 +32,6 @@ public class RatesServiceImpl implements RatesService {
             "PHP", "FJD", "HKD", "ZAR").collect(Collectors.toSet());
 
     private static Map<String, Double> currencyValues = new HashMap<>();
-    private static Map<String, Double> buyRates = new HashMap<>();
     private static List<ForexRates> exchangeRates = new ArrayList<>();
 
     @PostConstruct
@@ -51,7 +50,6 @@ public class RatesServiceImpl implements RatesService {
         // Removes old values from both collections
         exchangeRates.clear();
         currencyValues.clear();
-        buyRates.clear();
 
         // Updates latest forex currency values
         getCurrencyForexValues();
@@ -60,32 +58,12 @@ public class RatesServiceImpl implements RatesService {
         currencyValues.keySet().retainAll(countryList);
         currencyValues.replaceAll((countryCode, currencyValue) -> convertRate(currencyValue));
 
-        // Calculate Buy rates
-        buyRates.putAll(currencyValues);
-        buyRates.replaceAll((countryCode, currencyValue) -> calculateBuyRate(currencyValue));
-
-        // Calculate Sell Rates
-        currencyValues.replaceAll((countryCode, currencyValue) -> calculateSellRate(currencyValue));
-
-        // Set buy and sell Rates
+        // Set buy and sell Rates, and update carousel values
         exchangeRates = currencyValues.entrySet()
                 .stream()
-                .map(forexRate -> new ForexRates(true,
-                        forexRate.getKey(),
-                        Currency.getInstance(forexRate.getKey()).getDisplayName(),
-                        buyRates.get(forexRate.getKey()),
-                        forexRate.getValue()))
+                .map(currencyValueMap -> constructForexRates(currencyValueMap))
+                .sorted(Comparator.comparing(ForexRates::getCountryName))
                 .collect(Collectors.toList());
-
-        // Update carousel values
-        exchangeRates.forEach(forexRate -> {
-            if (noCarouselCountryList.contains(forexRate.getCountryCode())) {
-                forexRate.setCarousel(false);
-            }
-        });
-
-        // Sort by country name
-        exchangeRates.sort(Comparator.comparing(ForexRates::getCountryName));
     }
 
     @Override
@@ -112,6 +90,21 @@ public class RatesServiceImpl implements RatesService {
             default:
                 return 0.00d;
         }
+    }
+
+    private ForexRates constructForexRates(Map.Entry<String, Double> currencyValueMap) {
+        ForexRates forexRate = new ForexRates();
+
+        if (noCarouselCountryList.contains(currencyValueMap.getKey())) {
+            forexRate.setCarousel(false);
+        } else {
+            forexRate.setCarousel(true);
+        }
+        forexRate.setCountryCode(currencyValueMap.getKey());
+        forexRate.setCountryName(Currency.getInstance(currencyValueMap.getKey()).getDisplayName());
+        forexRate.setBuyRate(calculateBuyRate(currencyValueMap.getValue()));
+        forexRate.setSellRate(calculateSellRate(currencyValueMap.getValue()));
+        return forexRate;
     }
 
     private double calculateBuyRate(double currencyValue) {
