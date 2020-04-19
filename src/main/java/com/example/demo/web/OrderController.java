@@ -61,11 +61,21 @@ public class OrderController {
                     e.getCause().getMessage()),
                     HttpStatus.BAD_REQUEST);
         }
+        String trackingNumber = orderService.placeOrder(request);
+
+        if (StringUtils.isNotBlank(trackingNumber)) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    "SUCCESS",
+                    "Order placed successfully",
+                    trackingNumber),
+                    HttpStatus.CREATED);
+        }
+
         return new ResponseEntity<>(new ResponseWrapper(
-                "SUCCESS",
-                "Order placed successfully",
-                orderService.placeOrder(request)),
-                HttpStatus.CREATED);
+                "ERROR",
+                "Order validation failed",
+                "User does not exist"),
+                HttpStatus.BAD_REQUEST);
     }
 
     @PutMapping(path = "/order")
@@ -102,10 +112,10 @@ public class OrderController {
             if (request.getForexAmount() < 0) {
                 throw new IllegalArgumentException("Amount not valid");
             }
-            if (StringUtils.isNotBlank(OrderType.valueOf(request.getOrderType()).toString())) {
+            if (!StringUtils.isNotBlank(OrderType.valueOf(request.getOrderType()).toString())) {
                 throw new IllegalArgumentException("OrderType not valid");
             }
-            if (null != request.getCouponcode()) {
+            if (null == request.getCouponcode()) {
                 throw new IllegalArgumentException("null coupon code");
             }
 

@@ -50,6 +50,11 @@ public class UserDataServiceImpl implements UserDataService {
         return null;
     }
 
+    @Override
+    public UserData getUserDetailsById(UUID userId) {
+        return userDataRepository.getUserDataByUserId(userId);
+    }
+
     private UserData getUserDataByName(String userName) {
         return userDataRepository.getUserDataByName(userName);
     }

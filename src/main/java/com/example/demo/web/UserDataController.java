@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1")
 public class UserDataController {
@@ -59,5 +61,24 @@ public class UserDataController {
                 "ERROR",
                 "Incorrect Password",
                 null), HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/userId/{userId}")
+    public ResponseEntity<ResponseWrapper> getUserDetailsByUserId(@RequestParam String id) {
+        UUID userId;
+        try {
+             userId = UUID.fromString(id);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    "ERROR",
+                    "Invalid UserId " + id,
+                    null),
+                    HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new ResponseWrapper(
+                "SUCCESS",
+                "User Details fetched for userId: " + id,
+                userDataService.getUserDetailsById(userId)),
+                HttpStatus.OK);
     }
 }
