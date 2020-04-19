@@ -11,5 +11,5 @@ public interface RatesService {
 	
 	List<ForexRates> getExchangeRates();
 
-	Double getRateByCountryCodeAndType(String countryCode, OrderType orderType);
+	double getRateByCountryCodeAndType(String countryCode, OrderType orderType);
 }

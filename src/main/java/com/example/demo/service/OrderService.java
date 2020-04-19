@@ -8,7 +8,7 @@ public interface OrderService {
 
     Order getOrderByUserIdOrTrackingNumberOrCouponCode(String userId, String trackingNumber, String couponCode);
 
-    String placeOrder(Order order);
+    String placeOrder(CalculateRequest request);
 
     Order updateOrder(Order order);
 

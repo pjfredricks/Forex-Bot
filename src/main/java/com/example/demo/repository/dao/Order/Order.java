@@ -31,25 +31,42 @@ public class Order {
     private OrderType orderType;
 
     @NotNull
-    @ApiModelProperty(hidden = true)
-    @Column(name = "status")
-    private OrderStatus status;
+    @Column(name = "countryCode")
+    private String countryCode;
 
     @NotNull
-    @Column(name = "amount")
-    private Double amount;
+    @Column(name = "forexAmount")
+    private double forexAmount;
+
+    @NotNull
+    @Column(name = "forexTotal")
+    private double forexTotal;
+
+    @NotNull
+    @Column(name = "gstAmount")
+    private double gst;
+
+    @NotNull
+    @Column(name = "discountAmount")
+    private double discountAmount;
+
+    @NotNull
+    @Column(name = "salesTotal")
+    private int salesTotal;
+
+    @NotNull
+    @Column(name = "couponCode")
+    private String couponCode = "";
 
     @NotNull
     @ApiModelProperty(hidden = true)
     @Column(name = "createDate")
-    private String create_date;
+    private String createDate;
 
     @NotNull
-    @Column(name = "couponCode")
-    private String couponCode;
-
-    // TODO: Add more fields for amount, country..etc
-
+    @ApiModelProperty(hidden = true)
+    @Column(name = "status")
+    private OrderStatus status = OrderStatus.IN_PROCESS;
 
     public String getTrackingNumber() {
         return trackingNumber;
@@ -61,10 +78,6 @@ public class Order {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public UUID getUserId() {
@@ -91,20 +104,28 @@ public class Order {
         this.status = status;
     }
 
-    public Double getAmount() {
-        return amount;
+    public String getCountryCode() {
+        return countryCode;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
     }
 
-    public String getCreate_date() {
-        return create_date;
+    public double getForexAmount() {
+        return forexAmount;
     }
 
-    public void setCreate_date(String create_date) {
-        this.create_date = create_date;
+    public void setForexAmount(double amount) {
+        this.forexAmount = amount;
+    }
+
+    public String getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(String create_date) {
+        this.createDate = create_date;
     }
 
     public String getCouponCode() {
@@ -115,16 +136,53 @@ public class Order {
         this.couponCode = couponCode;
     }
 
+    public double getForexTotal() {
+        return forexTotal;
+    }
+
+    public void setForexTotal(double forexTotal) {
+        this.forexTotal = forexTotal;
+    }
+
+    public double getGst() {
+        return gst;
+    }
+
+    public void setGst(double gst) {
+        this.gst = gst;
+    }
+
+    public double getDiscountAmount() {
+        return discountAmount;
+    }
+
+    public void setDiscountAmount(double discountAmount) {
+        this.discountAmount = discountAmount;
+    }
+
+    public int getSalesTotal() {
+        return salesTotal;
+    }
+
+    public void setSalesTotal(int salesTotal) {
+        this.salesTotal = salesTotal;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
-                "id=" + id +
-                ", userId=" + userId +
+                "userId=" + userId +
+                ", trackingNumber='" + trackingNumber + '\'' +
                 ", orderType=" + orderType +
-                ", status=" + status +
-                ", amount=" + amount +
-                ", create_date='" + create_date + '\'' +
+                ", countryCode='" + countryCode + '\'' +
+                ", forexAmount=" + forexAmount +
+                ", forexTotal=" + forexTotal +
+                ", gst=" + gst +
+                ", discountAmount=" + discountAmount +
+                ", salesTotal=" + salesTotal +
                 ", couponCode='" + couponCode + '\'' +
+                ", createDate='" + createDate + '\'' +
+                ", status=" + status +
                 '}';
     }
 }

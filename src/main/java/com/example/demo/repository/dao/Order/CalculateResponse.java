@@ -6,7 +6,7 @@ public class CalculateResponse {
     private double forexTotal;
     private double gst;
     private double discountAmount;
-    private double salesTotal;
+    private int salesTotal;
 
     public String getUserId() {
         return userId;
@@ -40,11 +40,11 @@ public class CalculateResponse {
         this.discountAmount = discountAmount;
     }
 
-    public double getSalesTotal() {
+    public int getSalesTotal() {
         return salesTotal;
     }
 
-    public void setSalesTotal(double  salesTotal) {
+    public void setSalesTotal(int  salesTotal) {
         this.salesTotal = salesTotal;
     }
 }

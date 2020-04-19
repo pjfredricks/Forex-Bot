@@ -1,13 +1,16 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.repository.dao.Order.CalculateResponse;
-import com.example.demo.repository.dao.Order.Order;
+import com.example.demo.repository.dao.Order.*;
 import com.example.demo.repository.OrderRepository;
-import com.example.demo.repository.dao.Order.CalculateRequest;
 import com.example.demo.service.OrderService;
 import com.example.demo.service.RatesService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.UUID;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -28,8 +31,26 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public String placeOrder(Order order) {
+    @Transactional
+    public String placeOrder(CalculateRequest request) {
+        CalculateResponse response = calculateOrder(request);
+
+        Order order = new Order();
+        order.setUserId(UUID.fromString(request.getUserId()));
+        order.setCountryCode(request.getCountryCode());
         order.setTrackingNumber(RandomStringUtils.randomAlphanumeric(12));
+        order.setCouponCode(request.getCouponcode());
+        order.setCreateDate(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+        order.setOrderType(OrderType.valueOf(request.getOrderType()));
+        order.setForexAmount(request.getForexAmount());
+        order.setForexTotal(response.getForexTotal());
+        order.setGst(response.getGst());
+        order.setDiscountAmount(response.getDiscountAmount());
+        order.setSalesTotal(response.getSalesTotal());
+
+        // TODO : update status based on email and sms
+        order.setStatus(OrderStatus.COMPLETED);
+
         return orderRepository.save(order).getTrackingNumber();
     }
 
@@ -40,7 +61,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public CalculateResponse calculateOrder(CalculateRequest request) {
-        double rate = ratesService.getRateByCountryCodeAndType(request.getCountryCode(), request.getType());
+        double rate = ratesService.getRateByCountryCodeAndType(request.getCountryCode(), OrderType.valueOf(request.getOrderType()));
         double discountAmount = 0.00d;
         double forexTotal = calculateForexTotal(rate, request.getForexAmount());
         double gstAmount = calculateGstAmount(forexTotal);
@@ -56,11 +77,11 @@ public class OrderServiceImpl implements OrderService {
         return response;
     }
 
-    private Double calculateForexTotal(Double rate, int forexAmount) {
+    private double calculateForexTotal(double rate, int forexAmount) {
         return rate * forexAmount;
     }
 
-    private Double calculateGstAmount(double forexTotal) {
+    private double calculateGstAmount(double forexTotal) {
         return forexTotal / 100 * 18;
     }
 }

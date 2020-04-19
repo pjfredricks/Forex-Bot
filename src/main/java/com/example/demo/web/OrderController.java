@@ -2,11 +2,16 @@ package com.example.demo.web;
 
 import com.example.demo.repository.dao.Order.Order;
 import com.example.demo.repository.dao.Order.CalculateRequest;
+import com.example.demo.repository.dao.Order.OrderType;
 import com.example.demo.repository.dao.ResponseWrapper;
 import com.example.demo.service.OrderService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Currency;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1")
@@ -46,11 +51,20 @@ public class OrderController {
     }
 
     @PostMapping(path = "/order")
-    public ResponseEntity<ResponseWrapper> placeOrder(@RequestBody Order order) {
+    public ResponseEntity<ResponseWrapper> placeOrder(@RequestBody CalculateRequest request) {
+        try {
+            validateRequest(request);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    "ERROR",
+                    "Order validation failed",
+                    e.getCause().getMessage()),
+                    HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(new ResponseWrapper(
                 "SUCCESS",
                 "Order placed successfully",
-                orderService.placeOrder(order)),
+                orderService.placeOrder(request)),
                 HttpStatus.CREATED);
     }
 
@@ -63,13 +77,40 @@ public class OrderController {
                 HttpStatus.CREATED);
     }
 
-    // TODO: need to create new entity
     @PostMapping(path = "/order/calculateAmount")
     public ResponseEntity<ResponseWrapper> calculateOrder(@RequestBody CalculateRequest request) {
+        try {
+            validateRequest(request);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    "ERROR",
+                    "Order validation failed",
+                    e.getCause().getMessage()),
+                    HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(new ResponseWrapper(
                 "SUCCESS",
                 "Order amount calculated",
                 orderService.calculateOrder(request)),
                 HttpStatus.OK);
+    }
+
+    public static void validateRequest(CalculateRequest request) {
+        try {
+            UUID.fromString(request.getUserId());
+            Currency.getInstance(request.getCountryCode());
+            if (request.getForexAmount() < 0) {
+                throw new IllegalArgumentException("Amount not valid");
+            }
+            if (StringUtils.isNotBlank(OrderType.valueOf(request.getOrderType()).toString())) {
+                throw new IllegalArgumentException("OrderType not valid");
+            }
+            if (null != request.getCouponcode()) {
+                throw new IllegalArgumentException("null coupon code");
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

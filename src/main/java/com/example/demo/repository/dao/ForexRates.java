@@ -2,16 +2,16 @@ package com.example.demo.repository.dao;
 
 public class ForexRates {
 
-    private Boolean isCarousel;
+    private boolean isCarousel;
     private String countryCode;
     private String countryName;
-    private Double buyRate;
-    private Double sellRate;
+    private double buyRate;
+    private double sellRate;
 
     public ForexRates() {
     }
 
-    public ForexRates(Boolean isCarousel, String countryCode, String countryName, Double buyRate, Double sellRate) {
+    public ForexRates(boolean isCarousel, String countryCode, String countryName, double buyRate, double sellRate) {
         this.isCarousel = isCarousel;
         this.countryCode = countryCode;
         this.countryName = countryName;
@@ -19,11 +19,11 @@ public class ForexRates {
         this.sellRate = sellRate;
     }
 
-    public Boolean isCarousel() {
+    public boolean isCarousel() {
         return isCarousel;
     }
 
-    public void setCarousel(Boolean carousel) {
+    public void setCarousel(boolean carousel) {
         isCarousel = carousel;
     }
 
@@ -43,19 +43,19 @@ public class ForexRates {
         this.countryName = countryName;
     }
 
-    public Double getBuyRate() {
+    public double getBuyRate() {
         return buyRate;
     }
 
-    public void setBuyRate(Double buyRate) {
+    public void setBuyRate(double buyRate) {
         this.buyRate = buyRate;
     }
 
-    public Double getSellRate() {
+    public double getSellRate() {
         return sellRate;
     }
 
-    public void setSellRate(Double sellRate) {
+    public void setSellRate(double sellRate) {
         this.sellRate = sellRate;
     }
 }

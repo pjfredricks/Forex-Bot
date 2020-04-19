@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ public class RatesServiceImpl implements RatesService {
             "PHP", "FJD", "HKD", "ZAR").collect(Collectors.toSet());
 
     private static Map<String, Double> currencyValues = new HashMap<>();
+    private static Map<String, Double> buyRates = new HashMap<>();
     private static List<ForexRates> exchangeRates = new ArrayList<>();
 
     @PostConstruct
@@ -40,7 +42,7 @@ public class RatesServiceImpl implements RatesService {
 
     @Scheduled(cron = "0 0 2 * * *")
     public void scheduledTask() {
-        LOGGER.info("Updating Database with latest Rates @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
+        LOGGER.info("Updating Database with latest Rates @ Time - {}", dateTimeFormatter.format(LocalDateTime.now(ZoneId.of("Asia/Kolkata"))));
         updateExchangeRates();
     }
 
@@ -49,28 +51,41 @@ public class RatesServiceImpl implements RatesService {
         // Removes old values from both collections
         exchangeRates.clear();
         currencyValues.clear();
+        buyRates.clear();
 
         // Updates latest forex currency values
         getCurrencyForexValues();
 
+        // Remove unwanted countries and convert rates
         currencyValues.keySet().retainAll(countryList);
         currencyValues.replaceAll((countryCode, currencyValue) -> convertRate(currencyValue));
-        currencyValues.replaceAll((countryCode, currencyValue) -> applyReduction(currencyValue));
 
+        // Calculate Buy rates
+        buyRates.putAll(currencyValues);
+        buyRates.replaceAll((countryCode, currencyValue) -> calculateBuyRate(currencyValue));
+
+        // Calculate Sell Rates
+        currencyValues.replaceAll((countryCode, currencyValue) -> calculateSellRate(currencyValue));
+
+        // Set buy and sell Rates
         exchangeRates = currencyValues.entrySet()
                 .stream()
                 .map(forexRate -> new ForexRates(true,
                         forexRate.getKey(),
                         Currency.getInstance(forexRate.getKey()).getDisplayName(),
-                        forexRate.getValue(),
-                        null))
+                        buyRates.get(forexRate.getKey()),
+                        forexRate.getValue()))
                 .collect(Collectors.toList());
+
+        // Update carousel values
         exchangeRates.forEach(forexRate -> {
             if (noCarouselCountryList.contains(forexRate.getCountryCode())) {
                 forexRate.setCarousel(false);
             }
         });
-        exchangeRates.sort((o1, o2) -> o1.getCountryName().compareTo(o2.getCountryName()));
+
+        // Sort by country name
+        exchangeRates.sort(Comparator.comparing(ForexRates::getCountryName));
     }
 
     @Override
@@ -81,7 +96,8 @@ public class RatesServiceImpl implements RatesService {
         return exchangeRates;
     }
 
-    public Double getRateByCountryCodeAndType(String countryCode, OrderType orderType) {
+    @Override
+    public double getRateByCountryCodeAndType(String countryCode, OrderType orderType) {
         ForexRates rates = exchangeRates.stream()
                 .filter(forexRates -> forexRates.getCountryCode()
                         .equals(countryCode))
@@ -98,7 +114,7 @@ public class RatesServiceImpl implements RatesService {
         }
     }
 
-    private Double applyReduction(Double currencyValue) {
+    private double calculateBuyRate(double currencyValue) {
         int percent = 2;
 
         if (currencyValue < 5.000) percent = 6;
@@ -111,7 +127,20 @@ public class RatesServiceImpl implements RatesService {
         return BigDecimal.valueOf(currencyValue).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
 
-    private Double convertRate(Double currencyValue) {
+    private double calculateSellRate(double currencyValue) {
+        int percent = 1;
+
+        if (currencyValue < 5.000) percent = 4;
+        else
+        if (currencyValue < 30.000) percent = 3;
+        else
+        if (currencyValue < 80.000) percent = 2;
+
+        currencyValue =  currencyValue - (currencyValue/100) * percent;
+        return BigDecimal.valueOf(currencyValue).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+    }
+
+    private double convertRate(double currencyValue) {
         return BigDecimal.valueOf(1 / currencyValue).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
 
@@ -122,7 +151,7 @@ public class RatesServiceImpl implements RatesService {
                     .getBody()
                     .get("rates");
         } catch (Exception e) {
-            LOGGER.error("Error fetching data from exchange rate api @ Time - {}", dateTimeFormatter.format(LocalDateTime.now()));
+            LOGGER.error("Error fetching data from exchange rate api @ Time - {}", dateTimeFormatter.format(LocalDateTime.now(ZoneId.of("Asia/Kolkata"))));
         }
     }
 }
