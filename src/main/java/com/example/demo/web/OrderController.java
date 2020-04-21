@@ -115,7 +115,7 @@ public class OrderController {
             if (!StringUtils.isNotBlank(OrderType.valueOf(request.getOrderType()).toString())) {
                 throw new IllegalArgumentException("OrderType not valid");
             }
-            if (null == request.getCouponcode()) {
+            if (null == request.getCouponCode()) {
                 throw new IllegalArgumentException("null coupon code");
             }
 

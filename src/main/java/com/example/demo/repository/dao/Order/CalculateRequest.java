@@ -6,7 +6,7 @@ public class CalculateRequest {
     private String countryCode;
     private int orderType;
     private int forexAmount;
-    private String couponcode;
+    private String couponCode;
 
     public String getUserId() {
         return userId;
@@ -24,7 +24,7 @@ public class CalculateRequest {
         return forexAmount;
     }
 
-    public String getCouponcode() {
-        return couponcode;
+    public String getCouponCode() {
+        return couponCode;
     }
 }

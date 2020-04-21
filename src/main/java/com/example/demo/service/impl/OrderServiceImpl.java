@@ -10,6 +10,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
@@ -46,7 +48,7 @@ public class OrderServiceImpl implements OrderService {
         order.setUserId(UUID.fromString(request.getUserId()));
         order.setCountryCode(request.getCountryCode());
         order.setTrackingNumber(RandomStringUtils.randomAlphanumeric(12));
-        order.setCouponCode(request.getCouponcode());
+        order.setCouponCode(request.getCouponCode());
         order.setCreateDate(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
         order.setOrderType(OrderType.valueOf(request.getOrderType()));
         order.setForexAmount(request.getForexAmount());
@@ -89,6 +91,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private double calculateGstAmount(double forexTotal) {
-        return forexTotal / 100 * 18;
+        return BigDecimal.valueOf((forexTotal / 100 * 18)).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
 }
