@@ -12,19 +12,40 @@ public class CalculateRequest {
         return userId;
     }
 
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public String getCountryCode() {
         return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
     }
 
     public int getOrderType() {
         return orderType;
     }
 
+    public void setOrderType(int orderType) {
+        this.orderType = orderType;
+    }
+
     public int getForexAmount() {
         return forexAmount;
     }
 
+
+    public void setForexAmount(int forexAmount) {
+        this.forexAmount = forexAmount;
+    }
+
     public String getCouponCode() {
         return couponCode;
+    }
+
+    public void setCouponCode(String couponCode) {
+        this.couponCode = couponCode;
     }
 }

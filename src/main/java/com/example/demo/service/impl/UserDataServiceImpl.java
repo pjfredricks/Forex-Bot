@@ -29,20 +29,14 @@ public class UserDataServiceImpl implements UserDataService {
     @Transactional
     public UserDataResponse signUpUser(UserDataRequest userDataRequest) {
         UserData userData = mapRequestToData(userDataRequest);
-        userData.setId(userDataRepository.save(userData).getId());
+        userDataRepository.save(userData);
 
         return mapDataToResponse(userData);
     }
 
     @Override
     public UserDataResponse login(UserDataRequest userDataRequest) throws Exception {
-        UserData userData = null;
-
-        if (StringUtils.isEmpty(userDataRequest.getName())) {
-            userData = getUserDataByEmailIdOrMobileNum(userDataRequest.getEmailId(), userDataRequest.getMobileNum());
-        } else {
-            userData = getUserDataByName(userDataRequest.getName());
-        }
+        UserData userData = getUserDataByEmailIdOrMobileNum(userDataRequest.getEmailId(), userDataRequest.getMobileNum());
 
         if (checkPasswordsMatch(userDataRequest.getPassword(), userData.getPassword())) {
             return mapDataToResponse(userData);
@@ -53,10 +47,6 @@ public class UserDataServiceImpl implements UserDataService {
     @Override
     public UserData getUserDetailsById(UUID userId) {
         return userDataRepository.getUserDataByUserId(userId);
-    }
-
-    private UserData getUserDataByName(String userName) {
-        return userDataRepository.getUserDataByName(userName);
     }
 
     private UserData getUserDataByEmailIdOrMobileNum(String emailId, String mobileNum) {
@@ -91,8 +81,7 @@ public class UserDataServiceImpl implements UserDataService {
 
     // TODO: add update password
     private UserData updatePassword(UserDataRequest userDataRequest) {
-        UserData userDataFromDb = StringUtils.isEmpty(userDataRequest.getName())
-                ? getUserDataByEmailIdOrMobileNum(userDataRequest.getEmailId(), null) : getUserDataByName(userDataRequest.getName());
+        UserData userDataFromDb = getUserDataByEmailIdOrMobileNum(userDataRequest.getEmailId(), userDataRequest.getMobileNum());
 
         if (checkPasswordsMatch(userDataRequest.getPassword(), userDataFromDb.getPassword())) {
             // Executed only when user entered password and db password match
