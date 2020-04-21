@@ -56,12 +56,12 @@ public class RatesServiceImpl implements RatesService {
 
         // Remove unwanted countries and convert rates
         currencyValues.keySet().retainAll(countryList);
-        currencyValues.replaceAll((countryCode, currencyValue) -> convertRate(currencyValue));
+        currencyValues.replaceAll((countryCode, currencyValue) -> convertRate(1 / currencyValue, 6));
 
         // Set buy and sell Rates, and update carousel values
         exchangeRates = currencyValues.entrySet()
                 .stream()
-                .map(currencyValueMap -> constructForexRates(currencyValueMap))
+                .map(this::constructForexRates)
                 .sorted(Comparator.comparing(ForexRates::getCountryName))
                 .collect(Collectors.toList());
     }
@@ -110,6 +110,9 @@ public class RatesServiceImpl implements RatesService {
     private double calculateBuyRate(double currencyValue) {
         int percent = 2;
 
+        if (currencyValue < 0.01) {
+            return convertRate(currencyValue, 4);
+        }
         if (currencyValue < 5.000) percent = 6;
         else
         if (currencyValue < 30.000) percent = 5;
@@ -117,11 +120,15 @@ public class RatesServiceImpl implements RatesService {
         if (currencyValue < 80.000) percent = 3;
 
         currencyValue =  currencyValue - (currencyValue/100) * percent;
-        return BigDecimal.valueOf(currencyValue).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+        return convertRate(currencyValue, 2);
     }
 
     private double calculateSellRate(double currencyValue) {
         int percent = 1;
+
+        if (currencyValue < 0.01) {
+            return convertRate(currencyValue, 4);
+        }
 
         if (currencyValue < 5.000) percent = 4;
         else
@@ -130,11 +137,11 @@ public class RatesServiceImpl implements RatesService {
         if (currencyValue < 80.000) percent = 2;
 
         currencyValue =  currencyValue - (currencyValue/100) * percent;
-        return BigDecimal.valueOf(currencyValue).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+        return convertRate(currencyValue, 2);
     }
 
-    private double convertRate(double currencyValue) {
-        return BigDecimal.valueOf(1 / currencyValue).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+    private double convertRate(double currencyValue, int scalingValue) {
+        return BigDecimal.valueOf(currencyValue).setScale(scalingValue, RoundingMode.HALF_EVEN).doubleValue();
     }
 
     private static void getCurrencyForexValues() {

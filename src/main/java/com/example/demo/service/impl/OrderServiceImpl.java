@@ -87,10 +87,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private double calculateForexTotal(double rate, int forexAmount) {
-        return rate * forexAmount;
+        return BigDecimal.valueOf(rate * forexAmount).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
 
     private double calculateGstAmount(double forexTotal) {
-        return BigDecimal.valueOf((forexTotal / 100 * 18)).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
+        return BigDecimal.valueOf((forexTotal * 0.18)).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
 }
