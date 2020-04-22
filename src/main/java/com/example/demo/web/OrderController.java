@@ -1,8 +1,8 @@
 package com.example.demo.web;
 
-import com.example.demo.repository.dao.Order.Order;
-import com.example.demo.repository.dao.Order.CalculateRequest;
-import com.example.demo.repository.dao.Order.OrderType;
+import com.example.demo.repository.dao.order.Order;
+import com.example.demo.repository.dao.order.CalculateRequest;
+import com.example.demo.repository.dao.order.OrderType;
 import com.example.demo.repository.dao.ResponseWrapper;
 import com.example.demo.service.OrderService;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +27,7 @@ public class OrderController {
     public ResponseEntity<ResponseWrapper> getOrderByUserId(@RequestParam String userId) {
         return new ResponseEntity<>(new ResponseWrapper(
                 "SUCCESS",
-                "Order Details fetched for userId: " + userId,
+                "order Details fetched for userId: " + userId,
                 orderService.getOrderByUserIdOrTrackingNumberOrCouponCode(userId, null, null)),
                 HttpStatus.OK);
     }
@@ -36,7 +36,7 @@ public class OrderController {
     public ResponseEntity<ResponseWrapper> getOrderByTrackingNumber(@RequestParam String trackingNumber) {
         return new ResponseEntity<>(new ResponseWrapper(
                 "SUCCESS",
-                "Order Details fetched for trackingNumber: " + trackingNumber,
+                "order Details fetched for trackingNumber: " + trackingNumber,
                 orderService.getOrderByUserIdOrTrackingNumberOrCouponCode(null, trackingNumber, null)),
                 HttpStatus.OK);
     }
@@ -45,7 +45,7 @@ public class OrderController {
     public ResponseEntity<ResponseWrapper> getOrderByCouponCode(@RequestParam String couponCode) {
         return new ResponseEntity<>(new ResponseWrapper(
                 "SUCCESS",
-                "Order Details fetched for couponCode: " + couponCode,
+                "order Details fetched for couponCode: " + couponCode,
                 orderService.getOrderByUserIdOrTrackingNumberOrCouponCode(null, null, couponCode)),
                 HttpStatus.OK);
     }
@@ -57,7 +57,7 @@ public class OrderController {
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     "ERROR",
-                    "Order validation failed",
+                    "order validation failed",
                     e.getCause().getMessage()),
                     HttpStatus.BAD_REQUEST);
         }
@@ -66,14 +66,14 @@ public class OrderController {
         if (StringUtils.isNotBlank(trackingNumber)) {
             return new ResponseEntity<>(new ResponseWrapper(
                     "SUCCESS",
-                    "Order placed successfully",
+                    "order placed successfully",
                     trackingNumber),
                     HttpStatus.CREATED);
         }
 
         return new ResponseEntity<>(new ResponseWrapper(
                 "ERROR",
-                "Order validation failed",
+                "order validation failed",
                 "User does not exist"),
                 HttpStatus.BAD_REQUEST);
     }
@@ -82,7 +82,7 @@ public class OrderController {
     public ResponseEntity<ResponseWrapper> updateOrder(@RequestBody Order order) {
         return new ResponseEntity<>(new ResponseWrapper(
                 "SUCCESS",
-                "Order updated successfully",
+                "order updated successfully",
                 orderService.updateOrder(order)),
                 HttpStatus.CREATED);
     }
@@ -94,13 +94,13 @@ public class OrderController {
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     "ERROR",
-                    "Order validation failed",
+                    "order validation failed",
                     e.getCause().getMessage()),
                     HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(new ResponseWrapper(
                 "SUCCESS",
-                "Order amount calculated",
+                "order amount calculated",
                 orderService.calculateOrder(request)),
                 HttpStatus.OK);
     }

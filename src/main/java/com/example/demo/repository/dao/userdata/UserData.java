@@ -1,4 +1,4 @@
-package com.example.demo.repository.dao.UserData;
+package com.example.demo.repository.dao.userdata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;

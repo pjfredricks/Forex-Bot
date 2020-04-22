@@ -1,4 +1,4 @@
-package com.example.demo.repository.dao.Order;
+package com.example.demo.repository.dao.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
@@ -170,7 +170,7 @@ public class Order {
 
     @Override
     public String toString() {
-        return "Order{" +
+        return "order{" +
                 "userId=" + userId +
                 ", trackingNumber='" + trackingNumber + '\'' +
                 ", orderType=" + orderType +

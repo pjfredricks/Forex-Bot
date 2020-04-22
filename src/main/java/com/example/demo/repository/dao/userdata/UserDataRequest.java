@@ -1,22 +1,13 @@
-package com.example.demo.repository.dao.UserData;
+package com.example.demo.repository.dao.userdata;
 
-public class UserDataResponse {
-
-	private String userId;
+public class UserDataRequest {
 	private String name;
 	private String emailId;
+	private String password;
 	private String mobileNum;
 
-	public UserDataResponse() {
+	public UserDataRequest() {
 		super();
-	}
-
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 
 	public String getName() {
@@ -41,5 +32,13 @@ public class UserDataResponse {
 
 	public void setMobileNum(String mobileNum) {
 		this.mobileNum = mobileNum;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 }

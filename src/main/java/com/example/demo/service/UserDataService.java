@@ -1,8 +1,8 @@
 package com.example.demo.service;
 
-import com.example.demo.repository.dao.UserData.UserData;
-import com.example.demo.repository.dao.UserData.UserDataRequest;
-import com.example.demo.repository.dao.UserData.UserDataResponse;
+import com.example.demo.repository.dao.userdata.UserData;
+import com.example.demo.repository.dao.userdata.UserDataRequest;
+import com.example.demo.repository.dao.userdata.UserDataResponse;
 
 import java.util.UUID;
 

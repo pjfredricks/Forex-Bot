@@ -1,8 +1,8 @@
 package com.example.demo.web;
 
 import com.example.demo.repository.dao.ResponseWrapper;
-import com.example.demo.repository.dao.UserData.UserDataRequest;
-import com.example.demo.repository.dao.UserData.UserDataResponse;
+import com.example.demo.repository.dao.userdata.UserDataRequest;
+import com.example.demo.repository.dao.userdata.UserDataResponse;
 import com.example.demo.service.UserDataService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +28,12 @@ public class UserDataController {
             try {
                 return new ResponseEntity<>(new ResponseWrapper(
                         "SUCCESS",
-                        "UserData signed Up successfully",
+                        "userdata signed Up successfully",
                         userDataService.signUpUser(userDataRequest)), HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(new ResponseWrapper(
                         "ERROR",
-                        "UserData details already exist for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
+                        "userdata details already exist for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
                         null), HttpStatus.OK);
             }
         }

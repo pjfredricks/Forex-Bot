@@ -1,11 +1,10 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.repository.UserDataRepository;
-import com.example.demo.repository.dao.UserData.UserData;
-import com.example.demo.repository.dao.UserData.UserDataRequest;
-import com.example.demo.repository.dao.UserData.UserDataResponse;
+import com.example.demo.repository.dao.userdata.UserData;
+import com.example.demo.repository.dao.userdata.UserDataRequest;
+import com.example.demo.repository.dao.userdata.UserDataResponse;
 import com.example.demo.service.UserDataService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -89,7 +88,7 @@ public class UserDataServiceImpl implements UserDataService {
             userDataFromDb.setModified_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
             return userDataFromDb;
         } else {
-            // UserData password does not match
+            // userdata password does not match
             return null;
         }
     }

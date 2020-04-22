@@ -1,4 +1,4 @@
-package com.example.demo.repository.dao.Order;
+package com.example.demo.repository.dao.order;
 
 import java.util.HashMap;
 import java.util.Map;

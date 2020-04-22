@@ -1,7 +1,8 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.repository.dao.ForexRates;
-import com.example.demo.repository.dao.Order.OrderType;
+import com.example.demo.repository.dao.rates.ForexRates;
+import com.example.demo.repository.dao.order.OrderType;
+import com.example.demo.repository.dao.rates.RatesRequest;
 import com.example.demo.service.RatesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,17 @@ public class RatesServiceImpl implements RatesService {
                 .map(this::constructForexRates)
                 .sorted(Comparator.comparing(ForexRates::getCountryName))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateExchangeRates(List<RatesRequest> ratesRequest) {
+        ratesRequest.forEach(updatedRates -> exchangeRates
+                .forEach(forexRates -> {
+            if (forexRates.getCountryCode().equals(updatedRates.getCountryCode())) {
+                forexRates.setBuyRate(updatedRates.getBuyRate());
+                forexRates.setSellRate(updatedRates.getSellRate());
+            }
+        }));
     }
 
     @Override

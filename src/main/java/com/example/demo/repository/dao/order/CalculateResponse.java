@@ -1,4 +1,4 @@
-package com.example.demo.repository.dao.Order;
+package com.example.demo.repository.dao.order;
 
 public class CalculateResponse {
 

@@ -1,4 +1,4 @@
-package com.example.demo.repository.dao;
+package com.example.demo.repository.dao.rates;
 
 public class ForexRates {
 

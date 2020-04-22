@@ -1,6 +1,6 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.repository.dao.Order.*;
+import com.example.demo.repository.dao.order.*;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.service.OrderService;
 import com.example.demo.service.RatesService;

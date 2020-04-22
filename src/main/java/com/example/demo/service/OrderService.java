@@ -1,8 +1,8 @@
 package com.example.demo.service;
 
-import com.example.demo.repository.dao.Order.CalculateResponse;
-import com.example.demo.repository.dao.Order.Order;
-import com.example.demo.repository.dao.Order.CalculateRequest;
+import com.example.demo.repository.dao.order.CalculateResponse;
+import com.example.demo.repository.dao.order.Order;
+import com.example.demo.repository.dao.order.CalculateRequest;
 
 public interface OrderService {
 

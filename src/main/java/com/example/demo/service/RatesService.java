@@ -1,13 +1,16 @@
 package com.example.demo.service;
 
-import com.example.demo.repository.dao.ForexRates;
-import com.example.demo.repository.dao.Order.OrderType;
+import com.example.demo.repository.dao.rates.ForexRates;
+import com.example.demo.repository.dao.order.OrderType;
+import com.example.demo.repository.dao.rates.RatesRequest;
 
 import java.util.List;
 
 public interface RatesService {
 
 	void updateExchangeRates();
+
+	void updateExchangeRates(List<RatesRequest> ratesRequest);
 	
 	List<ForexRates> getExchangeRates();
 
