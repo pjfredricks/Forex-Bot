@@ -4,17 +4,17 @@ import com.example.demo.repository.dao.ResponseWrapper;
 import com.example.demo.repository.dao.userdata.UserDataRequest;
 import com.example.demo.repository.dao.userdata.UserDataResponse;
 import com.example.demo.service.UserDataService;
+import com.example.demo.web.utils.EmailUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.naming.NamingException;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1")
 public class UserDataController {
-
-    private static final String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
 
     private UserDataService userDataService;
 
@@ -23,8 +23,8 @@ public class UserDataController {
     }
 
     @PostMapping(path = "/signUp")
-    public ResponseEntity<ResponseWrapper> signUpUser(@RequestBody UserDataRequest userDataRequest) {
-        if (userDataRequest.getEmailId().matches(EMAIL_REGEX)) {
+    public ResponseEntity<ResponseWrapper> signUpUser(@RequestBody UserDataRequest userDataRequest) throws NamingException {
+        if (EmailUtil.doLookup(userDataRequest.getEmailId())) {
             try {
                 return new ResponseEntity<>(new ResponseWrapper(
                         "SUCCESS",
@@ -39,7 +39,7 @@ public class UserDataController {
         }
         return new ResponseEntity<>(new ResponseWrapper(
                 "ERROR",
-                "Invalid Email",
+                "Invalid EmailId: " + userDataRequest.getEmailId(),
                 null), HttpStatus.OK);
     }
 
@@ -65,23 +65,17 @@ public class UserDataController {
 
     @PutMapping(path = "/forgotPassword")
     public ResponseEntity<ResponseWrapper> updateUserPassword(@RequestBody UserDataRequest userDataRequest) {
-        if (userDataRequest.getEmailId().matches(EMAIL_REGEX)) {
-            try {
-                return new ResponseEntity<>(new ResponseWrapper(
-                        "SUCCESS",
-                        "password updated successfully",
-                        userDataService.updatePassword(userDataRequest)), HttpStatus.OK);
-            } catch (Exception e) {
-                return new ResponseEntity<>(new ResponseWrapper(
-                        "ERROR",
-                        "unable to find details for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
-                        null), HttpStatus.OK);
-            }
+        try {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    "SUCCESS",
+                    "password updated successfully",
+                    userDataService.updatePassword(userDataRequest)), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    "ERROR",
+                    "unable to find details for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
+                    null), HttpStatus.OK);
         }
-        return new ResponseEntity<>(new ResponseWrapper(
-                "ERROR",
-                "Invalid Email",
-                null), HttpStatus.OK);
     }
 
     @GetMapping(path = "/userId/{userId}")
