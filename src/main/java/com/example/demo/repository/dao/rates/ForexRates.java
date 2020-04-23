@@ -11,14 +11,6 @@ public class ForexRates {
     public ForexRates() {
     }
 
-    public ForexRates(boolean isCarousel, String countryCode, String countryName, double buyRate, double sellRate) {
-        this.isCarousel = isCarousel;
-        this.countryCode = countryCode;
-        this.countryName = countryName;
-        this.buyRate = buyRate;
-        this.sellRate = sellRate;
-    }
-
     public boolean isCarousel() {
         return isCarousel;
     }

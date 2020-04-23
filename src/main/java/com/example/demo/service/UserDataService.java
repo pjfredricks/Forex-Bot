@@ -14,5 +14,5 @@ public interface UserDataService {
 
 	UserData getUserDetailsById(UUID userId);
 
-	// TODO : need more methods for calculating amount, sending sms and email, and updating vendor details
+	UserDataResponse updatePassword(UserDataRequest userDataRequest) throws IllegalAccessException;
 }

@@ -48,6 +48,20 @@ public class UserDataServiceImpl implements UserDataService {
         return userDataRepository.getUserDataByUserId(userId);
     }
 
+    // TODO: add OTP validation
+    public UserDataResponse updatePassword(UserDataRequest userDataRequest) throws IllegalAccessException {
+        UserData userDataFromDb = getUserDataByEmailIdOrMobileNum(userDataRequest.getEmailId(), userDataRequest.getMobileNum());
+
+        if (null != userDataFromDb) {
+            userDataFromDb.setPassword(bCryptPasswordEncoder.encode(userDataRequest.getPassword()));
+            userDataFromDb.setModified_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+            userDataRepository.save(userDataFromDb);
+            return mapDataToResponse(userDataFromDb);
+        }
+
+        throw new IllegalAccessException("Not able to find records for requested details");
+    }
+
     private UserData getUserDataByEmailIdOrMobileNum(String emailId, String mobileNum) {
         return userDataRepository.getUserDataByEmailIdOrMobileNum(emailId, mobileNum);
     }
@@ -76,20 +90,5 @@ public class UserDataServiceImpl implements UserDataService {
         response.setMobileNum(userData.getMobileNum());
         response.setName(userData.getName());
         return response;
-    }
-
-    // TODO: add update password
-    private UserData updatePassword(UserDataRequest userDataRequest) {
-        UserData userDataFromDb = getUserDataByEmailIdOrMobileNum(userDataRequest.getEmailId(), userDataRequest.getMobileNum());
-
-        if (checkPasswordsMatch(userDataRequest.getPassword(), userDataFromDb.getPassword())) {
-            // Executed only when user entered password and db password match
-            userDataFromDb.setPassword(bCryptPasswordEncoder.encode(userDataRequest.getPassword()));
-            userDataFromDb.setModified_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
-            return userDataFromDb;
-        } else {
-            // userdata password does not match
-            return null;
-        }
     }
 }

@@ -38,7 +38,7 @@ public class UserDataController {
             }
         }
         return new ResponseEntity<>(new ResponseWrapper(
-                "SUCCESS",
+                "ERROR",
                 "Invalid Email",
                 null), HttpStatus.OK);
     }
@@ -60,6 +60,27 @@ public class UserDataController {
         return new ResponseEntity<>(new ResponseWrapper(
                 "ERROR",
                 "Incorrect Password",
+                null), HttpStatus.OK);
+    }
+
+    @PutMapping(path = "/forgotPassword")
+    public ResponseEntity<ResponseWrapper> updateUserPassword(@RequestBody UserDataRequest userDataRequest) {
+        if (userDataRequest.getEmailId().matches(EMAIL_REGEX)) {
+            try {
+                return new ResponseEntity<>(new ResponseWrapper(
+                        "SUCCESS",
+                        "password updated successfully",
+                        userDataService.updatePassword(userDataRequest)), HttpStatus.OK);
+            } catch (Exception e) {
+                return new ResponseEntity<>(new ResponseWrapper(
+                        "ERROR",
+                        "unable to find details for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
+                        null), HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(new ResponseWrapper(
+                "ERROR",
+                "Invalid Email",
                 null), HttpStatus.OK);
     }
 
