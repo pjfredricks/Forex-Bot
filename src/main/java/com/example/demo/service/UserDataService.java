@@ -10,9 +10,11 @@ public interface UserDataService {
 
 	UserDataResponse signUpUser(UserDataRequest userDataRequest) throws Exception;
 
+	UserData getUserDataByEmailIdOrMobileNum(String emailId, String mobileNum);
+
 	UserDataResponse login(UserDataRequest userDataRequest) throws Exception;
 
 	UserData getUserDetailsById(UUID userId);
 
-	UserDataResponse updatePassword(UserDataRequest userDataRequest) throws IllegalAccessException;
+	UserDataResponse resetPassword(UserDataRequest userDataRequest) throws IllegalAccessException;
 }

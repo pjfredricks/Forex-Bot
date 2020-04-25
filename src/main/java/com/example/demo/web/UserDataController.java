@@ -3,12 +3,13 @@ package com.example.demo.web;
 import com.example.demo.repository.dao.ResponseWrapper;
 import com.example.demo.repository.dao.userdata.UserDataRequest;
 import com.example.demo.repository.dao.userdata.UserDataResponse;
+import com.example.demo.service.EmailService;
 import com.example.demo.service.UserDataService;
-import com.example.demo.web.utils.EmailUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import java.util.UUID;
 
@@ -17,23 +18,27 @@ import java.util.UUID;
 public class UserDataController {
 
     private UserDataService userDataService;
+    private EmailService emailService;
 
-    public UserDataController(UserDataService userDataService) {
+    public UserDataController(UserDataService userDataService, EmailService emailService) {
         this.userDataService = userDataService;
+        this.emailService = emailService;
     }
 
     @PostMapping(path = "/signUp")
     public ResponseEntity<ResponseWrapper> signUpUser(@RequestBody UserDataRequest userDataRequest) throws NamingException {
-        if (EmailUtil.doLookup(userDataRequest.getEmailId())) {
+        if (emailService.doLookup(userDataRequest.getEmailId())) {
             try {
+                UserDataResponse response = userDataService.signUpUser(userDataRequest);
+                emailService.sendEmail(userDataRequest.getEmailId(), EmailService.EmailType.WELCOME);
                 return new ResponseEntity<>(new ResponseWrapper(
                         "SUCCESS",
-                        "userdata signed Up successfully",
-                        userDataService.signUpUser(userDataRequest)), HttpStatus.OK);
+                        "User signed Up successfully",
+                        response), HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(new ResponseWrapper(
                         "ERROR",
-                        "userdata details already exist for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
+                        "User details already exist for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
                         null), HttpStatus.OK);
             }
         }
@@ -63,17 +68,17 @@ public class UserDataController {
                 null), HttpStatus.OK);
     }
 
-    @PutMapping(path = "/forgotPassword")
-    public ResponseEntity<ResponseWrapper> updateUserPassword(@RequestBody UserDataRequest userDataRequest) {
+    @PutMapping(path = "/resetPassword")
+    public ResponseEntity<ResponseWrapper> resetUserPassword(@RequestBody UserDataRequest userDataRequest) {
         try {
             return new ResponseEntity<>(new ResponseWrapper(
                     "SUCCESS",
-                    "password updated successfully",
-                    userDataService.updatePassword(userDataRequest)), HttpStatus.OK);
+                    "Password updated successfully",
+                    userDataService.resetPassword(userDataRequest)), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     "ERROR",
-                    "unable to find details for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
+                    "Unable to find details for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
                     null), HttpStatus.OK);
         }
     }
@@ -95,5 +100,26 @@ public class UserDataController {
                 "User Details fetched for userId: " + id,
                 userDataService.getUserDetailsById(userId)),
                 HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/sendEmail")
+    public ResponseEntity<ResponseWrapper> sendEmail(@RequestParam String emailId, @RequestParam EmailService.EmailType emailType) {
+        try {
+            emailService.sendEmail(emailId, emailType);
+            return new ResponseEntity<>(new ResponseWrapper(
+                    "SUCCESS",
+                    "Email sent successfully",
+                    null), HttpStatus.OK);
+        } catch(MessagingException e) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    "ERROR",
+                    "User not registered with email " + emailId,
+                    null), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    "ERROR",
+                    e.getMessage(),
+                    null), HttpStatus.OK);
+        }
     }
 }

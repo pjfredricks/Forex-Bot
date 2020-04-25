@@ -48,8 +48,7 @@ public class UserDataServiceImpl implements UserDataService {
         return userDataRepository.getUserDataByUserId(userId);
     }
 
-    // TODO: add OTP validation
-    public UserDataResponse updatePassword(UserDataRequest userDataRequest) throws IllegalAccessException {
+    public UserDataResponse resetPassword(UserDataRequest userDataRequest) throws IllegalAccessException {
         UserData userDataFromDb = getUserDataByEmailIdOrMobileNum(userDataRequest.getEmailId(), userDataRequest.getMobileNum());
 
         if (null != userDataFromDb) {
@@ -62,7 +61,8 @@ public class UserDataServiceImpl implements UserDataService {
         throw new IllegalAccessException("Not able to find records for requested details");
     }
 
-    private UserData getUserDataByEmailIdOrMobileNum(String emailId, String mobileNum) {
+    @Override
+    public UserData getUserDataByEmailIdOrMobileNum(String emailId, String mobileNum) {
         return userDataRepository.getUserDataByEmailIdOrMobileNum(emailId, mobileNum);
     }
 

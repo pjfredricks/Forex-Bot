@@ -56,7 +56,7 @@ public class Order {
 
     @NotNull
     @Column(name = "couponCode")
-    private String couponCode = "";
+    private String couponCode;
 
     @NotNull
     @ApiModelProperty(hidden = true)
@@ -66,7 +66,13 @@ public class Order {
     @NotNull
     @ApiModelProperty(hidden = true)
     @Column(name = "status")
-    private OrderStatus status = OrderStatus.IN_PROCESS;
+    private OrderStatus status;
+
+    public Order() {
+        super();
+        this.status = OrderStatus.IN_PROCESS;
+        this.couponCode = "";
+    }
 
     public String getTrackingNumber() {
         return trackingNumber;
