@@ -1,6 +1,7 @@
 package com.example.demo.web;
 
 import com.example.demo.repository.dao.ResponseWrapper;
+import com.example.demo.repository.dao.userdata.ResetPasswordRequest;
 import com.example.demo.repository.dao.userdata.UserDataRequest;
 import com.example.demo.repository.dao.userdata.UserDataResponse;
 import com.example.demo.service.EmailService;
@@ -11,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.UUID;
 
 @RestController
@@ -71,16 +70,16 @@ public class UserDataController {
     }
 
     @PutMapping(path = "/resetPassword")
-    public ResponseEntity<ResponseWrapper> resetUserPassword(@RequestBody UserDataRequest userDataRequest) {
+    public ResponseEntity<ResponseWrapper> resetUserPassword(@RequestBody ResetPasswordRequest resetRequest) {
         try {
             return new ResponseEntity<>(new ResponseWrapper(
                     "SUCCESS",
                     "Password updated successfully",
-                    userDataService.resetPassword(userDataRequest)), HttpStatus.OK);
+                    userDataService.resetPassword(resetRequest)), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     "ERROR",
-                    "Unable to find details for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
+                    "Unable to find details for userId: " + resetRequest.getUserId(),
                     null), HttpStatus.OK);
         }
     }
@@ -104,7 +103,7 @@ public class UserDataController {
                 HttpStatus.OK);
     }
 
-    @GetMapping(path = "/sendEmail")
+    @PostMapping(path = "/sendEmail")
     public ResponseEntity<ResponseWrapper> sendEmail(@RequestParam String emailId, @RequestParam EmailService.EmailType emailType) {
         try {
             emailService.sendEmail(emailId, emailType);

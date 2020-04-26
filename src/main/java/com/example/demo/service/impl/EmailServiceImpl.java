@@ -28,13 +28,13 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendEmail(String emailId, String userName, EmailType type) throws MessagingException, IOException, URISyntaxException {
+    public void sendEmail(String emailId, UserData userData, EmailType type) throws MessagingException, IOException, URISyntaxException {
         switch (type) {
             case RESET:
-                javaMailSender.send(constructMail(emailId, userName, "reset_pass.html", "Reset your Forext Bot password"));
+                javaMailSender.send(constructMail(emailId, userData, "reset_pass.html", "Reset your Forext Bot password"));
                 break;
             case WELCOME:
-                javaMailSender.send(constructMail(emailId, userName, "welcome_page.html", "Welcome to ForexBot"));
+                javaMailSender.send(constructMail(emailId, userData, "welcome_page.html", "Welcome to ForexBot"));
                 break;
             default:
                 break;
@@ -50,7 +50,7 @@ public class EmailServiceImpl implements EmailService {
             throw new MessagingException("No user found for EmailId " + emailId);
         }
 
-        sendEmail(emailId, userData.getName(), type);
+        sendEmail(emailId, userData, type);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private MimeMessage constructMail(String emailId,
-                                      String userName,
+                                      UserData user,
                                       String fileName,
                                       String subject) throws MessagingException, IOException, URISyntaxException {
         MimeMessage message = javaMailSender.createMimeMessage();
@@ -69,7 +69,8 @@ public class EmailServiceImpl implements EmailService {
         helper.setSubject(subject);
 
         String pageAsText = new String(Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName).readAllBytes(), StandardCharsets.UTF_8);
-        pageAsText = pageAsText.replace("{userName}", userName);
+        pageAsText = pageAsText.replace("{userName}", user.getName());
+        pageAsText = pageAsText.replace("{userId}", user.getUserId().toString());
         helper.setText(pageAsText, true);
 
         return message;

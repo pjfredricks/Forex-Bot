@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.repository.dao.userdata.ResetPasswordRequest;
 import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.repository.dao.userdata.UserDataRequest;
 import com.example.demo.repository.dao.userdata.UserDataResponse;
@@ -16,5 +17,5 @@ public interface UserDataService {
 
 	UserData getUserDetailsById(UUID userId);
 
-	UserDataResponse resetPassword(UserDataRequest userDataRequest) throws IllegalAccessException;
+	UserDataResponse resetPassword(ResetPasswordRequest resetRequest) throws IllegalAccessException;
 }

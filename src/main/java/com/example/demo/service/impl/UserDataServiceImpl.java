@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.repository.UserDataRepository;
+import com.example.demo.repository.dao.userdata.ResetPasswordRequest;
 import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.repository.dao.userdata.UserDataRequest;
 import com.example.demo.repository.dao.userdata.UserDataResponse;
@@ -48,11 +49,11 @@ public class UserDataServiceImpl implements UserDataService {
         return userDataRepository.getUserDataByUserId(userId);
     }
 
-    public UserDataResponse resetPassword(UserDataRequest userDataRequest) throws IllegalAccessException {
-        UserData userDataFromDb = getUserDataByEmailIdOrMobileNum(userDataRequest.getEmailId(), userDataRequest.getMobileNum());
+    public UserDataResponse resetPassword(ResetPasswordRequest resetRequest) throws IllegalAccessException {
+        UserData userDataFromDb = getUserDetailsById(UUID.fromString(resetRequest.getUserId()));
 
         if (null != userDataFromDb) {
-            userDataFromDb.setPassword(bCryptPasswordEncoder.encode(userDataRequest.getPassword()));
+            userDataFromDb.setPassword(bCryptPasswordEncoder.encode(resetRequest.getPassword()));
             userDataFromDb.setModified_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
             userDataRepository.save(userDataFromDb);
             return mapDataToResponse(userDataFromDb);
