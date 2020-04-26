@@ -118,7 +118,7 @@ public class UserDataController {
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     "ERROR",
-                    e.getMessage(),
+                    e.getStackTrace().toString(),
                     null), HttpStatus.OK);
         }
     }
