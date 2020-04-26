@@ -11,8 +11,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 @Service
@@ -69,7 +68,7 @@ public class EmailServiceImpl implements EmailService {
         helper.setTo(emailId);
         helper.setSubject(subject);
 
-        String pageAsText = Files.readString(Paths.get(ClassLoader.getSystemResource(fileName).toURI()));
+        String pageAsText = new String(Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName).readAllBytes(), StandardCharsets.UTF_8);
         pageAsText = pageAsText.replace("{userName}", userName);
         helper.setText(pageAsText, true);
 

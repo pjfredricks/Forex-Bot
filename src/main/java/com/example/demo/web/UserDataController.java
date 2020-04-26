@@ -105,7 +105,7 @@ public class UserDataController {
     }
 
     @GetMapping(path = "/sendEmail")
-    public ResponseEntity<ResponseWrapper> sendEmail(@RequestParam String emailId, @RequestParam EmailService.EmailType emailType) throws IOException, URISyntaxException {
+    public ResponseEntity<ResponseWrapper> sendEmail(@RequestParam String emailId, @RequestParam EmailService.EmailType emailType) {
         try {
             emailService.sendEmail(emailId, emailType);
             return new ResponseEntity<>(new ResponseWrapper(
@@ -118,12 +118,10 @@ public class UserDataController {
                     "User not registered with email " + emailId,
                     null), HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println(System.getenv("spring.mail.password"));
-            throw e;
-//            return new ResponseEntity<>(new ResponseWrapper(
-//                    "ERROR",
-//                    e.getStackTrace().toString(),
-//                    null), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseWrapper(
+                    "ERROR",
+                    e.getMessage(),
+                    null), HttpStatus.OK);
         }
     }
 }
