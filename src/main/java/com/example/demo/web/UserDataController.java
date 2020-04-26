@@ -118,7 +118,7 @@ public class UserDataController {
                     "User not registered with email " + emailId,
                     null), HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println(System.getProperty("spring.mail.password"));
+            System.out.println(System.getenv("spring.mail.password"));
             throw e;
 //            return new ResponseEntity<>(new ResponseWrapper(
 //                    "ERROR",
