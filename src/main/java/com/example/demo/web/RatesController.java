@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.example.demo.web.utils.Constants.SUCCESS;
+
 @RestController
 @RequestMapping("api/v1")
 public class RatesController {
@@ -23,7 +25,7 @@ public class RatesController {
     public ResponseEntity<ResponseWrapper> updateExchangeRates() {
         ratesService.updateExchangeRates();
         return new ResponseEntity<>(new ResponseWrapper(
-                "SUCCESS",
+                SUCCESS,
                 "Rates have been updated",
                 null), HttpStatus.OK);
     }
@@ -31,7 +33,7 @@ public class RatesController {
     @GetMapping(path = "/rates")
     public ResponseEntity<ResponseWrapper> getExchangeRates() {
         return new ResponseEntity<>(new ResponseWrapper(
-                "SUCCESS",
+                SUCCESS,
                 "Rates have been fetched",
                 ratesService.getExchangeRates()), HttpStatus.OK);
     }
@@ -40,7 +42,7 @@ public class RatesController {
     public ResponseEntity<ResponseWrapper> updateExchangeRatesManual(@RequestBody List<RatesRequest> ratesRequest) {
         ratesService.updateExchangeRates(ratesRequest);
         return new ResponseEntity<>(new ResponseWrapper(
-                "SUCCESS",
+                SUCCESS,
                 "Rates have been updated",
                 null), HttpStatus.OK);
     }

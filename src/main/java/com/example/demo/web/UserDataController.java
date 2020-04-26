@@ -14,6 +14,9 @@ import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import java.util.UUID;
 
+import static com.example.demo.web.utils.Constants.ERROR;
+import static com.example.demo.web.utils.Constants.SUCCESS;
+
 @RestController
 @RequestMapping("/api/v1")
 public class UserDataController {
@@ -33,18 +36,18 @@ public class UserDataController {
                 UserDataResponse response = userDataService.signUpUser(userDataRequest);
                 emailService.sendEmail(userDataRequest.getEmailId(), EmailService.EmailType.WELCOME);
                 return new ResponseEntity<>(new ResponseWrapper(
-                        "SUCCESS",
+                        SUCCESS,
                         "User signed Up successfully",
                         response), HttpStatus.OK);
             } catch (Exception e) {
                 return new ResponseEntity<>(new ResponseWrapper(
-                        "ERROR",
+                        ERROR,
                         "User details already exist for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
                         null), HttpStatus.OK);
             }
         }
         return new ResponseEntity<>(new ResponseWrapper(
-                "ERROR",
+                ERROR,
                 "Invalid EmailId: " + userDataRequest.getEmailId(),
                 null), HttpStatus.OK);
     }
@@ -55,16 +58,19 @@ public class UserDataController {
         try {
             userDataResponse = userDataService.login(userDataRequest);
         } catch (Exception e) {
-            e.printStackTrace();
+            return new ResponseEntity<>(new ResponseWrapper(
+                    ERROR,
+                    e.getMessage(),
+                    null), HttpStatus.OK);
         }
         if (userDataResponse != null) {
                 return new ResponseEntity<>(new ResponseWrapper(
-                        "SUCCESS",
+                        SUCCESS,
                         "Login success",
                         userDataResponse), HttpStatus.OK);
         }
         return new ResponseEntity<>(new ResponseWrapper(
-                "ERROR",
+                ERROR,
                 "Incorrect Password",
                 null), HttpStatus.OK);
     }
@@ -73,12 +79,12 @@ public class UserDataController {
     public ResponseEntity<ResponseWrapper> resetUserPassword(@RequestBody ResetPasswordRequest resetRequest) {
         try {
             return new ResponseEntity<>(new ResponseWrapper(
-                    "SUCCESS",
+                    SUCCESS,
                     "Password updated successfully",
                     userDataService.resetPassword(resetRequest)), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
-                    "ERROR",
+                    ERROR,
                     "Unable to find details for userId: " + resetRequest.getUserId(),
                     null), HttpStatus.OK);
         }
@@ -91,13 +97,13 @@ public class UserDataController {
              userId = UUID.fromString(id);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ResponseWrapper(
-                    "ERROR",
+                    ERROR,
                     "Invalid UserId " + id,
                     null),
                     HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(new ResponseWrapper(
-                "SUCCESS",
+                SUCCESS,
                 "User Details fetched for userId: " + id,
                 userDataService.getUserDetailsById(userId)),
                 HttpStatus.OK);
@@ -108,17 +114,17 @@ public class UserDataController {
         try {
             emailService.sendEmail(emailId, emailType);
             return new ResponseEntity<>(new ResponseWrapper(
-                    "SUCCESS",
+                    SUCCESS,
                     "Email sent successfully",
                     null), HttpStatus.OK);
         } catch(MessagingException e) {
             return new ResponseEntity<>(new ResponseWrapper(
-                    "ERROR",
+                    ERROR,
                     "User not registered with email " + emailId,
                     null), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
-                    "ERROR",
+                    ERROR,
                     e.getMessage(),
                     null), HttpStatus.OK);
         }

@@ -130,8 +130,8 @@ public class Order {
         return createDate;
     }
 
-    public void setCreateDate(String create_date) {
-        this.createDate = create_date;
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
     }
 
     public String getCouponCode() {

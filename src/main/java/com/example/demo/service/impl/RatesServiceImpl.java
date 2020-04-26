@@ -62,7 +62,7 @@ public class RatesServiceImpl implements RatesService {
         // Set buy and sell Rates, and update carousel values
         exchangeRates = currencyValues.entrySet()
                 .stream()
-                .map(this::constructForexRates)
+                .map(RatesServiceImpl::constructForexRates)
                 .sorted(Comparator.comparing(ForexRates::getCountryName))
                 .collect(Collectors.toList());
     }
@@ -88,29 +88,30 @@ public class RatesServiceImpl implements RatesService {
 
     @Override
     public double getRateByCountryCodeAndType(String countryCode, OrderType orderType) {
-        ForexRates rates = exchangeRates.stream()
-                .filter(forexRates -> forexRates.getCountryCode()
-                        .equals(countryCode))
-                .findAny()
-                .get();
+        Optional<ForexRates> rates = exchangeRates.stream()
+                .filter(forexRates -> forexRates.getCountryCode().equals(countryCode))
+                .findFirst();
+
+        if (!rates.isPresent()) {
+            return 0.00d;
+        }
 
         switch (orderType) {
             case SELL:
-                return rates.getSellRate();
+                return rates.get().getSellRate();
             case BUY:
-                return rates.getBuyRate();
+                return rates.get().getBuyRate();
             default:
                 return 0.00d;
         }
     }
 
-    private ForexRates constructForexRates(Map.Entry<String, Double> currencyValueMap) {
+    private static ForexRates constructForexRates(Map.Entry<String, Double> currencyValueMap) {
         ForexRates forexRate = new ForexRates();
+        forexRate.setCarousel(true);
 
         if (noCarouselCountryList.contains(currencyValueMap.getKey())) {
             forexRate.setCarousel(false);
-        } else {
-            forexRate.setCarousel(true);
         }
         forexRate.setCountryCode(currencyValueMap.getKey());
         forexRate.setCountryName(Currency.getInstance(currencyValueMap.getKey()).getDisplayName());
@@ -119,7 +120,7 @@ public class RatesServiceImpl implements RatesService {
         return forexRate;
     }
 
-    private double calculateBuyRate(double currencyValue) {
+    private static double calculateBuyRate(double currencyValue) {
         int percent = 2;
 
         if (currencyValue < 0.01) {
@@ -135,7 +136,7 @@ public class RatesServiceImpl implements RatesService {
         return convertRate(currencyValue, 2);
     }
 
-    private double calculateSellRate(double currencyValue) {
+    private static double calculateSellRate(double currencyValue) {
         int percent = 1;
 
         if (currencyValue < 0.01) {
@@ -152,7 +153,7 @@ public class RatesServiceImpl implements RatesService {
         return convertRate(currencyValue, 2);
     }
 
-    private double convertRate(double currencyValue, int scalingValue) {
+    private static double convertRate(double currencyValue, int scalingValue) {
         return BigDecimal.valueOf(currencyValue).setScale(scalingValue, RoundingMode.HALF_EVEN).doubleValue();
     }
 

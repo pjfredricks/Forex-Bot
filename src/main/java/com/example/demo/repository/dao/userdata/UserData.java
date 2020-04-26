@@ -41,11 +41,11 @@ public class UserData {
     @NotNull
     @ApiModelProperty(hidden = true)
     @Column(name = "createDate")
-    private String create_date;
+    private String createDate;
 
     @ApiModelProperty(hidden = true)
     @Column(name = "modifiedDate")
-    private String modified_date;
+    private String modifiedDate;
 
     public UserData() {
         super();
@@ -99,20 +99,20 @@ public class UserData {
         this.password = password;
     }
 
-    public String getCreate_date() {
-        return create_date;
+    public String getCreateDate() {
+        return createDate;
     }
 
-    public void setCreate_date(String create_date) {
-        this.create_date = create_date;
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
     }
 
-    public String getModified_date() {
-        return modified_date;
+    public String getModifiedDate() {
+        return modifiedDate;
     }
 
-    public void setModified_date(String modified_date) {
-        this.modified_date = modified_date;
+    public void setModifiedDate(String modifiedDate) {
+        this.modifiedDate = modifiedDate;
     }
 
     @Override
@@ -121,8 +121,8 @@ public class UserData {
                 "id=" + id +
                 ", emailId='" + emailId + '\'' +
                 ", password='" + password + '\'' +
-                ", create_date='" + create_date + '\'' +
-                ", modified_date='" + modified_date + '\'' +
+                ", create_date='" + createDate + '\'' +
+                ", modified_date='" + modifiedDate + '\'' +
                 '}';
     }
 }

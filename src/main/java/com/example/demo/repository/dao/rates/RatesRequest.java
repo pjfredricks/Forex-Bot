@@ -6,6 +6,7 @@ public class RatesRequest {
     private double sellRate;
 
     public RatesRequest() {
+        super();
     }
 
     public String getCountryCode() {

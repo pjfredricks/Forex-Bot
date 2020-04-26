@@ -54,7 +54,7 @@ public class UserDataServiceImpl implements UserDataService {
 
         if (null != userDataFromDb) {
             userDataFromDb.setPassword(bCryptPasswordEncoder.encode(resetRequest.getPassword()));
-            userDataFromDb.setModified_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+            userDataFromDb.setModifiedDate(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
             userDataRepository.save(userDataFromDb);
             return mapDataToResponse(userDataFromDb);
         }
@@ -67,7 +67,7 @@ public class UserDataServiceImpl implements UserDataService {
         return userDataRepository.getUserDataByEmailIdOrMobileNum(emailId, mobileNum);
     }
 
-    private Boolean checkPasswordsMatch(String enteredPassword, String passwordFromDb) {
+    private boolean checkPasswordsMatch(String enteredPassword, String passwordFromDb) {
         return bCryptPasswordEncoder.matches(enteredPassword, passwordFromDb);
     }
 
@@ -79,7 +79,7 @@ public class UserDataServiceImpl implements UserDataService {
         userData.setMobileNum(userRequest.getMobileNum());
         userData.setName(userRequest.getName());
         userData.setPassword(bCryptPasswordEncoder.encode(userRequest.getPassword()));
-        userData.setCreate_date(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+        userData.setCreateDate(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
         return userData;
     }
 

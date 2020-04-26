@@ -9,6 +9,7 @@ public class ForexRates {
     private double sellRate;
 
     public ForexRates() {
+        super();
     }
 
     public boolean isCarousel() {

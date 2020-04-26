@@ -5,6 +5,7 @@ public class ResetPasswordRequest {
     private String password;
 
     public ResetPasswordRequest() {
+        super();
     }
 
     public String getUserId() {
