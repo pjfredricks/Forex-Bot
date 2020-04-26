@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.UUID;
 
 @RestController
@@ -103,7 +105,7 @@ public class UserDataController {
     }
 
     @GetMapping(path = "/sendEmail")
-    public ResponseEntity<ResponseWrapper> sendEmail(@RequestParam String emailId, @RequestParam EmailService.EmailType emailType) {
+    public ResponseEntity<ResponseWrapper> sendEmail(@RequestParam String emailId, @RequestParam EmailService.EmailType emailType) throws IOException, URISyntaxException {
         try {
             emailService.sendEmail(emailId, emailType);
             return new ResponseEntity<>(new ResponseWrapper(
@@ -116,10 +118,11 @@ public class UserDataController {
                     "User not registered with email " + emailId,
                     null), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    "ERROR",
-                    e.getStackTrace().toString(),
-                    null), HttpStatus.OK);
+            throw e;
+//            return new ResponseEntity<>(new ResponseWrapper(
+//                    "ERROR",
+//                    e.getStackTrace().toString(),
+//                    null), HttpStatus.OK);
         }
     }
 }
