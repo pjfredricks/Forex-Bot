@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.mail.MessagingException;
-import javax.naming.NamingException;
 import java.util.UUID;
 
 import static com.example.demo.web.utils.Constants.ERROR;
@@ -29,26 +27,20 @@ public class UserDataController {
     }
 
     @PostMapping(path = "/signUp")
-    public ResponseEntity<ResponseWrapper> signUpUser(@RequestBody UserDataRequest userDataRequest) throws NamingException {
-        if (emailService.doLookup(userDataRequest.getEmailId())) {
-            try {
-                UserDataResponse response = userDataService.signUpUser(userDataRequest);
-                emailService.sendEmail(userDataRequest.getEmailId(), EmailService.EmailType.WELCOME);
-                return new ResponseEntity<>(new ResponseWrapper(
-                        SUCCESS,
-                        "User signed Up successfully",
-                        response), HttpStatus.OK);
-            } catch (Exception e) {
-                return new ResponseEntity<>(new ResponseWrapper(
-                        ERROR,
-                        "User details already exist for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
-                        null), HttpStatus.OK);
-            }
+    public ResponseEntity<ResponseWrapper> signUpUser(@RequestBody UserDataRequest userDataRequest) {
+        try {
+            UserDataResponse response = userDataService.signUpUser(userDataRequest);
+            sendWelcomeEmail(userDataRequest);
+            return new ResponseEntity<>(new ResponseWrapper(
+                    SUCCESS,
+                    "User signed Up successfully",
+                    response), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    ERROR,
+                    "User details already exist for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
+                    null), HttpStatus.OK);
         }
-        return new ResponseEntity<>(new ResponseWrapper(
-                ERROR,
-                "Invalid EmailId: " + userDataRequest.getEmailId(),
-                null), HttpStatus.OK);
     }
 
     @PostMapping(path = "/login")
@@ -77,10 +69,27 @@ public class UserDataController {
     @PutMapping(path = "/resetPassword")
     public ResponseEntity<ResponseWrapper> resetUserPassword(@RequestBody UserDataRequest resetRequest) {
         try {
+            UserDataResponse response = userDataService.resetPassword(resetRequest);
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
                     "Password updated successfully",
-                    userDataService.resetPassword(resetRequest)), HttpStatus.OK);
+                    response), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    ERROR,
+                    "Unable to find details for userId: " + resetRequest.getUserId(),
+                    null), HttpStatus.OK);
+        }
+    }
+
+    @PutMapping(path = "/updateDetails")
+    public ResponseEntity<ResponseWrapper> updateUserDetails(@RequestBody UserDataRequest resetRequest) {
+        try {
+            UserDataResponse response = userDataService.updateUserDetails(resetRequest);
+            return new ResponseEntity<>(new ResponseWrapper(
+                    SUCCESS,
+                    "User details updated successfully",
+                    response), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
@@ -125,7 +134,7 @@ public class UserDataController {
                     SUCCESS,
                     "Email sent successfully",
                     null), HttpStatus.OK);
-        } catch(MessagingException e) {
+        } catch(IllegalAccessException e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
                     "User not registered with email " + emailId,
@@ -133,8 +142,8 @@ public class UserDataController {
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
-                    e.getMessage(),
-                    null), HttpStatus.OK);
+                    "Unable to send Email",
+                    e.getMessage()), HttpStatus.OK);
         }
     }
 }

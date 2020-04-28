@@ -5,6 +5,7 @@ import com.example.demo.service.EmailService;
 import com.example.demo.service.UserDataService;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -28,7 +29,18 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendEmail(String emailId, UserData userData, EmailType type) throws MessagingException, IOException, URISyntaxException {
+    @Async
+    public void sendEmail(String emailId, EmailType type) throws MessagingException, IOException, URISyntaxException, IllegalAccessException {
+        UserData userData = userDataService.getUserDataByEmailIdOrMobileNum(emailId, null);
+
+        if (userData == null) {
+            throw new IllegalAccessException("No user found for EmailId " + emailId);
+        }
+
+        sendEmail(emailId, userData, type);
+    }
+
+    private void sendEmail(String emailId, UserData userData, EmailType type) throws MessagingException, IOException, URISyntaxException {
         switch (type) {
             case RESET:
                 javaMailSender.send(constructMail(emailId, userData, "reset_pass.html", "Reset your Forext Bot password"));
@@ -41,27 +53,10 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-
-    @Override
-    public void sendEmail(String emailId, EmailType type) throws MessagingException, IOException, URISyntaxException {
-        UserData userData = userDataService.getUserDataByEmailIdOrMobileNum(emailId, null);
-
-        if (userData == null) {
-            throw new MessagingException("No user found for EmailId " + emailId);
-        }
-
-        sendEmail(emailId, userData, type);
-    }
-
-    @Override
-    public boolean doLookup(String emailId) {
-        return allowedDns.stream().anyMatch(emailId::contains);
-    }
-
     private MimeMessage constructMail(String emailId,
                                       UserData user,
                                       String fileName,
-                                      String subject) throws MessagingException, IOException, URISyntaxException {
+                                      String subject) throws MessagingException, IOException {
         MimeMessage message = javaMailSender.createMimeMessage();
 
         MimeMessageHelper helper = new MimeMessageHelper(message, true);

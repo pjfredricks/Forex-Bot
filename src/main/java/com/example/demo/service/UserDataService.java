@@ -17,4 +17,6 @@ public interface UserDataService {
 	UserData getUserDetailsById(UUID userId);
 
 	UserDataResponse resetPassword(UserDataRequest resetRequest) throws IllegalAccessException;
+
+	UserDataResponse updateUserDetails(UserDataRequest resetRequest) throws IllegalAccessException;
 }

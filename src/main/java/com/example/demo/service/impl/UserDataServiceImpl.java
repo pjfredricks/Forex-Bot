@@ -5,6 +5,7 @@ import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.repository.dao.userdata.UserDataRequest;
 import com.example.demo.repository.dao.userdata.UserDataResponse;
 import com.example.demo.service.UserDataService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +65,29 @@ public class UserDataServiceImpl implements UserDataService {
     @Override
     public UserData getUserDataByEmailIdOrMobileNum(String emailId, String mobileNum) {
         return userDataRepository.getUserDataByEmailIdOrMobileNum(emailId, mobileNum);
+    }
+
+    @Override
+    @Transactional
+    public UserDataResponse updateUserDetails(UserDataRequest updateRequest) throws IllegalAccessException {
+        UserData userDataFromDb = getUserDetailsById(UUID.fromString(updateRequest.getUserId()));
+
+        if (null != userDataFromDb) {
+            if (StringUtils.isNotBlank(updateRequest.getName())) {
+                userDataFromDb.setName(updateRequest.getName());
+            }
+            if (StringUtils.isNotBlank(updateRequest.getEmailId())) {
+                userDataFromDb.setEmailId(updateRequest.getEmailId());
+            }
+            if (StringUtils.isNotBlank(updateRequest.getMobileNum())) {
+                userDataFromDb.setMobileNum(updateRequest.getMobileNum());
+            }
+            userDataFromDb.setModifiedDate(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+            userDataRepository.save(userDataFromDb);
+            return mapDataToResponse(userDataFromDb);
+        }
+
+        throw new IllegalAccessException("Not able to find records for requested details");
     }
 
     private boolean checkPasswordsMatch(String enteredPassword, String passwordFromDb) {
