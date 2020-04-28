@@ -1,12 +1,21 @@
 image: openjdk:11-jre-slim
 
-build:
-  script:
-    - mvn clean install
+stages:
+  - build
+  - deploy
+
+maven-build:
+  image: maven:3-jdk-11
+  stage: build
+  script: "mvn install -B"
 
 deploy:
+  stage: deploy
+  image: ruby:latest
   script:
-    - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git
-    - git push heroku master
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+    - dpl --provider=heroku --app=$HEROKU_APP --api-key=$HEROKU_API_KEY
   only:
     - master
