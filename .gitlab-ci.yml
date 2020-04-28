@@ -1,6 +1,7 @@
 deploy:
-        image: openjdk:11-jre-slim
-        script:
-          - dpl --provider=heroku --app=$HEROKU_APP --api-key=$HEROKU_API_KEY
-        only:
-          - master
+  image: openjdk:11-jre-slim
+  script:
+    - gem install dpl
+    - dpl --provider=heroku --app=$HEROKU_APP --api-key=$HEROKU_API_KEY
+  only:
+    - master
