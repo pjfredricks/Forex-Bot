@@ -1,7 +1,6 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.repository.UserDataRepository;
-import com.example.demo.repository.dao.userdata.ResetPasswordRequest;
 import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.repository.dao.userdata.UserDataRequest;
 import com.example.demo.repository.dao.userdata.UserDataResponse;
@@ -49,7 +48,7 @@ public class UserDataServiceImpl implements UserDataService {
         return userDataRepository.getUserDataByUserId(userId);
     }
 
-    public UserDataResponse resetPassword(ResetPasswordRequest resetRequest) throws IllegalAccessException {
+    public UserDataResponse resetPassword(UserDataRequest resetRequest) throws IllegalAccessException {
         UserData userDataFromDb = getUserDetailsById(UUID.fromString(resetRequest.getUserId()));
 
         if (null != userDataFromDb) {

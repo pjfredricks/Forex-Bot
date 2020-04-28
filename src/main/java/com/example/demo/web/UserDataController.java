@@ -1,7 +1,6 @@
 package com.example.demo.web;
 
 import com.example.demo.repository.dao.ResponseWrapper;
-import com.example.demo.repository.dao.userdata.ResetPasswordRequest;
 import com.example.demo.repository.dao.userdata.UserDataRequest;
 import com.example.demo.repository.dao.userdata.UserDataResponse;
 import com.example.demo.service.EmailService;
@@ -76,7 +75,7 @@ public class UserDataController {
     }
 
     @PutMapping(path = "/resetPassword")
-    public ResponseEntity<ResponseWrapper> resetUserPassword(@RequestBody ResetPasswordRequest resetRequest) {
+    public ResponseEntity<ResponseWrapper> resetUserPassword(@RequestBody UserDataRequest resetRequest) {
         try {
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
@@ -91,26 +90,35 @@ public class UserDataController {
     }
 
     @GetMapping(path = "/userId/{userId}")
-    public ResponseEntity<ResponseWrapper> getUserDetailsByUserId(@RequestParam String id) {
+    public ResponseEntity<ResponseWrapper> getUserDetailsByUserId(@RequestBody UserDataRequest userRequest) {
         UUID userId;
         try {
-             userId = UUID.fromString(id);
+             userId = UUID.fromString(userRequest.getUserId());
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
-                    "Invalid UserId " + id,
+                    "Invalid UserId " + userRequest.getUserId(),
                     null),
                     HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
-                "User Details fetched for userId: " + id,
+                "User Details fetched for userId: " + userRequest.getUserId(),
                 userDataService.getUserDetailsById(userId)),
                 HttpStatus.OK);
     }
 
-    @PostMapping(path = "/sendEmail")
-    public ResponseEntity<ResponseWrapper> sendEmail(@RequestParam String emailId, @RequestParam EmailService.EmailType emailType) {
+    @PostMapping(path = "/sendResetEmail")
+    public ResponseEntity<ResponseWrapper> sendResetEmail(@RequestBody UserDataRequest userRequest) {
+        return sendEmail(userRequest.getEmailId(), EmailService.EmailType.RESET);
+    }
+
+    @PostMapping(path = "/sendWelcomeEmail")
+    public ResponseEntity<ResponseWrapper> sendWelcomeEmail(@RequestBody UserDataRequest userRequest) {
+        return sendEmail(userRequest.getEmailId(), EmailService.EmailType.WELCOME);
+    }
+
+    private ResponseEntity<ResponseWrapper> sendEmail(String emailId, EmailService.EmailType emailType) {
         try {
             emailService.sendEmail(emailId, emailType);
             return new ResponseEntity<>(new ResponseWrapper(

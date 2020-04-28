@@ -1,6 +1,7 @@
 package com.example.demo.repository.dao.userdata;
 
 public class UserDataRequest {
+	private String userId;
 	private String name;
 	private String emailId;
 	private String password;
@@ -8,6 +9,14 @@ public class UserDataRequest {
 
 	public UserDataRequest() {
 		super();
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	public String getName() {
