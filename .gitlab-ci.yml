@@ -1,12 +1,6 @@
-image: java:8
-
-build:
-  script:
-    - mvn clean install
-
 deploy:
-  image: java:11
-  script:
-    - dpl --provider=heroku --app=$HEROKU_APP --api-key=$HEROKU_API_KEY
-  only:
-    - master
+        image: openjdk:11-jre-slim
+        script:
+          - dpl --provider=heroku --app=$HEROKU_APP --api-key=$HEROKU_API_KEY
+        only:
+          - master
