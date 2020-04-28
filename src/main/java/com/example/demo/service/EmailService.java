@@ -1,8 +1,9 @@
 package com.example.demo.service;
 
+import com.example.demo.repository.dao.userdata.UserData;
+
 import javax.mail.MessagingException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 public interface EmailService {
 
@@ -12,5 +13,5 @@ public interface EmailService {
         BACKUP
     }
 
-    void sendEmail(String emailId, EmailType emailType) throws MessagingException, IOException, URISyntaxException, IllegalAccessException;
+    void sendEmail(String emailId, UserData userData, EmailType emailType) throws MessagingException, IOException;
 }

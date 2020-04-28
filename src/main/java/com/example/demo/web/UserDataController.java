@@ -1,6 +1,7 @@
 package com.example.demo.web;
 
 import com.example.demo.repository.dao.ResponseWrapper;
+import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.repository.dao.userdata.UserDataRequest;
 import com.example.demo.repository.dao.userdata.UserDataResponse;
 import com.example.demo.service.EmailService;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.UUID;
 
 import static com.example.demo.web.utils.Constants.ERROR;
@@ -118,32 +121,29 @@ public class UserDataController {
     }
 
     @PostMapping(path = "/sendResetEmail")
-    public ResponseEntity<ResponseWrapper> sendResetEmail(@RequestBody UserDataRequest userRequest) {
+    public ResponseEntity<ResponseWrapper> sendResetEmail(@RequestBody UserDataRequest userRequest) throws IOException, MessagingException {
         return sendEmail(userRequest.getEmailId(), EmailService.EmailType.RESET);
     }
 
     @PostMapping(path = "/sendWelcomeEmail")
-    public ResponseEntity<ResponseWrapper> sendWelcomeEmail(@RequestBody UserDataRequest userRequest) {
+    public ResponseEntity<ResponseWrapper> sendWelcomeEmail(@RequestBody UserDataRequest userRequest) throws IOException, MessagingException {
         return sendEmail(userRequest.getEmailId(), EmailService.EmailType.WELCOME);
     }
 
-    private ResponseEntity<ResponseWrapper> sendEmail(String emailId, EmailService.EmailType emailType) {
-        try {
-            emailService.sendEmail(emailId, emailType);
-            return new ResponseEntity<>(new ResponseWrapper(
-                    SUCCESS,
-                    "Email sent successfully",
-                    null), HttpStatus.OK);
-        } catch(IllegalAccessException e) {
+    private ResponseEntity<ResponseWrapper> sendEmail(String emailId, EmailService.EmailType emailType) throws IOException, MessagingException {
+        UserData userData = userDataService.getUserDataByEmailIdOrMobileNum(emailId, null);
+
+        if (userData == null) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
-                    "User not registered with email " + emailId,
+                    "No User registered with email " + emailId,
                     null), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    ERROR,
-                    "Unable to send Email",
-                    e.getMessage()), HttpStatus.OK);
         }
+
+        emailService.sendEmail(emailId, userData, emailType);
+        return new ResponseEntity<>(new ResponseWrapper(
+                SUCCESS,
+                "Email sent successfully",
+                null), HttpStatus.OK);
     }
 }
