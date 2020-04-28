@@ -1,9 +1,5 @@
 image: java:11
 
-stages:
-  - build
-  - deploy
-
 build:
   script:
     - mvn clean install
