@@ -1,7 +1,12 @@
-deploy:
-  image: openjdk:11-jre-slim
+image: openjdk:11-jre-slim
+
+build:
   script:
-    - gem install dpl
-    - dpl --provider=heroku --app=$HEROKU_APP --api-key=$HEROKU_API_KEY
+    - mvn clean install
+
+deploy:
+  script:
+    - git remote add heroku https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP.git
+    - git push heroku master
   only:
     - master
