@@ -1,0 +1,18 @@
+image: java:11
+
+stages:
+  - build
+  - deploy
+
+build:
+  script:
+    - mvn clean install
+
+production:
+  type: deploy
+  stage: production
+  image: java:11
+  script:
+    - dpl --provider=heroku --app=$HEROKU_APP_PRODUCTION --api-key=$HEROKU_API_KEY
+  only:
+    - master
