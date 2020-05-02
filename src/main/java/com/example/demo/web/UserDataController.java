@@ -6,8 +6,10 @@ import com.example.demo.repository.dao.userdata.UserDataRequest;
 import com.example.demo.repository.dao.userdata.UserDataResponse;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.UserDataService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -128,6 +130,17 @@ public class UserDataController {
     @PostMapping(path = "/sendWelcomeEmail")
     public ResponseEntity<ResponseWrapper> sendWelcomeEmail(@RequestBody UserDataRequest userRequest) throws IOException, MessagingException {
         return sendEmail(userRequest.getEmailId(), EmailService.EmailType.WELCOME);
+    }
+
+    @PostMapping(path = "/sendOtp")
+    public ResponseEntity<ResponseWrapper> sendOtp(@RequestBody UserDataRequest userRequest) {
+        // TODO: Use mobile Num after SMS impl
+        String otp = RandomStringUtils.randomAlphanumeric(6);
+        emailService.sendOtpEmail(userRequest.getEmailId(), otp);
+        return new ResponseEntity<>(new ResponseWrapper(
+                SUCCESS,
+                "Otp sent to email Id: " + userRequest.getEmailId(),
+                DigestUtils.md5DigestAsHex(otp.getBytes())), HttpStatus.OK);
     }
 
     private ResponseEntity<ResponseWrapper> sendEmail(String emailId, EmailService.EmailType emailType) throws IOException, MessagingException {

@@ -2,6 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.service.EmailService;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -53,5 +54,16 @@ public class EmailServiceImpl implements EmailService {
         helper.setText(pageAsText, true);
 
         return message;
+    }
+
+    @Override
+    @Async
+    public void sendOtpEmail(String emailId, String otp) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(emailId);
+        message.setSubject("OTP for signUp");
+        message.setText("The otp for your transaction is: " + otp);
+
+        javaMailSender.send(message);
     }
 }
