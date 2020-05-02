@@ -1,15 +1,11 @@
 package com.example.demo.web;
 
 import com.example.demo.repository.dao.ResponseWrapper;
-import com.example.demo.repository.dao.userdata.UserData;
-import com.example.demo.repository.dao.userdata.UserDataRequest;
-import com.example.demo.repository.dao.userdata.UserDataResponse;
+import com.example.demo.repository.dao.userdata.*;
 import com.example.demo.service.EmailService;
 import com.example.demo.service.UserDataService;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
@@ -133,14 +129,37 @@ public class UserDataController {
     }
 
     @PostMapping(path = "/sendOtp")
-    public ResponseEntity<ResponseWrapper> sendOtp(@RequestBody UserDataRequest userRequest) {
+    public ResponseEntity<ResponseWrapper> sendOtp(@RequestBody OtpRequest otpRequest) {
         // TODO: Use mobile Num after SMS impl
-        String otp = RandomStringUtils.randomAlphanumeric(6);
-        emailService.sendOtpEmail(userRequest.getEmailId(), otp);
+        String otp = userDataService.generateAndSaveOtp(otpRequest.getEmailId(), otpRequest.getOtpType());
+        emailService.sendOtpEmail(otpRequest.getEmailId(), otp);
+
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
-                "Otp sent to email Id: " + userRequest.getEmailId(),
-                DigestUtils.md5DigestAsHex(otp.getBytes())), HttpStatus.OK);
+                "Otp sent to email Id: " + otpRequest.getEmailId(),
+                null), HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/verifyOtp")
+    public ResponseEntity<ResponseWrapper> verifyOtp(@RequestBody OtpRequest otpRequest) {
+        // TODO: Use mobile Num after SMS impl
+        try {
+            if (userDataService.verifyOtp(otpRequest.getOtp(), otpRequest.getEmailId(), otpRequest.getOtpType())) {
+                return new ResponseEntity<>(new ResponseWrapper(
+                        SUCCESS,
+                        "Otp verification successful",
+                        null), HttpStatus.OK);
+            }
+        } catch (IllegalAccessException e) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    ERROR,
+                    e.getMessage(),
+                    null), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new ResponseWrapper(
+                ERROR,
+                "Invalid OTP",
+                null), HttpStatus.OK);
     }
 
     private ResponseEntity<ResponseWrapper> sendEmail(String emailId, EmailService.EmailType emailType) throws IOException, MessagingException {

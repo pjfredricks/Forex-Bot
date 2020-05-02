@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
+import static com.example.demo.web.utils.Constants.ZONE;
+
 @Service
 public class OrderServiceImpl implements OrderService {
 
@@ -49,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
         order.setCountryCode(request.getCountryCode());
         order.setTrackingNumber(RandomStringUtils.randomAlphanumeric(12));
         order.setCouponCode(request.getCouponCode());
-        order.setCreateDate(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+        order.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
         order.setOrderType(OrderType.valueOf(request.getOrderType()));
         order.setForexAmount(request.getForexAmount());
         order.setForexTotal(response.getForexTotal());

@@ -20,6 +20,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.example.demo.web.utils.Constants.ZONE;
+
 @Service
 public class RatesServiceImpl implements RatesService {
 
@@ -42,7 +44,7 @@ public class RatesServiceImpl implements RatesService {
 
     @Scheduled(cron = "0 0 2 * * *")
     public void scheduledTask() {
-        LOGGER.info("Updating Database with latest Rates @ Time - {}", dateTimeFormatter.format(LocalDateTime.now(ZoneId.of("Asia/Kolkata"))));
+        LOGGER.info("Updating Database with latest Rates @ Time - {}", dateTimeFormatter.format(LocalDateTime.now(ZoneId.of(ZONE))));
         updateExchangeRates();
     }
 
@@ -164,7 +166,7 @@ public class RatesServiceImpl implements RatesService {
                     .getBody()
                     .get("rates");
         } catch (Exception e) {
-            LOGGER.error("Error fetching data from exchange rate api @ Time - {}", dateTimeFormatter.format(LocalDateTime.now(ZoneId.of("Asia/Kolkata"))));
+            LOGGER.error("Error fetching data from exchange rate api @ Time - {}", dateTimeFormatter.format(LocalDateTime.now(ZoneId.of(ZONE))));
         }
     }
 }

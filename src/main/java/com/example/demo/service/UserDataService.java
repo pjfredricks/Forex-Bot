@@ -19,4 +19,9 @@ public interface UserDataService {
 	UserDataResponse resetPassword(UserDataRequest resetRequest) throws IllegalAccessException;
 
 	UserDataResponse updateUserDetails(UserDataRequest resetRequest) throws IllegalAccessException;
+
+	// TODO: Use mobileNum after sms impl
+	String generateAndSaveOtp(String emailId, int otpType);
+
+	boolean verifyOtp(String otp, String emailId, int otpType) throws IllegalAccessException;
 }

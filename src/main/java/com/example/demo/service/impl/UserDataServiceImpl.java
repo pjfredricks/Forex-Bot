@@ -1,10 +1,10 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.repository.UserDataRepository;
-import com.example.demo.repository.dao.userdata.UserData;
-import com.example.demo.repository.dao.userdata.UserDataRequest;
-import com.example.demo.repository.dao.userdata.UserDataResponse;
+import com.example.demo.repository.OtpDataRepository;
+import com.example.demo.repository.dao.userdata.*;
 import com.example.demo.service.UserDataService;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,15 +14,21 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
 
+import static com.example.demo.web.utils.Constants.ZONE;
+
 @Service
 public class UserDataServiceImpl implements UserDataService {
 
+    private OtpDataRepository otpDataRepository;
     private UserDataRepository userDataRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserDataServiceImpl(UserDataRepository userDataRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserDataServiceImpl(UserDataRepository userDataRepository,
+                               BCryptPasswordEncoder bCryptPasswordEncoder,
+                               OtpDataRepository otpDataRepository) {
         this.userDataRepository = userDataRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.otpDataRepository = otpDataRepository;
     }
 
     @Override
@@ -54,7 +60,7 @@ public class UserDataServiceImpl implements UserDataService {
 
         if (null != userDataFromDb) {
             userDataFromDb.setPassword(bCryptPasswordEncoder.encode(resetRequest.getPassword()));
-            userDataFromDb.setModifiedDate(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+            userDataFromDb.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
             userDataRepository.save(userDataFromDb);
             return mapDataToResponse(userDataFromDb);
         }
@@ -82,12 +88,52 @@ public class UserDataServiceImpl implements UserDataService {
             if (StringUtils.isNotBlank(updateRequest.getMobileNum())) {
                 userDataFromDb.setMobileNum(updateRequest.getMobileNum());
             }
-            userDataFromDb.setModifiedDate(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+            userDataFromDb.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
             userDataRepository.save(userDataFromDb);
             return mapDataToResponse(userDataFromDb);
         }
 
         throw new IllegalAccessException("Not able to find records for requested details");
+    }
+
+    @Override
+    @Transactional
+    public String generateAndSaveOtp(String emailId, int otpTypeInt) {
+        String otp = RandomStringUtils.randomNumeric(6);
+        OtpData otpData = otpDataRepository.findOtpDataByEmailIdAndOtpType(emailId, OtpType.valueOf(otpTypeInt));
+
+        if (otpData != null) {
+            otpData.setOtp(bCryptPasswordEncoder.encode(otp));
+            otpData.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
+            otpData.setRetryCount(otpData.getRetryCount() + 1);
+        } else {
+            otpData = new OtpData();
+            otpData.setOtp(bCryptPasswordEncoder.encode(otp));
+            otpData.setEmailId(emailId);
+            otpData.setOtpType(OtpType.valueOf(otpTypeInt));
+            otpData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
+            otpData.setRetryCount(0);
+        }
+
+        otpDataRepository.save(otpData);
+        return otp;
+    }
+
+    @Override
+    public boolean verifyOtp(String otp, String emailId, int otpType) throws IllegalAccessException {
+        OtpData otpData = otpDataRepository.findOtpDataByEmailIdAndOtpType(emailId, OtpType.valueOf(otpType));
+
+        if (otpData == null) {
+            throw new IllegalAccessException("Invalid emailId or Otp Type");
+        }
+
+        if (bCryptPasswordEncoder.matches(otp, otpData.getOtp())) {
+            otpData.setOtpVerified(true);
+            otpDataRepository.save(otpData);
+            return true;
+        }
+
+        return false;
     }
 
     private boolean checkPasswordsMatch(String enteredPassword, String passwordFromDb) {
@@ -102,7 +148,7 @@ public class UserDataServiceImpl implements UserDataService {
         userData.setMobileNum(userRequest.getMobileNum());
         userData.setName(userRequest.getName());
         userData.setPassword(bCryptPasswordEncoder.encode(userRequest.getPassword()));
-        userData.setCreateDate(LocalDateTime.now(ZoneId.of("Asia/Kolkata")).toString());
+        userData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
         return userData;
     }
 
