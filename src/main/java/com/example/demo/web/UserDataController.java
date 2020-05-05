@@ -52,7 +52,7 @@ public class UserDataController {
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
-                    e.getMessage(),
+                    "User not found",
                     null), HttpStatus.OK);
         }
         if (userDataResponse != null) {
