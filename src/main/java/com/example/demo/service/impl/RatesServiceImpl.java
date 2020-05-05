@@ -30,11 +30,15 @@ public class RatesServiceImpl implements RatesService {
     private static final Set<String> countryList = Stream.of("USD", "AUD", "GBP", "EUR", "CAD",
             "CNY", "SAR", "SGD", "MYR", "THB",
             "IDR", "ILS", "JPY", "KRW", "CHF",
-            "PHP", "FJD", "HKD", "ZAR").collect(Collectors.toSet());
+            "PHP", "FJD", "HKD", "ZAR", "SEK",
+            "NOK", "DKK", "NZD", "BHD", "OMR",
+            "KWD").collect(Collectors.toSet());
     private static final Set<String> noCarouselCountryList = Stream.of("ILS", "JPY", "KRW", "CHF",
-            "PHP", "FJD", "HKD", "ZAR").collect(Collectors.toSet());
+            "PHP", "FJD", "HKD", "ZAR",
+            "SEK", "NOK", "DKK", "NZD",
+            "BHD", "OMR", "KWD").collect(Collectors.toSet());
 
-    private static Map<String, Double> currencyValues = new HashMap<>();
+    private static Map<String, Number> currencyValues = new HashMap<>();
     private static List<ForexRates> exchangeRates = new ArrayList<>();
 
     @PostConstruct
@@ -56,10 +60,12 @@ public class RatesServiceImpl implements RatesService {
 
         // Updates latest forex currency values
         getCurrencyForexValues();
+        double inrValue = currencyValues.get("INR").doubleValue();
 
         // Remove unwanted countries and convert rates
         currencyValues.keySet().retainAll(countryList);
-        currencyValues.replaceAll((countryCode, currencyValue) -> convertRate(1 / currencyValue, 6));
+        currencyValues.entrySet().forEach(currencyValue -> currencyValue.setValue(currencyValue.getValue().doubleValue() / inrValue));
+        currencyValues.replaceAll((countryCode, currencyValue) -> convertRate(1 / currencyValue.doubleValue(), 6));
 
         // Set buy and sell Rates, and update carousel values
         exchangeRates = currencyValues.entrySet()
@@ -108,7 +114,7 @@ public class RatesServiceImpl implements RatesService {
         }
     }
 
-    private static ForexRates constructForexRates(Map.Entry<String, Double> currencyValueMap) {
+    private static ForexRates constructForexRates(Map.Entry<String, Number> currencyValueMap) {
         ForexRates forexRate = new ForexRates();
         forexRate.setCarousel(true);
 
@@ -117,8 +123,8 @@ public class RatesServiceImpl implements RatesService {
         }
         forexRate.setCountryCode(currencyValueMap.getKey());
         forexRate.setCountryName(Currency.getInstance(currencyValueMap.getKey()).getDisplayName());
-        forexRate.setBuyRate(calculateBuyRate(currencyValueMap.getValue()));
-        forexRate.setSellRate(calculateSellRate(currencyValueMap.getValue()));
+        forexRate.setBuyRate(calculateBuyRate(currencyValueMap.getValue().doubleValue()));
+        forexRate.setSellRate(calculateSellRate(currencyValueMap.getValue().doubleValue()));
         return forexRate;
     }
 
@@ -161,8 +167,8 @@ public class RatesServiceImpl implements RatesService {
 
     private static void getCurrencyForexValues() {
         try {
-            currencyValues = (Map<String, Double>) new RestTemplate()
-                    .getForEntity("https://api.exchangerate-api.com/v4/latest/INR", LinkedHashMap.class)
+            currencyValues = (Map<String, Number>) new RestTemplate()
+                    .getForEntity("http://data.fixer.io/api/latest?access_key=4c29457e83b0090604057f85b8e874e3&format=1", LinkedHashMap.class)
                     .getBody()
                     .get("rates");
         } catch (Exception e) {
