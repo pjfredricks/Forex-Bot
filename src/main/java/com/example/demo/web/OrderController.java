@@ -3,6 +3,7 @@ package com.example.demo.web;
 import com.example.demo.repository.dao.ResponseWrapper;
 import com.example.demo.repository.dao.order.CalculateRequest;
 import com.example.demo.repository.dao.order.Order;
+import com.example.demo.repository.dao.order.OrderResponse;
 import com.example.demo.repository.dao.order.OrderType;
 import com.example.demo.service.OrderService;
 import org.apache.commons.lang3.StringUtils;
@@ -55,31 +56,31 @@ public class OrderController {
 
     @PostMapping(path = "/order")
     public ResponseEntity<ResponseWrapper> placeOrder(@RequestBody CalculateRequest request) {
-        String trackingNumber;
+        OrderResponse response;
         try {
             validateRequest(request);
-            trackingNumber = orderService.placeOrder(request);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
-                    ERROR,
+                    SUCCESS,
                     "Order validation failed",
                     e.getMessage()),
                     HttpStatus.BAD_REQUEST);
         }
 
-        if (StringUtils.isNotBlank(trackingNumber)) {
+        response = orderService.placeOrder(request);
+        if (response.getTransactionId() != null) {
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
                     "Order placed successfully",
-                    trackingNumber),
+                    response),
                     HttpStatus.CREATED);
         }
-
         return new ResponseEntity<>(new ResponseWrapper(
-                ERROR,
-                "User validation failed",
-                "User does not exist"),
-                HttpStatus.BAD_REQUEST);
+                SUCCESS,
+                "Order placement failed",
+                response),
+                HttpStatus.CREATED);
+
     }
 
     @PutMapping(path = "/order")

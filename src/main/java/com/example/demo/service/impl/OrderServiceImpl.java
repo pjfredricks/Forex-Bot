@@ -41,20 +41,26 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public String placeOrder(CalculateRequest request) throws IllegalAccessException {
+    public OrderResponse placeOrder(CalculateRequest request) {
+        OrderResponse orderResponse = new OrderResponse();
         UserData userData = userDataService.getUserDetailsById(UUID.fromString(request.getUserId()));
+
         if (ObjectUtils.isEmpty(userData)) {
-            return "";
+            orderResponse.setTransactionId(null);
+            orderResponse.setUserExists(false);
+            orderResponse.setEmailVerified(false);
+            return orderResponse;
         }
+        orderResponse.setUserExists(true);
         CalculateResponse response = calculateOrder(request);
 
         if (!userData.isEmailVerified()) {
-            throw new IllegalAccessException("EmailId not verified");
+            orderResponse.setTransactionId(null);
+            orderResponse.setUserExists(true);
+            orderResponse.setEmailVerified(false);
+            return orderResponse;
         }
-
-        if (!userData.isMobileVerified()) {
-            throw new IllegalAccessException("MobileNum not verified");
-        }
+        orderResponse.setEmailVerified(true);
 
         Order order = new Order();
         order.setUserId(UUID.fromString(request.getUserId()));
@@ -72,7 +78,8 @@ public class OrderServiceImpl implements OrderService {
         // TODO : update status based on email and sms
         order.setStatus(OrderStatus.COMPLETED);
 
-        return orderRepository.save(order).getTrackingNumber();
+        orderResponse.setTransactionId(orderRepository.save(order).getTrackingNumber());
+        return orderResponse;
     }
 
     @Override
