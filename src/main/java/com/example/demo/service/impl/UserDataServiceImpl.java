@@ -41,8 +41,14 @@ public class UserDataServiceImpl implements UserDataService {
     }
 
     @Override
-    public UserDataResponse login(UserDataRequest userDataRequest) throws Exception {
-        UserData userData = getUserDataByEmailIdOrMobileNum(userDataRequest.getEmailId(), userDataRequest.getMobileNum());
+    public UserDataResponse login(UserDataRequest userDataRequest) {
+        UserData userData = null;
+
+        if (userDataRequest.getEmailId().contains("@")) {
+            userData = getUserDataByEmailId(userDataRequest.getEmailId());
+        } else {
+            userData = getUserDataByMobileNum(userDataRequest.getMobileNum());
+        }
 
         if (checkPasswordsMatch(userDataRequest.getPassword(), userData.getPassword())) {
             return mapDataToResponse(userData);
@@ -69,8 +75,13 @@ public class UserDataServiceImpl implements UserDataService {
     }
 
     @Override
-    public UserData getUserDataByEmailIdOrMobileNum(String emailId, String mobileNum) {
-        return userDataRepository.getUserDataByEmailIdOrMobileNum(emailId, mobileNum);
+    public UserData getUserDataByEmailId(String emailId) {
+        return userDataRepository.getUserDataByEmailId(emailId);
+    }
+
+    @Override
+    public UserData getUserDataByMobileNum(String mobileNum) {
+        return userDataRepository.getUserDataByMobileNum(mobileNum);
     }
 
     @Override

@@ -10,7 +10,9 @@ import java.util.UUID;
 @Repository
 public interface UserDataRepository extends JpaRepository<UserData, Integer> {
 
-    UserData getUserDataByEmailIdOrMobileNum(String emailId, String mobileNum);
+    UserData getUserDataByEmailId(String emailId);
+
+    UserData getUserDataByMobileNum(String mobileNum);
 
     UserData getUserDataByUserId(UUID userId);
 

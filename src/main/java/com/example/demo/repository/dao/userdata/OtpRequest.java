@@ -4,7 +4,7 @@ public class OtpRequest {
 
     private String userId;
     private String otp;
-    private String emailId;
+    private String mobileNum;
     private int otpType;
 
     public OtpRequest() {
@@ -26,12 +26,12 @@ public class OtpRequest {
         this.otp = otp;
     }
 
-    public String getEmailId() {
-        return emailId;
+    public String getMobileNum() {
+        return mobileNum;
     }
 
-    public void setEmailId(String emailId) {
-        this.emailId = emailId;
+    public void setMobileNum(String mobileNum) {
+        this.mobileNum = mobileNum;
     }
 
     public int getOtpType() {

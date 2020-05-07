@@ -131,12 +131,12 @@ public class UserDataController {
     @PostMapping(path = "/sendOtp")
     public ResponseEntity<ResponseWrapper> sendOtp(@RequestBody OtpRequest otpRequest) {
         // TODO: Use mobile Num after SMS impl
-        String otp = userDataService.generateAndSaveOtp(otpRequest.getEmailId(), otpRequest.getOtpType());
-        emailService.sendOtpEmail(otpRequest.getEmailId(), otp);
+        String otp = userDataService.generateAndSaveOtp(otpRequest.getMobileNum(), otpRequest.getOtpType());
+        emailService.sendOtpEmail(otpRequest.getMobileNum(), otp);
 
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
-                "Otp sent to email Id: " + otpRequest.getEmailId(),
+                "Otp sent to email Id: " + otpRequest.getMobileNum(),
                 null), HttpStatus.OK);
     }
 
@@ -144,7 +144,7 @@ public class UserDataController {
     public ResponseEntity<ResponseWrapper> verifyOtp(@RequestBody OtpRequest otpRequest) {
         // TODO: Use mobile Num after SMS impl
         try {
-            if (userDataService.verifyOtp(otpRequest.getOtp(), otpRequest.getEmailId(), otpRequest.getOtpType())) {
+            if (userDataService.verifyOtp(otpRequest.getOtp(), otpRequest.getMobileNum(), otpRequest.getOtpType())) {
                 return new ResponseEntity<>(new ResponseWrapper(
                         SUCCESS,
                         "Otp verification successful",
@@ -163,7 +163,7 @@ public class UserDataController {
     }
 
     private ResponseEntity<ResponseWrapper> sendEmail(String emailId, EmailService.EmailType emailType) throws IOException, MessagingException {
-        UserData userData = userDataService.getUserDataByEmailIdOrMobileNum(emailId, null);
+        UserData userData = userDataService.getUserDataByEmailId(emailId);
 
         if (userData == null) {
             return new ResponseEntity<>(new ResponseWrapper(
