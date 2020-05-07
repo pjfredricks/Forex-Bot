@@ -51,7 +51,7 @@ public class UserDataServiceImpl implements UserDataService {
         if (userDataRequest.getEmailId().contains("@")) {
             userData = getUserDataByEmailId(userDataRequest.getEmailId());
         } else {
-            userData = getUserDataByMobileNum(userDataRequest.getMobileNum());
+            userData = getUserDataByMobileNum(userDataRequest.getEmailId());
         }
 
         if (checkPasswordsMatch(userDataRequest.getPassword(), userData.getPassword())) {
@@ -130,7 +130,7 @@ public class UserDataServiceImpl implements UserDataService {
             otpData.setRetryCount(otpData.getRetryCount() + 1);
         } else {
             otpData = new OtpData();
-            if (OtpType.SIGN_UP.equals(OtpType.valueOf(otpRequest.getOtpType()))) {
+            if (!OtpType.SIGN_UP.equals(OtpType.valueOf(otpRequest.getOtpType()))) {
                 otpData.setUserId(UUID.fromString(otpRequest.getUserId()));
             }
             otpData.setOtp(bCryptPasswordEncoder.encode(otp));
