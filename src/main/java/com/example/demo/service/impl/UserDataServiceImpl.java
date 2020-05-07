@@ -130,7 +130,9 @@ public class UserDataServiceImpl implements UserDataService {
             otpData.setRetryCount(otpData.getRetryCount() + 1);
         } else {
             otpData = new OtpData();
-            otpData.setUserId(UUID.fromString(otpRequest.getUserId()));
+            if (OtpType.SIGN_UP.equals(OtpType.valueOf(otpRequest.getOtpType()))) {
+                otpData.setUserId(UUID.fromString(otpRequest.getUserId()));
+            }
             otpData.setOtp(bCryptPasswordEncoder.encode(otp));
             otpData.setEmailId(otpRequest.getMobileNum());
             otpData.setOtpType(OtpType.valueOf(otpRequest.getOtpType()));
