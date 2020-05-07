@@ -1,7 +1,7 @@
 package com.example.demo.repository;
 
-import com.example.demo.repository.dao.userdata.OtpData;
-import com.example.demo.repository.dao.userdata.OtpType;
+import com.example.demo.repository.dao.otp.OtpData;
+import com.example.demo.repository.dao.otp.OtpType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

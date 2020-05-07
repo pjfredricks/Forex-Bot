@@ -2,8 +2,12 @@ package com.example.demo.service.impl;
 
 import com.example.demo.repository.UserDataRepository;
 import com.example.demo.repository.OtpDataRepository;
+import com.example.demo.repository.dao.otp.OtpData;
+import com.example.demo.repository.dao.otp.OtpRequest;
+import com.example.demo.repository.dao.otp.OtpType;
 import com.example.demo.repository.dao.userdata.*;
 import com.example.demo.service.UserDataService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -94,9 +98,15 @@ public class UserDataServiceImpl implements UserDataService {
                 userDataFromDb.setName(updateRequest.getName());
             }
             if (StringUtils.isNotBlank(updateRequest.getEmailId())) {
+                if (userDataFromDb.isEmailVerified()) {
+                    throw new IllegalAccessException("EmailId is verified, Not allowed to update");
+                }
                 userDataFromDb.setEmailId(updateRequest.getEmailId());
             }
             if (StringUtils.isNotBlank(updateRequest.getMobileNum())) {
+                if (userDataFromDb.isMobileVerified()) {
+                    throw new IllegalAccessException("MobileNum is verified, Not allowed to update");
+                }
                 userDataFromDb.setMobileNum(updateRequest.getMobileNum());
             }
             userDataFromDb.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
@@ -109,9 +119,10 @@ public class UserDataServiceImpl implements UserDataService {
 
     @Override
     @Transactional
-    public String generateAndSaveOtp(String emailId, int otpTypeInt) {
+    public String generateAndSaveOtp(OtpRequest otpRequest) {
         String otp = RandomStringUtils.randomNumeric(6);
-        OtpData otpData = otpDataRepository.findOtpDataByEmailIdAndOtpType(emailId, OtpType.valueOf(otpTypeInt));
+        OtpData otpData = otpDataRepository.findOtpDataByEmailIdAndOtpType(otpRequest.getMobileNum(),
+                OtpType.valueOf(otpRequest.getOtpType()));
 
         if (otpData != null) {
             otpData.setOtp(bCryptPasswordEncoder.encode(otp));
@@ -119,9 +130,10 @@ public class UserDataServiceImpl implements UserDataService {
             otpData.setRetryCount(otpData.getRetryCount() + 1);
         } else {
             otpData = new OtpData();
+            otpData.setUserId(UUID.fromString(otpRequest.getUserId()));
             otpData.setOtp(bCryptPasswordEncoder.encode(otp));
-            otpData.setEmailId(emailId);
-            otpData.setOtpType(OtpType.valueOf(otpTypeInt));
+            otpData.setEmailId(otpRequest.getMobileNum());
+            otpData.setOtpType(OtpType.valueOf(otpRequest.getOtpType()));
             otpData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
             otpData.setRetryCount(0);
         }
@@ -131,20 +143,40 @@ public class UserDataServiceImpl implements UserDataService {
     }
 
     @Override
-    public boolean verifyOtp(String otp, String emailId, int otpType) throws IllegalAccessException {
-        OtpData otpData = otpDataRepository.findOtpDataByEmailIdAndOtpType(emailId, OtpType.valueOf(otpType));
+    @Transactional
+    public boolean verifyOtp(OtpRequest otpRequest) throws IllegalAccessException {
+        OtpData otpData = otpDataRepository.findOtpDataByEmailIdAndOtpType(otpRequest.getMobileNum(),
+                OtpType.valueOf(otpRequest.getOtpType()));
 
-        if (otpData == null) {
+        if (ObjectUtils.isEmpty(otpData)) {
             throw new IllegalAccessException("Invalid emailId or Otp Type");
         }
 
-        if (bCryptPasswordEncoder.matches(otp, otpData.getOtp())) {
+        UserData userData;
+        if (bCryptPasswordEncoder.matches(otpRequest.getOtp(), otpData.getOtp())) {
             otpData.setOtpVerified(true);
             otpDataRepository.save(otpData);
+            userData = userDataRepository.getUserDataByUserId(UUID.fromString(otpRequest.getUserId()));
+            if (ObjectUtils.isEmpty(userData)) {
+                throw new IllegalAccessException("No user fround for userId: " + otpRequest.getUserId());
+            }
+            userData.setMobileVerified(true);
+            userDataRepository.save(userData);
             return true;
         }
 
         return false;
+    }
+
+    @Override
+    @Transactional
+    public void verifyEmail(UserDataRequest userDataRequest) throws IllegalAccessException {
+        UserData userData = userDataRepository.getUserDataByUserId(UUID.fromString(userDataRequest.getUserId()));
+        if (ObjectUtils.isEmpty(userData)) {
+            throw new IllegalAccessException("No user fround for userId: " + userDataRequest.getUserId());
+        }
+        userData.setEmailVerified(true);
+        userDataRepository.save(userData);
     }
 
     private boolean checkPasswordsMatch(String enteredPassword, String passwordFromDb) {

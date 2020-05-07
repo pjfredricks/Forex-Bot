@@ -1,4 +1,4 @@
-package com.example.demo.repository.dao.userdata;
+package com.example.demo.repository.dao.otp;
 
 import java.util.HashMap;
 import java.util.Map;

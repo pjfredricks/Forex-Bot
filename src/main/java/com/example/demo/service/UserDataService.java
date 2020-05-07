@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.repository.dao.otp.OtpRequest;
 import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.repository.dao.userdata.UserDataRequest;
 import com.example.demo.repository.dao.userdata.UserDataResponse;
@@ -22,8 +23,9 @@ public interface UserDataService {
 
 	UserDataResponse updateUserDetails(UserDataRequest resetRequest) throws IllegalAccessException;
 
-	// TODO: Use mobileNum after sms impl
-	String generateAndSaveOtp(String emailId, int otpType);
+	String generateAndSaveOtp(OtpRequest otpRequest);
 
-	boolean verifyOtp(String otp, String emailId, int otpType) throws IllegalAccessException;
+	boolean verifyOtp(OtpRequest otpRequest) throws IllegalAccessException;
+
+	void verifyEmail(UserDataRequest userDataRequest) throws IllegalAccessException;
 }

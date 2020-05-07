@@ -31,12 +31,20 @@ public class UserData {
     private String emailId;
 
     @NotNull
+    @Column(name = "isEmailVerified", columnDefinition = "boolean default false")
+    private boolean isEmailVerified;
+
+    @NotNull
     @Column(name = "password")
     private String password;
 
     @NotNull
     @Column(name = "mobileNum", unique = true)
     private String mobileNum;
+
+    @NotNull
+    @Column(name = "isMobileVerified", columnDefinition = "boolean default false")
+    private boolean isMobileVerified;
 
     @NotNull
     @ApiModelProperty(hidden = true)
@@ -83,12 +91,28 @@ public class UserData {
         this.emailId = emailId;
     }
 
+    public boolean isEmailVerified() {
+        return isEmailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        isEmailVerified = emailVerified;
+    }
+
     public String getMobileNum() {
         return mobileNum;
     }
 
     public void setMobileNum(String mobileNum) {
         this.mobileNum = mobileNum;
+    }
+
+    public boolean isMobileVerified() {
+        return isMobileVerified;
+    }
+
+    public void setMobileVerified(boolean mobileVerified) {
+        isMobileVerified = mobileVerified;
     }
 
     public String getPassword() {

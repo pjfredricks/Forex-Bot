@@ -8,7 +8,7 @@ public interface OrderService {
 
     Order getOrderByUserIdOrTrackingNumberOrCouponCode(String userId, String trackingNumber, String couponCode);
 
-    String placeOrder(CalculateRequest request);
+    String placeOrder(CalculateRequest request) throws IllegalAccessException;
 
     Order updateOrder(Order order);
 

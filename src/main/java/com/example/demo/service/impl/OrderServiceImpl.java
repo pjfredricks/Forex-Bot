@@ -2,6 +2,7 @@ package com.example.demo.service.impl;
 
 import com.example.demo.repository.dao.order.*;
 import com.example.demo.repository.OrderRepository;
+import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.service.OrderService;
 import com.example.demo.service.RatesService;
 import com.example.demo.service.UserDataService;
@@ -40,11 +41,20 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public String placeOrder(CalculateRequest request) {
-        if (ObjectUtils.isEmpty(userDataService.getUserDetailsById(UUID.fromString(request.getUserId())))) {
+    public String placeOrder(CalculateRequest request) throws IllegalAccessException {
+        UserData userData = userDataService.getUserDetailsById(UUID.fromString(request.getUserId()));
+        if (ObjectUtils.isEmpty(userData)) {
             return "";
         }
         CalculateResponse response = calculateOrder(request);
+
+        if (!userData.isEmailVerified()) {
+            throw new IllegalAccessException("EmailId not verified");
+        }
+
+        if (!userData.isMobileVerified()) {
+            throw new IllegalAccessException("MobileNum not verified");
+        }
 
         Order order = new Order();
         order.setUserId(UUID.fromString(request.getUserId()));

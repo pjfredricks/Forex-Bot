@@ -33,6 +33,9 @@ public class EmailServiceImpl implements EmailService {
             case WELCOME:
                 javaMailSender.send(constructMail(emailId, userData, "welcome_page.html", "Welcome to ForexBot"));
                 break;
+            case VERIFY:
+                javaMailSender.send(constructMail(emailId, userData, "verify_email.html", "Verify your Email address"));
+                break;
             default:
                 break;
         }

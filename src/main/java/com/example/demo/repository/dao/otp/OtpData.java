@@ -1,4 +1,4 @@
-package com.example.demo.repository.dao.userdata;
+package com.example.demo.repository.dao.otp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
@@ -35,7 +35,7 @@ public class OtpData {
 
     @NotNull
     @ApiModelProperty(hidden = true)
-    @Column(name = "otpVerified")
+    @Column(name = "otpVerified", columnDefinition = "boolean default false")
     private boolean otpVerified;
 
     @NotNull
@@ -53,7 +53,6 @@ public class OtpData {
 
     public OtpData() {
         super();
-        otpVerified = false;
     }
 
     public UUID getUserId() {

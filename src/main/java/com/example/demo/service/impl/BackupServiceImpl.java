@@ -4,7 +4,7 @@ import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.OtpDataRepository;
 import com.example.demo.repository.UserDataRepository;
 import com.example.demo.repository.dao.order.Order;
-import com.example.demo.repository.dao.userdata.OtpData;
+import com.example.demo.repository.dao.otp.OtpData;
 import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.service.BackupService;
 import com.fasterxml.jackson.core.JsonProcessingException;

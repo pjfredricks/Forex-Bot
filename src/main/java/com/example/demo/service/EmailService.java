@@ -10,6 +10,7 @@ public interface EmailService {
     enum EmailType {
         WELCOME,
         RESET,
+        VERIFY,
         BACKUP
     }
 

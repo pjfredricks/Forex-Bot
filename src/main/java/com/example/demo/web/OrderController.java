@@ -55,16 +55,17 @@ public class OrderController {
 
     @PostMapping(path = "/order")
     public ResponseEntity<ResponseWrapper> placeOrder(@RequestBody CalculateRequest request) {
+        String trackingNumber;
         try {
             validateRequest(request);
+            trackingNumber = orderService.placeOrder(request);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
                     "Order validation failed",
-                    e.getCause().getMessage()),
+                    e.getMessage()),
                     HttpStatus.BAD_REQUEST);
         }
-        String trackingNumber = orderService.placeOrder(request);
 
         if (StringUtils.isNotBlank(trackingNumber)) {
             return new ResponseEntity<>(new ResponseWrapper(
