@@ -2,13 +2,13 @@ package com.example.demo.service.impl;
 
 import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.service.EmailService;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +46,7 @@ public class EmailServiceImpl implements EmailService {
                                       String fileName,
                                       String subject) throws MessagingException, IOException {
         MimeMessage message = javaMailSender.createMimeMessage();
+        message.setFrom(new InternetAddress("forexbotdev@gmail.com", "Forex Bot"));
 
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setTo(emailId);
@@ -61,9 +62,12 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     @Async
-    public void sendOtpEmail(String emailId, String otp) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(emailId);
+    public void sendOtpEmail(String emailId, String otp) throws MessagingException, IOException {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        message.setFrom(new InternetAddress("forexbotdev@gmail.com", "Forex Bot"));
+
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setTo(emailId);
         message.setSubject("OTP for signUp");
         message.setText("The otp for your transaction is: " + otp);
 

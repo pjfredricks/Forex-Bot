@@ -39,6 +39,10 @@ public class UserDataServiceImpl implements UserDataService {
     @Transactional
     public UserDataResponse signUpUser(UserDataRequest userDataRequest) {
         UserData userData = mapRequestToData(userDataRequest);
+        OtpData otpData = otpDataRepository.findOtpDataByEmailId(userDataRequest.getEmailId());
+        if (ObjectUtils.isNotEmpty(otpData) && otpData.isOtpVerified()) {
+            userData.setMobileVerified(true);
+        }
         userDataRepository.save(userData);
 
         return mapDataToResponse(userData);
@@ -154,16 +158,17 @@ public class UserDataServiceImpl implements UserDataService {
             throw new IllegalAccessException("Invalid emailId or Otp Type");
         }
 
-        UserData userData;
+
+        if (otpRequest.getOtpType() != 0) {
+            UserData userData = userDataRepository.getUserDataByUserId(UUID.fromString(otpRequest.getUserId()));
+            if (ObjectUtils.isEmpty(userData)) {
+                throw new IllegalAccessException("No user found for userId: " + otpRequest.getUserId());
+            }
+        }
+
         if (bCryptPasswordEncoder.matches(otpRequest.getOtp(), otpData.getOtp())) {
             otpData.setOtpVerified(true);
             otpDataRepository.save(otpData);
-            userData = userDataRepository.getUserDataByUserId(UUID.fromString(otpRequest.getUserId()));
-            if (ObjectUtils.isEmpty(userData)) {
-                throw new IllegalAccessException("No user fround for userId: " + otpRequest.getUserId());
-            }
-            userData.setMobileVerified(true);
-            userDataRepository.save(userData);
             return true;
         }
 

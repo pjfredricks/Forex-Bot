@@ -45,7 +45,7 @@ public class EmailController {
     }
 
     @PostMapping(path = "/sendOtp")
-    public ResponseEntity<ResponseWrapper> sendOtp(@RequestBody OtpRequest otpRequest) {
+    public ResponseEntity<ResponseWrapper> sendOtp(@RequestBody OtpRequest otpRequest) throws IOException, MessagingException {
         // TODO: Use mobile Num after SMS impl
         String otp = userDataService.generateAndSaveOtp(otpRequest);
         emailService.sendOtpEmail(otpRequest.getMobileNum(), otp);
