@@ -43,27 +43,20 @@ public class UserDataController {
 
     @PostMapping(path = "/login")
     public ResponseEntity<ResponseWrapper> login(@RequestBody UserDataRequest userDataRequest) {
-        UserDataResponse userDataResponse = null;
-        try {
-            userDataResponse = userDataService.login(userDataRequest);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    ERROR,
-                    "User not found",
-                    null), HttpStatus.OK);
-        }
+        UserDataResponse userDataResponse = userDataService.login(userDataRequest);
         if (userDataResponse != null) {
-                return new ResponseEntity<>(new ResponseWrapper(
-                        SUCCESS,
-                        "Login success",
-                        userDataResponse), HttpStatus.OK);
+            return new ResponseEntity<>(new ResponseWrapper(
+                    SUCCESS,
+                    "Login success",
+                    userDataResponse), HttpStatus.OK);
         }
         return new ResponseEntity<>(new ResponseWrapper(
                 ERROR,
-                "Incorrect Password",
+                "Incorrect Credentials",
                 null), HttpStatus.OK);
     }
 
+    // Not integrated with UI
     @PutMapping(path = "/resetPassword")
     public ResponseEntity<ResponseWrapper> resetUserPassword(@RequestBody UserDataRequest resetRequest) {
         try {
@@ -75,11 +68,12 @@ public class UserDataController {
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
-                    "Unable to find details for userId: " + resetRequest.getUserId(),
+                    e.getMessage(),
                     null), HttpStatus.OK);
         }
     }
 
+    // Not integrated with UI
     @PutMapping(path = "/updateDetails")
     public ResponseEntity<ResponseWrapper> updateUserDetails(@RequestBody UserDataRequest resetRequest) {
         try {
@@ -96,22 +90,57 @@ public class UserDataController {
         }
     }
 
-    @GetMapping(path = "/userId/{userId}")
-    public ResponseEntity<ResponseWrapper> getUserDetailsByUserId(@RequestBody UserDataRequest userRequest) {
-        UUID userId;
+    // Not integrated with UI
+    @GetMapping(path = "/user/{userId}")
+    public ResponseEntity<ResponseWrapper> getUserDetailsByUserId(@PathVariable String userId) {
         try {
-             userId = UUID.fromString(userRequest.getUserId());
+            return new ResponseEntity<>(new ResponseWrapper(
+                    SUCCESS,
+                    "User Details fetched for userId: " + userId,
+                    userDataService.getUserDetailsById(UUID.fromString(userId))),
+                    HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
-                    "Invalid UserId " + userRequest.getUserId(),
+                    "Invalid UserId " + userId,
                     null),
                     HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ResponseWrapper(
-                SUCCESS,
-                "User Details fetched for userId: " + userRequest.getUserId(),
-                userDataService.getUserDetailsById(userId)),
-                HttpStatus.OK);
+    }
+
+    // Not integrated with UI
+    @GetMapping(path = "/user/{mobileNum}")
+    public ResponseEntity<ResponseWrapper> getUserDetailsByMobileNum(@PathVariable String mobileNum) {
+        try {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    SUCCESS,
+                    "User Details fetched for mobile number: " + mobileNum,
+                    userDataService.getUserDataByMobileNum(mobileNum)),
+                    HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    ERROR,
+                    "Invalid mobile number " + mobileNum,
+                    null),
+                    HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Not integrated with UI
+    @GetMapping(path = "/user/{emailId}")
+    public ResponseEntity<ResponseWrapper> getUserDetailsByEmailId(@PathVariable String emailId) {
+        try {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    SUCCESS,
+                    "User Details fetched for emailId: " + emailId,
+                    userDataService.getUserDataByEmailId(emailId)),
+                    HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    ERROR,
+                    "Invalid emailId " + emailId,
+                    null),
+                    HttpStatus.BAD_REQUEST);
+        }
     }
 }

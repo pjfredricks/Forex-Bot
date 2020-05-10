@@ -1,11 +1,11 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.repository.UserDataRepository;
 import com.example.demo.repository.dao.order.*;
 import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.service.OrderService;
 import com.example.demo.service.RatesService;
-import com.example.demo.service.UserDataService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
@@ -24,12 +24,12 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderRepository orderRepository;
     private RatesService ratesService;
-    private UserDataService userDataService;
+    private UserDataRepository userDataRepository;
 
-    public OrderServiceImpl(OrderRepository repository, RatesService ratesService, UserDataService userDataService) {
+    public OrderServiceImpl(OrderRepository repository, RatesService ratesService, UserDataRepository userDataRepository) {
         this.orderRepository = repository;
         this.ratesService = ratesService;
-        this.userDataService = userDataService;
+        this.userDataRepository = userDataRepository;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponse placeOrder(CalculateRequest request) {
         OrderResponse orderResponse = new OrderResponse();
-        UserData userData = userDataService.getUserDetailsById(UUID.fromString(request.getUserId()));
+        UserData userData = userDataRepository.getUserDataByUserId(UUID.fromString(request.getUserId()));
 
         if (ObjectUtils.isEmpty(userData)) {
             orderResponse.setTransactionId(null);

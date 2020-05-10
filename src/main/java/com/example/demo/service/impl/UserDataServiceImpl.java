@@ -70,16 +70,16 @@ public class UserDataServiceImpl implements UserDataService {
     }
 
     public UserDataResponse resetPassword(UserDataRequest resetRequest) throws IllegalAccessException {
-        UserData userDataFromDb = getUserDetailsById(UUID.fromString(resetRequest.getUserId()));
+        UserData userData = userDataRepository.getUserDataByUserId(UUID.fromString(resetRequest.getUserId()));
 
-        if (null != userDataFromDb) {
-            userDataFromDb.setPassword(bCryptPasswordEncoder.encode(resetRequest.getPassword()));
-            userDataFromDb.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
-            userDataRepository.save(userDataFromDb);
-            return mapDataToResponse(userDataFromDb);
+        if (ObjectUtils.isNotEmpty(userData)) {
+            userData.setPassword(bCryptPasswordEncoder.encode(resetRequest.getPassword()));
+            userData.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
+            userDataRepository.save(userData);
+            return mapDataToResponse(userData);
         }
 
-        throw new IllegalAccessException("Not able to find records for requested details");
+        throw new IllegalAccessException("Bad Credentials, Password reset failed");
     }
 
     @Override
@@ -95,27 +95,27 @@ public class UserDataServiceImpl implements UserDataService {
     @Override
     @Transactional
     public UserDataResponse updateUserDetails(UserDataRequest updateRequest) throws IllegalAccessException {
-        UserData userDataFromDb = getUserDetailsById(UUID.fromString(updateRequest.getUserId()));
+        UserData userData = userDataRepository.getUserDataByUserId(UUID.fromString(updateRequest.getUserId()));
 
-        if (null != userDataFromDb) {
+        if (ObjectUtils.isNotEmpty(userData)) {
+            if (userData.isEmailVerified()) {
+                throw new IllegalAccessException("EmailId is verified, Not allowed to update");
+            }
+            if (userData.isMobileVerified()) {
+                throw new IllegalAccessException("MobileNum is verified, Not allowed to update");
+            }
             if (StringUtils.isNotBlank(updateRequest.getName())) {
-                userDataFromDb.setName(updateRequest.getName());
+                userData.setName(updateRequest.getName());
             }
             if (StringUtils.isNotBlank(updateRequest.getEmailId())) {
-                if (userDataFromDb.isEmailVerified()) {
-                    throw new IllegalAccessException("EmailId is verified, Not allowed to update");
-                }
-                userDataFromDb.setEmailId(updateRequest.getEmailId());
+                userData.setEmailId(updateRequest.getEmailId());
             }
             if (StringUtils.isNotBlank(updateRequest.getMobileNum())) {
-                if (userDataFromDb.isMobileVerified()) {
-                    throw new IllegalAccessException("MobileNum is verified, Not allowed to update");
-                }
-                userDataFromDb.setMobileNum(updateRequest.getMobileNum());
+                userData.setMobileNum(updateRequest.getMobileNum());
             }
-            userDataFromDb.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
-            userDataRepository.save(userDataFromDb);
-            return mapDataToResponse(userDataFromDb);
+            userData.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
+            userDataRepository.save(userData);
+            return mapDataToResponse(userData);
         }
 
         throw new IllegalAccessException("Not able to find records for requested details");
@@ -128,7 +128,7 @@ public class UserDataServiceImpl implements UserDataService {
         OtpData otpData = otpDataRepository.findOtpDataByEmailIdAndOtpType(otpRequest.getMobileNum(),
                 OtpType.valueOf(otpRequest.getOtpType()));
 
-        if (otpData != null) {
+        if (ObjectUtils.isNotEmpty(otpData)) {
             otpData.setOtp(bCryptPasswordEncoder.encode(otp));
             otpData.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
             otpData.setRetryCount(otpData.getRetryCount() + 1);
@@ -158,10 +158,8 @@ public class UserDataServiceImpl implements UserDataService {
             throw new IllegalAccessException("Invalid emailId or Otp Type");
         }
 
-
         if (otpRequest.getOtpType() != 0) {
-            UserData userData = userDataRepository.getUserDataByUserId(UUID.fromString(otpRequest.getUserId()));
-            if (ObjectUtils.isEmpty(userData)) {
+            if (ObjectUtils.isEmpty(userDataRepository.getUserDataByUserId(UUID.fromString(otpRequest.getUserId())))) {
                 throw new IllegalAccessException("No user found for userId: " + otpRequest.getUserId());
             }
         }
