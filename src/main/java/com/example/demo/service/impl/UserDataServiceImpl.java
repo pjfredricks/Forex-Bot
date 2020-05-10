@@ -98,20 +98,18 @@ public class UserDataServiceImpl implements UserDataService {
         UserData userData = userDataRepository.getUserDataByUserId(UUID.fromString(updateRequest.getUserId()));
 
         if (ObjectUtils.isNotEmpty(userData)) {
-            if (userData.isEmailVerified()) {
+            if (StringUtils.isNotBlank(updateRequest.getEmailId()) && userData.isEmailVerified()) {
                 throw new IllegalAccessException("EmailId is verified, Not allowed to update");
+            } else {
+                userData.setEmailId(updateRequest.getEmailId());
             }
-            if (userData.isMobileVerified()) {
+            if (StringUtils.isNotBlank(updateRequest.getMobileNum()) && userData.isMobileVerified()) {
                 throw new IllegalAccessException("MobileNum is verified, Not allowed to update");
+            } else {
+                userData.setMobileNum(updateRequest.getMobileNum());
             }
             if (StringUtils.isNotBlank(updateRequest.getName())) {
                 userData.setName(updateRequest.getName());
-            }
-            if (StringUtils.isNotBlank(updateRequest.getEmailId())) {
-                userData.setEmailId(updateRequest.getEmailId());
-            }
-            if (StringUtils.isNotBlank(updateRequest.getMobileNum())) {
-                userData.setMobileNum(updateRequest.getMobileNum());
             }
             userData.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
             userDataRepository.save(userData);
