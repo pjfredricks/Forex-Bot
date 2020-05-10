@@ -46,7 +46,7 @@ public class EmailServiceImpl implements EmailService {
                                       String fileName,
                                       String subject) throws MessagingException, IOException {
         MimeMessage message = javaMailSender.createMimeMessage();
-        message.setFrom(new InternetAddress("forexbotdev@gmail.com", "Forex Bot"));
+        message.setFrom(new InternetAddress("info@forexbot.in", "Forex Bot"));
 
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setTo(emailId);
@@ -64,7 +64,7 @@ public class EmailServiceImpl implements EmailService {
     @Async
     public void sendOtpEmail(String emailId, String otp) throws MessagingException, IOException {
         MimeMessage message = javaMailSender.createMimeMessage();
-        message.setFrom(new InternetAddress("forexbotdev@gmail.com", "Forex Bot"));
+        message.setFrom(new InternetAddress("info@forexbot.in", "Forex Bot"));
 
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setTo(emailId);
