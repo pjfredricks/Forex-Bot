@@ -62,6 +62,14 @@ public class OrderServiceImpl implements OrderService {
         }
         orderResponse.setEmailVerified(true);
 
+        Order order = createOrder(request, response);
+        order.setStatus(OrderStatus.COMPLETED);
+
+        orderResponse.setTransactionId(orderRepository.save(order).getTrackingNumber());
+        return orderResponse;
+    }
+
+    private Order createOrder(CalculateRequest request, CalculateResponse response) {
         Order order = new Order();
         order.setUserId(UUID.fromString(request.getUserId()));
         order.setCountryCode(request.getCountryCode());
@@ -74,12 +82,7 @@ public class OrderServiceImpl implements OrderService {
         order.setGst(response.getGst());
         order.setDiscountAmount(response.getDiscountAmount());
         order.setSalesTotal(response.getSalesTotal());
-
-        // TODO : update status based on email and sms
-        order.setStatus(OrderStatus.COMPLETED);
-
-        orderResponse.setTransactionId(orderRepository.save(order).getTrackingNumber());
-        return orderResponse;
+        return order;
     }
 
     @Override
