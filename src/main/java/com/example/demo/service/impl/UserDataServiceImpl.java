@@ -39,7 +39,7 @@ public class UserDataServiceImpl implements UserDataService {
     @Transactional
     public UserDataResponse signUpUser(UserDataRequest userDataRequest) {
         UserData userData = mapRequestToData(userDataRequest);
-        OtpData otpData = otpDataRepository.findOtpDataByEmailId(userDataRequest.getEmailId());
+        OtpData otpData = otpDataRepository.findOtpDataByMobileNumber(userDataRequest.getMobileNum());
         if (ObjectUtils.isNotEmpty(otpData) && otpData.isOtpVerified()) {
             userData.setMobileVerified(true);
         }
@@ -123,7 +123,7 @@ public class UserDataServiceImpl implements UserDataService {
     @Transactional
     public String generateAndSaveOtp(OtpRequest otpRequest) {
         String otp = RandomStringUtils.randomNumeric(6);
-        OtpData otpData = otpDataRepository.findOtpDataByEmailIdAndOtpType(otpRequest.getMobileNum(),
+        OtpData otpData = otpDataRepository.findOtpDataByMobileNumberAndOtpType(otpRequest.getMobileNum(),
                 OtpType.valueOf(otpRequest.getOtpType()));
 
         if (ObjectUtils.isNotEmpty(otpData)) {
@@ -136,7 +136,7 @@ public class UserDataServiceImpl implements UserDataService {
                 otpData.setUserId(UUID.fromString(otpRequest.getUserId()));
             }
             otpData.setOtp(bCryptPasswordEncoder.encode(otp));
-            otpData.setEmailId(otpRequest.getMobileNum());
+            otpData.setMobileNumber(otpRequest.getMobileNum());
             otpData.setOtpType(OtpType.valueOf(otpRequest.getOtpType()));
             otpData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
             otpData.setRetryCount(0);
@@ -149,7 +149,7 @@ public class UserDataServiceImpl implements UserDataService {
     @Override
     @Transactional
     public boolean verifyOtp(OtpRequest otpRequest) throws IllegalAccessException {
-        OtpData otpData = otpDataRepository.findOtpDataByEmailIdAndOtpType(otpRequest.getMobileNum(),
+        OtpData otpData = otpDataRepository.findOtpDataByMobileNumberAndOtpType(otpRequest.getMobileNum(),
                 OtpType.valueOf(otpRequest.getOtpType()));
 
         if (ObjectUtils.isEmpty(otpData)) {

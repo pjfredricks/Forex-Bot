@@ -16,6 +16,5 @@ public interface EmailService {
 
     void sendEmail(String emailId, UserData userData, EmailType emailType) throws MessagingException, IOException;
 
-    // TODO: Remove after sms implemented
-    void sendOtpEmail(String emailId, String otp) throws MessagingException, IOException;
+    void sendOtp(String mobileNum, String otp) throws IOException;
 }

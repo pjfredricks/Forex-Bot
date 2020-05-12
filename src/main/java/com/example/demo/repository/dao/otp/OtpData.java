@@ -39,8 +39,8 @@ public class OtpData {
     private boolean otpVerified;
 
     @NotNull
-    @Column(name = "emailId", unique = true)
-    private String emailId;
+    @Column(name = "mobileNumber", unique = true)
+    private String mobileNumber;
 
     @NotNull
     @ApiModelProperty(hidden = true)
@@ -50,6 +50,9 @@ public class OtpData {
     @ApiModelProperty(hidden = true)
     @Column(name = "modifiedDate")
     private String modifiedDate;
+
+    @Column(name = "textLocalResponse", columnDefinition = "text default 'empty'")
+    private String textLocalResponse;
 
     public OtpData() {
         super();
@@ -95,12 +98,12 @@ public class OtpData {
         this.retryCount = retryCount;
     }
 
-    public String getEmailId() {
-        return emailId;
+    public String getMobileNumber() {
+        return mobileNumber;
     }
 
-    public void setEmailId(String emailId) {
-        this.emailId = emailId;
+    public void setMobileNumber(String mobileNumber) {
+        this.mobileNumber = mobileNumber;
     }
 
     public String getCreateDate() {
@@ -117,5 +120,13 @@ public class OtpData {
 
     public void setModifiedDate(String modifiedDate) {
         this.modifiedDate = modifiedDate;
+    }
+
+    public String getTextLocalResponse() {
+        return textLocalResponse;
+    }
+
+    public void setTextLocalResponse(String textLocalResponse) {
+        this.textLocalResponse = textLocalResponse;
     }
 }

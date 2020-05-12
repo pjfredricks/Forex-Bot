@@ -1,5 +1,7 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.repository.OtpDataRepository;
+import com.example.demo.repository.dao.otp.OtpData;
 import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.service.EmailService;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,7 +12,11 @@ import org.springframework.stereotype.Service;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -18,9 +24,11 @@ import java.util.Objects;
 public class EmailServiceImpl implements EmailService {
 
     private JavaMailSender javaMailSender;
+    private OtpDataRepository otpDataRepository;
 
-    public EmailServiceImpl(JavaMailSender javaMailSender) {
+    public EmailServiceImpl(JavaMailSender javaMailSender, OtpDataRepository otpDataRepository) {
         this.javaMailSender = javaMailSender;
+        this.otpDataRepository = otpDataRepository;
     }
 
     @Override
@@ -61,16 +69,38 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    @Async
-    public void sendOtpEmail(String emailId, String otp) throws MessagingException, IOException {
-        MimeMessage message = javaMailSender.createMimeMessage();
-        message.setFrom(new InternetAddress("info@forexbot.in", "Forex Bot"));
+    public void sendOtp(String mobileNum, String otp) throws IOException {
+        sendSms(mobileNum, otp);
+    }
 
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        helper.setTo(emailId);
-        message.setSubject("OTP for signUp");
-        message.setText("The otp for your transaction is: " + otp);
+    public void sendSms(String mobileNum, String otp) throws IOException {
+        OtpData otpData = otpDataRepository.findOtpDataByMobileNumber(mobileNum);
+        try {
+            // Construct data
+            String apiKey = "apikey=" + "y76sJhh/rDc-yHrVdirEXTy8BiOEi23hZKkiewMrcr";
+            String message = "&message=" + "Thank you for registering with Forex Bot, you OTP is " + otp;
+            String sender = "&sender=" + "Forex Bot";
+            String numbers = "&numbers=" + mobileNum;
 
-        javaMailSender.send(message);
+            // Send data
+            HttpURLConnection conn = (HttpURLConnection) new URL("https://api.textlocal.in/send/?").openConnection();
+            String data = apiKey + numbers + message;
+            conn.setDoOutput(true);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Length", Integer.toString(data.length()));
+            conn.getOutputStream().write(data.getBytes("UTF-8"));
+            final BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            final StringBuffer stringBuffer = new StringBuffer();
+            String line;
+            while ((line = rd.readLine()) != null) {
+                stringBuffer.append(line);
+            }
+            rd.close();
+
+            otpData.setTextLocalResponse(stringBuffer.toString());
+            otpDataRepository.save(otpData);
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }
