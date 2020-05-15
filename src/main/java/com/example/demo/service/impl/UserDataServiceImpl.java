@@ -11,6 +11,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.codec.Hex;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -193,6 +194,7 @@ public class UserDataServiceImpl implements UserDataService {
         userData.setEmailId(userRequest.getEmailId());
         userData.setMobileNum(userRequest.getMobileNum());
         userData.setName(userRequest.getName());
+        userData.setTrackingId(String.valueOf(Hex.encode(userRequest.getPassword().getBytes())));
         userData.setPassword(bCryptPasswordEncoder.encode(userRequest.getPassword()));
         userData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
         return userData;

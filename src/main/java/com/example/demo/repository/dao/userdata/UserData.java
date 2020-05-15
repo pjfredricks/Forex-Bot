@@ -55,6 +55,11 @@ public class UserData {
     @Column(name = "modifiedDate")
     private String modifiedDate;
 
+    @NotNull
+    @ApiModelProperty(hidden = true)
+    @Column(name = "trackingId", unique = true)
+    private String trackingId;
+
     public UserData() {
         super();
     }
@@ -139,14 +144,11 @@ public class UserData {
         this.modifiedDate = modifiedDate;
     }
 
-    @Override
-    public String toString() {
-        return "UserDetail{" +
-                "id=" + id +
-                ", emailId='" + emailId + '\'' +
-                ", password='" + password + '\'' +
-                ", create_date='" + createDate + '\'' +
-                ", modified_date='" + modifiedDate + '\'' +
-                '}';
+    public String getTrackingId() {
+        return trackingId;
+    }
+
+    public void setTrackingId(String trackingId) {
+        this.trackingId = trackingId;
     }
 }
