@@ -58,7 +58,7 @@ public class UserDataServiceImpl implements UserDataService {
             userData = getUserDataByMobileNum(userDataRequest.getEmailId());
         }
 
-        if (checkPasswordsMatch(userDataRequest.getPassword(), userData.getPassword())) {
+        if (ObjectUtils.isNotEmpty(userData) && checkPasswordsMatch(userDataRequest.getPassword(), userData.getPassword())) {
             return mapDataToResponse(userData);
         }
         return null;
