@@ -55,7 +55,6 @@ public class UserData {
     @Column(name = "modifiedDate")
     private String modifiedDate;
 
-    @NotNull
     @ApiModelProperty(hidden = true)
     @Column(name = "trackingId", unique = true)
     private String trackingId;
