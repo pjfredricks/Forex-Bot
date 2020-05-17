@@ -23,7 +23,7 @@ public interface UserDataService {
 
 	UserDataResponse updateUserDetails(UserDataRequest resetRequest) throws IllegalAccessException;
 
-	String generateAndSaveOtp(OtpRequest otpRequest);
+	String generateAndSaveOtp(OtpRequest otpRequest) throws IllegalAccessException;
 
 	boolean verifyOtp(OtpRequest otpRequest) throws IllegalAccessException;
 

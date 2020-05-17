@@ -122,26 +122,14 @@ public class UserDataServiceImpl implements UserDataService {
 
     @Override
     @Transactional
-    public String generateAndSaveOtp(OtpRequest otpRequest) {
+    public String generateAndSaveOtp(OtpRequest otpRequest) throws IllegalAccessException {
         String otp = RandomStringUtils.randomNumeric(6);
+        isNewUser(otpRequest);
+
         OtpData otpData = otpDataRepository.findOtpDataByMobileNumberAndOtpType(otpRequest.getMobileNum(),
                 OtpType.valueOf(otpRequest.getOtpType()));
 
-        if (ObjectUtils.isNotEmpty(otpData)) {
-            otpData.setOtp(bCryptPasswordEncoder.encode(otp));
-            otpData.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
-            otpData.setRetryCount(otpData.getRetryCount() + 1);
-        } else {
-            otpData = new OtpData();
-            if (!OtpType.SIGN_UP.equals(OtpType.valueOf(otpRequest.getOtpType()))) {
-                otpData.setUserId(UUID.fromString(otpRequest.getUserId()));
-            }
-            otpData.setOtp(bCryptPasswordEncoder.encode(otp));
-            otpData.setMobileNumber(otpRequest.getMobileNum());
-            otpData.setOtpType(OtpType.valueOf(otpRequest.getOtpType()));
-            otpData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
-            otpData.setRetryCount(0);
-        }
+        otpData = constructOtpData(otpData, otp, otpRequest);
 
         otpDataRepository.save(otpData);
         return otp;
@@ -181,6 +169,34 @@ public class UserDataServiceImpl implements UserDataService {
         }
         userData.setEmailVerified(true);
         userDataRepository.save(userData);
+    }
+
+    private void isNewUser(OtpRequest otpRequest) throws IllegalAccessException {
+        if (OtpType.SIGN_UP.equals(OtpType.valueOf(otpRequest.getOtpType()))
+                && (ObjectUtils.isNotEmpty(userDataRepository.getUserDataByMobileNum(otpRequest.getMobileNum()))
+                || ObjectUtils.isNotEmpty(userDataRepository.getUserDataByEmailId(otpRequest.getEmailId())))) {
+            throw new IllegalAccessException("User already registered with credentials");
+        }
+    }
+
+    private OtpData constructOtpData(OtpData otpData, String otp, OtpRequest otpRequest) {
+        if (ObjectUtils.isNotEmpty(otpData)) {
+            otpData.setOtp(bCryptPasswordEncoder.encode(otp));
+            otpData.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
+            otpData.setRetryCount(otpData.getRetryCount() + 1);
+        } else {
+            otpData = new OtpData();
+            if (!OtpType.SIGN_UP.equals(OtpType.valueOf(otpRequest.getOtpType()))) {
+                otpData.setUserId(UUID.fromString(otpRequest.getUserId()));
+            }
+            otpData.setOtp(bCryptPasswordEncoder.encode(otp));
+            otpData.setMobileNumber(otpRequest.getMobileNum());
+            otpData.setOtpType(OtpType.valueOf(otpRequest.getOtpType()));
+            otpData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
+            otpData.setRetryCount(0);
+        }
+
+        return otpData;
     }
 
     private boolean checkPasswordsMatch(String enteredPassword, String passwordFromDb) {

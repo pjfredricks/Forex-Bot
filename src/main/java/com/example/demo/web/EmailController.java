@@ -46,10 +46,9 @@ public class EmailController {
 
     @PostMapping(path = "/sendOtp")
     public ResponseEntity<ResponseWrapper> sendOtp(@RequestBody OtpRequest otpRequest) {
-        String otp = userDataService.generateAndSaveOtp(otpRequest);
         try {
-            emailService.sendOtp(otpRequest.getMobileNum(), otp);
-        } catch (IOException e) {
+            emailService.sendOtp(otpRequest.getMobileNum(), userDataService.generateAndSaveOtp(otpRequest));
+        } catch (IOException | IllegalAccessException e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
                     e.getMessage(),
