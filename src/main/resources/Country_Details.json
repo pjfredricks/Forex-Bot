@@ -72,15 +72,6 @@
     "currencyName": "Hong Kong dollar"
   },
   {
-    "countryName": "India",
-    "latitude": "20",
-    "longitude": "77",
-    "buyRate": 0.00,
-    "sellRate": 0.00,
-    "countryCode": "INR",
-    "currencyName": "Indian rupee"
-  },
-  {
     "countryName": "Indonesia",
     "latitude": "-5",
     "longitude": "120",
