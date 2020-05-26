@@ -7,6 +7,9 @@ public class ForexRates {
     private String countryName;
     private double buyRate;
     private double sellRate;
+    private double latitude;
+    private double longitude;
+    private String currencyName;
 
     public ForexRates() {
         super();
@@ -50,5 +53,29 @@ public class ForexRates {
 
     public void setSellRate(double sellRate) {
         this.sellRate = sellRate;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getCurrencyName() {
+        return currencyName;
+    }
+
+    public void setCurrencyName(String currencyName) {
+        this.currencyName = currencyName;
     }
 }

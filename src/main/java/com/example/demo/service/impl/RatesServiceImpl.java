@@ -4,6 +4,8 @@ import com.example.demo.repository.dao.rates.ForexRates;
 import com.example.demo.repository.dao.order.OrderType;
 import com.example.demo.repository.dao.rates.RatesRequest;
 import com.example.demo.service.RatesService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -27,22 +30,34 @@ public class RatesServiceImpl implements RatesService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RatesServiceImpl.class);
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private static final Set<String> countryList = Stream.of("USD", "AUD", "GBP", "EUR", "CAD",
+    private static final Set<String> countryList = Stream.of("INR", "USD", "AUD", "GBP", "EUR", "CAD",
             "CNY", "SAR", "SGD", "MYR", "THB",
             "IDR", "ILS", "JPY", "KRW", "CHF",
             "PHP", "FJD", "HKD", "ZAR", "SEK",
             "NOK", "DKK", "NZD", "BHD", "OMR",
             "KWD").collect(Collectors.toSet());
-    private static final Set<String> noCarouselCountryList = Stream.of("ILS", "JPY", "KRW", "CHF",
+    private static final Set<String> noCarouselCountryList = Stream.of("INR", "ILS", "JPY", "KRW", "CHF",
             "PHP", "FJD", "HKD", "ZAR",
             "SEK", "NOK", "DKK", "NZD",
             "BHD", "OMR", "KWD").collect(Collectors.toSet());
 
+    private static final ObjectMapper mapper = new ObjectMapper();
     private static Map<String, Number> currencyValues = new HashMap<>();
     private static List<ForexRates> exchangeRates = new ArrayList<>();
 
     @PostConstruct
     public void onStartup() {
+        try {
+            exchangeRates = mapper.readValue(
+                    Thread
+                            .currentThread()
+                            .getContextClassLoader()
+                            .getResourceAsStream("Country_Details.json"),
+                    mapper.getTypeFactory()
+                            .constructCollectionType(List.class, ForexRates.class));
+        } catch (IOException e) {
+            exchangeRates = new ArrayList<>();
+        }
         updateExchangeRates();
     }
 
@@ -55,7 +70,6 @@ public class RatesServiceImpl implements RatesService {
     @Override
     public void updateExchangeRates() {
         // Removes old values from both collections
-        exchangeRates.clear();
         currencyValues.clear();
 
         // Updates latest forex currency values
@@ -68,9 +82,8 @@ public class RatesServiceImpl implements RatesService {
         currencyValues.replaceAll((countryCode, currencyValue) -> convertRate(1 / currencyValue.doubleValue(), 6));
 
         // Set buy and sell Rates, and update carousel values
-        exchangeRates = currencyValues.entrySet()
-                .stream()
-                .map(RatesServiceImpl::constructForexRates)
+        exchangeRates = exchangeRates.stream()
+                .map(forexRate -> setCarouselAndRates(forexRate, currencyValues))
                 .sorted(Comparator.comparing(ForexRates::getCountryName))
                 .collect(Collectors.toList());
     }
@@ -114,17 +127,18 @@ public class RatesServiceImpl implements RatesService {
         }
     }
 
-    private static ForexRates constructForexRates(Map.Entry<String, Number> currencyValueMap) {
-        ForexRates forexRate = new ForexRates();
+    private static ForexRates setCarouselAndRates(ForexRates forexRate, Map<String, Number> currencyValues) {
         forexRate.setCarousel(true);
 
-        if (noCarouselCountryList.contains(currencyValueMap.getKey())) {
+        if (noCarouselCountryList.contains(forexRate.getCountryCode())) {
             forexRate.setCarousel(false);
         }
-        forexRate.setCountryCode(currencyValueMap.getKey());
-        forexRate.setCountryName(Currency.getInstance(currencyValueMap.getKey()).getDisplayName());
-        forexRate.setBuyRate(calculateBuyRate(currencyValueMap.getValue().doubleValue()));
-        forexRate.setSellRate(calculateSellRate(currencyValueMap.getValue().doubleValue()));
+        if(ObjectUtils.isNotEmpty(currencyValues.get(forexRate.getCountryCode()))) {
+            forexRate.setBuyRate(
+                    calculateBuyRate(currencyValues.get(forexRate.getCountryCode()).doubleValue()));
+            forexRate.setSellRate(
+                    calculateSellRate(currencyValues.get(forexRate.getCountryCode()).doubleValue()));
+        }
         return forexRate;
     }
 
