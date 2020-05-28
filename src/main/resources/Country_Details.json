@@ -153,7 +153,7 @@
     "currencyName": "Omani rial"
   },
   {
-    "countryName": "Palestine, State of",
+    "countryName": "Israel",
     "latitude": "31.9",
     "longitude": "35.2",
     "buyRate": 0.00,
@@ -198,15 +198,6 @@
     "currencyName": "South African rand"
   },
   {
-    "countryName": "Svalbard and Jan Mayen",
-    "latitude": "78",
-    "longitude": "20",
-    "buyRate": 0.00,
-    "sellRate": 0.00,
-    "countryCode": "NOK",
-    "currencyName": "Norwegian krone"
-  },
-  {
     "countryName": "Sweden",
     "latitude": "62",
     "longitude": "15",
@@ -234,16 +225,7 @@
     "currencyName": "Thai baht"
   },
   {
-    "countryName": "Tokelau",
-    "latitude": "-9",
-    "longitude": "-172",
-    "buyRate": 0.00,
-    "sellRate": 0.00,
-    "countryCode": "NZD",
-    "currencyName": "New Zealand dollar"
-  },
-  {
-    "countryName": "United Kingdom of Great Britain and Northern Ireland",
+    "countryName": "United Kingdom",
     "latitude": "54",
     "longitude": "-2",
     "buyRate": 0.00,
