@@ -23,6 +23,11 @@ import java.util.Objects;
 @Service
 public class EmailServiceImpl implements EmailService {
 
+    public static final String API_KEY = "apikey=y76sJhh/rDc-yHrVdirEXTy8BiOEi23hZKkiewMrcr";
+    public static final String SENDER = "&sender=FEXBOT";
+    public static final String OTP_MESSAGE = "&message=Your OTP for your Forex Bot transaction is ";
+    public static final String ORDER_CONFIRM_MESSAGE = "&message=Your OTP for your Forex Bot transaction is";
+
     private JavaMailSender javaMailSender;
     private OtpDataRepository otpDataRepository;
 
@@ -49,6 +54,24 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Override
+    public void sendOtp(String mobileNum, String otp) throws IOException {
+        String message = OTP_MESSAGE + otp;
+        String numbers = "&numbers=" + mobileNum;
+        String data = API_KEY + numbers + message + SENDER;
+
+        sendSms(mobileNum, data);
+    }
+
+    @Override
+    public void sendConfirmation(String mobileNum) throws IOException {
+//        String message = "&message=" + "Your OTP for your Forex Bot transaction is " + otp;
+//        String numbers = "&numbers=" + mobileNum;
+//        String data = API_KEY + numbers + message + SENDER;
+//
+//        sendSms(mobileNum, data);
+    }
+
     private MimeMessage constructMail(String emailId,
                                       UserData user,
                                       String fileName,
@@ -68,39 +91,24 @@ public class EmailServiceImpl implements EmailService {
         return message;
     }
 
-    @Override
-    public void sendOtp(String mobileNum, String otp) throws IOException {
-        sendSms(mobileNum, otp);
-    }
-
-    public void sendSms(String mobileNum, String otp) throws IOException {
+    private void sendSms(String mobileNum, String data) throws IOException {
         OtpData otpData = otpDataRepository.findOtpDataByMobileNumber(mobileNum);
-        try {
-            // Construct data
-            String apiKey = "apikey=" + "y76sJhh/rDc-yHrVdirEXTy8BiOEi23hZKkiewMrcr";
-            String message = "&message=" + "Thank you for registering with Forex Bot, you OTP is " + otp;
-            String sender = "&sender=" + "Forex Bot";
-            String numbers = "&numbers=" + mobileNum;
 
-            // Send data
-            HttpURLConnection conn = (HttpURLConnection) new URL("https://api.textlocal.in/send/?").openConnection();
-            String data = apiKey + numbers + message;
-            conn.setDoOutput(true);
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Length", Integer.toString(data.length()));
-            conn.getOutputStream().write(data.getBytes("UTF-8"));
-            final BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            final StringBuffer stringBuffer = new StringBuffer();
-            String line;
-            while ((line = rd.readLine()) != null) {
-                stringBuffer.append(line);
-            }
-            rd.close();
-
-            otpData.setTextLocalResponse(stringBuffer.toString());
-            otpDataRepository.save(otpData);
-        } catch (Exception e) {
-            throw e;
+        // Send data
+        HttpURLConnection conn = (HttpURLConnection) new URL("https://api.textlocal.in/send/?").openConnection();
+        conn.setDoOutput(true);
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Length", Integer.toString(data.length()));
+        conn.getOutputStream().write(data.getBytes(StandardCharsets.UTF_8));
+        final BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        final StringBuilder builder = new StringBuilder();
+        String line;
+        while ((line = rd.readLine()) != null) {
+            builder.append(line);
         }
+        rd.close();
+
+        otpData.setTextLocalResponse(builder.toString());
+        otpDataRepository.save(otpData);
     }
 }

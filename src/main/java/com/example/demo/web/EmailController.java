@@ -63,7 +63,6 @@ public class EmailController {
 
     @PostMapping(path = "/verifyOtp")
     public ResponseEntity<ResponseWrapper> verifyOtp(@RequestBody OtpRequest otpRequest) {
-        // TODO: Use mobile Num after SMS impl
         try {
             if (userDataService.verifyOtp(otpRequest)) {
                 return new ResponseEntity<>(new ResponseWrapper(
