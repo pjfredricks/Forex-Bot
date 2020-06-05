@@ -82,6 +82,23 @@ public class EmailController {
                 null), HttpStatus.OK);
     }
 
+    @PostMapping(path = "/sendConfirmationSms")
+    public ResponseEntity<ResponseWrapper> sendConfirmationSms(@RequestBody OtpRequest otpRequest) {
+        try {
+            emailService.sendConfirmation(otpRequest.getTrackingId(), otpRequest.getMobileNum());
+        } catch (IOException e) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    SUCCESS,
+                    e.getMessage(),
+                    null), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(new ResponseWrapper(
+                SUCCESS,
+                "Otp sent to number: " + otpRequest.getMobileNum(),
+                null), HttpStatus.OK);
+    }
+
     @PostMapping(path = "/verifyEmail")
     public ResponseEntity<ResponseWrapper> verifyEmail(@RequestBody UserDataRequest userDataRequest) {
         try {

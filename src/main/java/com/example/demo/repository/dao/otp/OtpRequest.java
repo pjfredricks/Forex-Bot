@@ -6,6 +6,7 @@ public class OtpRequest {
     private String otp;
     private String mobileNum;
     private String emailId;
+    private String trackingId;
     private int otpType;
 
     public OtpRequest() {
@@ -49,5 +50,13 @@ public class OtpRequest {
 
     public void setOtpType(int otpType) {
         this.otpType = otpType;
+    }
+
+    public String getTrackingId() {
+        return trackingId;
+    }
+
+    public void setTrackingId(String trackingId) {
+        this.trackingId = trackingId;
     }
 }

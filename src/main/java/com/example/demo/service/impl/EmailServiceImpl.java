@@ -1,9 +1,14 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.repository.OrderRepository;
 import com.example.demo.repository.OtpDataRepository;
+import com.example.demo.repository.UserDataRepository;
+import com.example.demo.repository.dao.order.Order;
+import com.example.demo.repository.dao.order.OrderType;
 import com.example.demo.repository.dao.otp.OtpData;
 import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.service.EmailService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -25,15 +30,23 @@ public class EmailServiceImpl implements EmailService {
 
     public static final String API_KEY = "apikey=y76sJhh/rDc-yHrVdirEXTy8BiOEi23hZKkiewMrcr";
     public static final String SENDER = "&sender=FEXBOT";
-    public static final String OTP_MESSAGE = "&message=Your OTP for your Forex Bot transaction is ";
-    public static final String ORDER_CONFIRM_MESSAGE = "&message=Your OTP for your Forex Bot transaction is";
+    public static final String OTP_MESSAGE = "Your OTP for your Forex Bot transaction is ";
+    public static final String ORDER_CONFIRM_MESSAGE = "Hi {userName}, %n" +
+            "Your order for {orderType} {currency} {amount} has been confirmed by ForexBot,%n" +
+            "Kindly follow the instructions in link below,%n" +
+            " forexbot.in/instructions";
 
     private JavaMailSender javaMailSender;
     private OtpDataRepository otpDataRepository;
+    private OrderRepository orderRepository;
+    private UserDataRepository userDataRepository;
 
-    public EmailServiceImpl(JavaMailSender javaMailSender, OtpDataRepository otpDataRepository) {
+    public EmailServiceImpl(JavaMailSender javaMailSender, OtpDataRepository otpDataRepository,
+                            OrderRepository orderRepository, UserDataRepository userDataRepository) {
         this.javaMailSender = javaMailSender;
         this.otpDataRepository = otpDataRepository;
+        this.orderRepository = orderRepository;
+        this.userDataRepository = userDataRepository;
     }
 
     @Override
@@ -56,7 +69,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendOtp(String mobileNum, String otp) throws IOException {
-        String message = OTP_MESSAGE + otp;
+        String message = "&message=" + OTP_MESSAGE + otp;
         String numbers = "&numbers=" + mobileNum;
         String data = API_KEY + numbers + message + SENDER;
 
@@ -64,12 +77,29 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendConfirmation(String mobileNum) throws IOException {
-//        String message = "&message=" + "Your OTP for your Forex Bot transaction is " + otp;
-//        String numbers = "&numbers=" + mobileNum;
-//        String data = API_KEY + numbers + message + SENDER;
-//
-//        sendSms(mobileNum, data);
+    public void sendConfirmation(String trackingNumber, String mobileNum) throws IOException {
+        Order order = orderRepository.getOrderByTrackingNumber(trackingNumber);
+        String name = userDataRepository.getUserDataByMobileNum(mobileNum).getName();
+
+        String message = ORDER_CONFIRM_MESSAGE;
+        message = message.replace("{userName}", name.substring(0, Math.min(name.length(), 15)));
+        if (OrderType.BUY.equals(order.getOrderType())) {
+            message = message.replace("{orderType}", "buying");
+        } else if (OrderType.SELL.equals(order.getOrderType())) {
+            message = message.replace("{orderType}", "selling");
+        }
+        message = message.replace("{currency}", order.getCountryCode());
+        message = message.replace("{amount}", String.valueOf(order.getSalesTotal()));
+
+        if (message.length() > 157) {
+            throw new RuntimeException("Message length exceeds set characters");
+        }
+        message = "&message=" + message;
+        String numbers = "&numbers=" + mobileNum;
+
+        String data = API_KEY + numbers + message + SENDER;
+
+        sendSms(mobileNum, data);
     }
 
     private MimeMessage constructMail(String emailId,
@@ -92,8 +122,6 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private void sendSms(String mobileNum, String data) throws IOException {
-        OtpData otpData = otpDataRepository.findOtpDataByMobileNumber(mobileNum);
-
         // Send data
         HttpURLConnection conn = (HttpURLConnection) new URL("https://api.textlocal.in/send/?").openConnection();
         conn.setDoOutput(true);
@@ -108,7 +136,10 @@ public class EmailServiceImpl implements EmailService {
         }
         rd.close();
 
-        otpData.setTextLocalResponse(builder.toString());
-        otpDataRepository.save(otpData);
+        OtpData otpData = otpDataRepository.findOtpDataByMobileNumber(mobileNum);
+        if (ObjectUtils.isNotEmpty(otpData)) {
+            otpData.setTextLocalResponse(builder.toString());
+            otpDataRepository.save(otpData);
+        }
     }
 }
