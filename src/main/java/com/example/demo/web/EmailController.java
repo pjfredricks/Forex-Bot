@@ -1,7 +1,6 @@
 package com.example.demo.web;
 
 import com.example.demo.repository.dao.ResponseWrapper;
-import com.example.demo.repository.dao.otp.OtpRequest;
 import com.example.demo.repository.dao.userdata.UserData;
 import com.example.demo.repository.dao.userdata.UserDataRequest;
 import com.example.demo.service.EmailService;
@@ -21,8 +20,8 @@ import static com.example.demo.web.utils.Constants.SUCCESS;
 @RequestMapping("api/v1")
 public class EmailController {
 
-    private EmailService emailService;
-    private UserDataService userDataService;
+    private final EmailService emailService;
+    private final UserDataService userDataService;
 
     public EmailController(EmailService emailService, UserDataService userDataService) {
         this.emailService = emailService;
@@ -42,61 +41,6 @@ public class EmailController {
     @PostMapping(path = "/sendVerificationMail")
     public ResponseEntity<ResponseWrapper> sendVerificationMail(@RequestBody UserDataRequest userDataRequest) throws IOException, MessagingException {
         return sendEmail(userDataRequest.getEmailId(), EmailService.EmailType.VERIFY);
-    }
-
-    @PostMapping(path = "/sendOtp")
-    public ResponseEntity<ResponseWrapper> sendOtp(@RequestBody OtpRequest otpRequest) {
-        try {
-            emailService.sendOtp(otpRequest.getMobileNum(), userDataService.generateAndSaveOtp(otpRequest));
-        } catch (IOException | IllegalAccessException e) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    SUCCESS,
-                    e.getMessage(),
-                    null), HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(new ResponseWrapper(
-                SUCCESS,
-                "Otp sent to number: " + otpRequest.getMobileNum(),
-                null), HttpStatus.OK);
-    }
-
-    @PostMapping(path = "/verifyOtp")
-    public ResponseEntity<ResponseWrapper> verifyOtp(@RequestBody OtpRequest otpRequest) {
-        try {
-            if (userDataService.verifyOtp(otpRequest)) {
-                return new ResponseEntity<>(new ResponseWrapper(
-                        SUCCESS,
-                        "Otp verification successful",
-                        null), HttpStatus.OK);
-            }
-        } catch (IllegalAccessException e) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    ERROR,
-                    e.getMessage(),
-                    null), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(new ResponseWrapper(
-                ERROR,
-                "Invalid OTP",
-                null), HttpStatus.OK);
-    }
-
-    @PostMapping(path = "/sendConfirmationSms")
-    public ResponseEntity<ResponseWrapper> sendConfirmationSms(@RequestBody OtpRequest otpRequest) {
-        try {
-            emailService.sendConfirmation(otpRequest.getTrackingId(), otpRequest.getMobileNum());
-        } catch (IOException e) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    SUCCESS,
-                    e.getMessage(),
-                    null), HttpStatus.OK);
-        }
-
-        return new ResponseEntity<>(new ResponseWrapper(
-                SUCCESS,
-                "Otp sent to number: " + otpRequest.getMobileNum(),
-                null), HttpStatus.OK);
     }
 
     @PostMapping(path = "/verifyEmail")

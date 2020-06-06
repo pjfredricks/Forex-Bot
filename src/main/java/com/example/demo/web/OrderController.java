@@ -21,14 +21,14 @@ import static com.example.demo.web.utils.Constants.SUCCESS;
 @RequestMapping("api/v1")
 public class OrderController {
 
-    private OrderService orderService;
+    private final OrderService orderService;
 
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 
     @GetMapping(path = "/order/userId/{userId}")
-    public ResponseEntity<ResponseWrapper> getOrderByUserId(@RequestParam String userId) {
+    public ResponseEntity<ResponseWrapper> getOrderByUserId(@PathVariable String userId) {
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
                 "Order Details fetched for userId: " + userId,
@@ -37,7 +37,7 @@ public class OrderController {
     }
 
     @GetMapping(path = "/order/trackingNumber/{trackingNumber}")
-    public ResponseEntity<ResponseWrapper> getOrderByTrackingNumber(@RequestParam String trackingNumber) {
+    public ResponseEntity<ResponseWrapper> getOrderByTrackingNumber(@PathVariable String trackingNumber) {
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
                 "Order Details fetched for trackingNumber: " + trackingNumber,
@@ -46,7 +46,7 @@ public class OrderController {
     }
 
     @GetMapping(path = "/order/couponCode/{couponCode}")
-    public ResponseEntity<ResponseWrapper> getOrderByCouponCode(@RequestParam String couponCode) {
+    public ResponseEntity<ResponseWrapper> getOrderByCouponCode(@PathVariable String couponCode) {
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
                 "Order Details fetched for couponCode: " + couponCode,

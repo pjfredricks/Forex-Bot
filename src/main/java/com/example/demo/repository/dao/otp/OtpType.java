@@ -9,8 +9,8 @@ public enum OtpType {
     ORDER_CONFIRM(2);
 
 
-    private int value;
-    private static Map map = new HashMap();
+    private final Integer value;
+    private static final Map<Integer, OtpType> map = new HashMap<>();
 
     OtpType(int value) {
         this.value = value;
@@ -23,7 +23,7 @@ public enum OtpType {
     }
 
     public static OtpType valueOf(int otpType) {
-        return (OtpType) map.get(otpType);
+        return map.get(otpType);
     }
 
     public int getValue() {

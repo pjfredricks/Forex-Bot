@@ -15,7 +15,7 @@ import static com.example.demo.web.utils.Constants.SUCCESS;
 @RequestMapping("api/v1")
 public class RatesController {
 
-    private RatesService ratesService;
+    private final RatesService ratesService;
 
     public RatesController(RatesService ratesService) {
         this.ratesService = ratesService;

@@ -13,7 +13,7 @@ import static com.example.demo.web.utils.Constants.SUCCESS;
 @RequestMapping("api/v1")
 public class BackupController {
 
-    private BackupService backupService;
+    private final BackupService backupService;
 
     public BackupController(BackupService backupService) {
         this.backupService = backupService;

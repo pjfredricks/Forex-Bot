@@ -16,8 +16,8 @@ import static com.example.demo.web.utils.Constants.SUCCESS;
 @RequestMapping("/api/v1")
 public class UserDataController {
 
-    private UserDataService userDataService;
-    private EmailController emailController;
+    private final UserDataService userDataService;
+    private final EmailController emailController;
 
     public UserDataController(UserDataService userDataService, EmailController emailController) {
         this.userDataService = userDataService;

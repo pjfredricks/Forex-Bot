@@ -7,10 +7,10 @@ public enum OrderType {
     BUY(0),
     SELL(1);
 
-    private int value;
-    private static Map map = new HashMap();
+    private final Integer value;
+    private static final Map<Integer, OrderType> map = new HashMap<>();
 
-    OrderType(int value) {
+    OrderType(Integer value) {
         this.value = value;
     }
 
@@ -21,7 +21,7 @@ public enum OrderType {
     }
 
     public static OrderType valueOf(int orderType) {
-        return (OrderType) map.get(orderType);
+        return map.get(orderType);
     }
 
     public int getValue() {

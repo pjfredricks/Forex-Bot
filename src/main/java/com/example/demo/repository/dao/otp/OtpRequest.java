@@ -10,6 +10,7 @@ public class OtpRequest {
     private int otpType;
 
     public OtpRequest() {
+        super();
     }
 
     public String getUserId() {

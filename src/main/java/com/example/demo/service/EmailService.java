@@ -15,8 +15,4 @@ public interface EmailService {
     }
 
     void sendEmail(String emailId, UserData userData, EmailType emailType) throws MessagingException, IOException;
-
-    void sendOtp(String mobileNum, String otp) throws IOException;
-
-    void sendConfirmation(String trackingNumber, String mobileNum) throws IOException;
 }
