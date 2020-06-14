@@ -219,19 +219,6 @@ public class RatesServiceImpl implements RatesService {
         return BigDecimal.valueOf(currencyValue).setScale(scalingValue, RoundingMode.HALF_EVEN).doubleValue();
     }
 
-    // Local testing
-//    private void getCurrencyForexValues() {
-//        try {
-//            currencyValues = (Map<String, Number>) new RestTemplate()
-//                    .getForEntity("https://api.exchangerate-api.com/v4/latest/INR", LinkedHashMap.class)
-//                    .getBody()
-//                    .get("rates");
-//        } catch (Exception e) {
-//            LOGGER.error("Error fetching data from exchange rate api @ Time - {}", dateTimeFormatter.format(LocalDateTime.now(ZoneId.of(ZONE))));
-//        }
-//    }
-
-    // Prod values
     private void getCurrencyForexValues() {
         try {
             currencyValues = (Map<String, Number>) new RestTemplate()
