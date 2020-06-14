@@ -8,6 +8,7 @@ import com.forexbot.api.service.OrderService;
 import com.forexbot.api.service.RatesService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,27 +49,23 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderResponse placeOrder(CalculateRequest request) {
-        OrderResponse orderResponse = new OrderResponse();
         UserData userData = userDataRepository.getUserDataByUserId(UUID.fromString(request.getUserId()));
 
+        OrderResponse orderResponse = new OrderResponse();
         if (ObjectUtils.isEmpty(userData)) {
-            orderResponse.setTransactionId(null);
-            orderResponse.setUserExists(false);
-            orderResponse.setEmailVerified(false);
             return orderResponse;
         }
         orderResponse.setUserExists(true);
-        CalculateResponse response = calculateOrder(request);
 
         if (!userData.isEmailVerified()) {
-            orderResponse.setTransactionId(null);
-            orderResponse.setUserExists(true);
-            orderResponse.setEmailVerified(false);
             return orderResponse;
         }
         orderResponse.setEmailVerified(true);
 
+        CalculateResponse response = calculateOrder(request);
         Order order = createOrder(request, response);
+
+        //TODO: update status based on vendor
         order.setStatus(OrderStatus.COMPLETED);
 
         orderResponse.setTransactionId(orderRepository.save(order).getTrackingNumber());
@@ -82,7 +79,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public CalculateResponse calculateOrder(CalculateRequest request) {
-        double rate = ratesService.getRateByCountryCodeAndType(request.getCountryCode(), OrderType.valueOf(request.getOrderType()));
+        double rate = ratesService.getRateByCountryCodeAndType(request.getCountryCode(),
+                OrderType.valueOf(request.getOrderType()));
         double discountAmount = 0.00d;
         double forexTotal = calculateForexTotal(rate, request.getForexAmount());
         double gstAmount = calculateGstAmount(forexTotal);
@@ -100,17 +98,14 @@ public class OrderServiceImpl implements OrderService {
 
     private Order createOrder(CalculateRequest request, CalculateResponse response) {
         Order order = new Order();
+        BeanUtils.copyProperties(request, order, "userId");
+        BeanUtils.copyProperties(response, order, "userId");
+
         order.setUserId(UUID.fromString(request.getUserId()));
-        order.setCountryCode(request.getCountryCode());
         order.setTrackingNumber(RandomStringUtils.randomAlphanumeric(12));
-        order.setCouponCode(request.getCouponCode());
         order.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
         order.setOrderType(OrderType.valueOf(request.getOrderType()));
-        order.setForexAmount(request.getForexAmount());
-        order.setForexTotal(response.getForexTotal());
-        order.setGst(response.getGst());
-        order.setDiscountAmount(response.getDiscountAmount());
-        order.setSalesTotal(response.getSalesTotal());
+
         return order;
     }
 

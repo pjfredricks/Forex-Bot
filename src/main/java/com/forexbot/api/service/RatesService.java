@@ -2,15 +2,15 @@ package com.forexbot.api.service;
 
 import com.forexbot.api.dao.order.OrderType;
 import com.forexbot.api.dao.rates.ForexRates;
-import com.forexbot.api.dao.rates.RatesRequest;
+import com.forexbot.api.dao.rates.ForexRequest;
 
 import java.util.List;
 
 public interface RatesService {
 
-	void updateExchangeRates();
+	void updateRates(String triggerIdentity);
 
-	void updateExchangeRates(List<RatesRequest> ratesRequest);
+	void updateRates(List<ForexRequest> ratesRequest, String triggerIdentity);
 	
 	List<ForexRates> getExchangeRates();
 

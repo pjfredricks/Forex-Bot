@@ -7,6 +7,7 @@ public class AdminRequest {
     private String mobileNum;
 
     public AdminRequest() {
+        super();
     }
 
     public String getUserName() {

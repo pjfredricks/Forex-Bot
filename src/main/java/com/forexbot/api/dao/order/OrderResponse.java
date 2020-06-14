@@ -6,12 +6,11 @@ public class OrderResponse {
     private boolean isEmailVerified;
 
     public OrderResponse() {
-    }
-
-    public OrderResponse(String transactionId, boolean userExists, boolean isEmailVerified) {
-        this.transactionId = transactionId;
-        this.userExists = userExists;
-        this.isEmailVerified = isEmailVerified;
+        super();
+        // Set default values
+        transactionId = null;
+        userExists = false;
+        isEmailVerified = false;
     }
 
     public String getTransactionId() {

@@ -1,6 +1,7 @@
 package com.forexbot.api.web;
 
-import com.forexbot.api.dao.rates.RatesRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.forexbot.api.dao.rates.ForexRequest;
 import com.forexbot.api.service.RatesService;
 import com.forexbot.api.web.utils.ResponseWrapper;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class RatesController {
 
     @PutMapping(path = "/rates")
     public ResponseEntity<ResponseWrapper> updateExchangeRates() {
-        ratesService.updateExchangeRates();
+        ratesService.updateRates("Api call");
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
                 "Rates have been updated",
@@ -39,8 +40,9 @@ public class RatesController {
     }
 
     @PutMapping(path = "/update/rates")
-    public ResponseEntity<ResponseWrapper> updateExchangeRatesManual(@RequestBody List<RatesRequest> ratesRequest) {
-        ratesService.updateExchangeRates(ratesRequest);
+    public ResponseEntity<ResponseWrapper> updateExchangeRatesManual(@RequestBody List<ForexRequest> ratesRequest,
+                                                                     @RequestHeader String triggerIdentity) {
+        ratesService.updateRates(ratesRequest, triggerIdentity);
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
                 "Rates have been updated",

@@ -1,13 +1,18 @@
 package com.forexbot.api.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forexbot.api.dao.order.OrderType;
+import com.forexbot.api.dao.rates.DailyRates;
+import com.forexbot.api.dao.rates.DailyRatesData;
 import com.forexbot.api.dao.rates.ForexRates;
-import com.forexbot.api.dao.rates.RatesRequest;
+import com.forexbot.api.dao.rates.ForexRequest;
+import com.forexbot.api.repository.RatesRepository;
 import com.forexbot.api.service.RatesService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -43,7 +48,14 @@ public class RatesServiceImpl implements RatesService {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private static Map<String, Number> currencyValues = new HashMap<>();
-    private static List<ForexRates> exchangeRates = new ArrayList<>();
+    private List<ForexRates> exchangeRates = new ArrayList<>();
+    private List<DailyRates> dailyRates = new ArrayList<>();
+
+    private final RatesRepository ratesRepository;
+
+    public RatesServiceImpl(RatesRepository ratesRepository) {
+        this.ratesRepository = ratesRepository;
+    }
 
     @PostConstruct
     public void onStartup() {
@@ -58,19 +70,20 @@ public class RatesServiceImpl implements RatesService {
         } catch (IOException e) {
             exchangeRates = new ArrayList<>();
         }
-        updateExchangeRates();
+        updateRates("Startup");
     }
 
     @Scheduled(cron = "0 0 2 * * *")
     public void scheduledTask() {
         LOGGER.info("Updating Database with latest Rates @ Time - {}", dateTimeFormatter.format(LocalDateTime.now(ZoneId.of(ZONE))));
-        updateExchangeRates();
+        updateRates("Cron Job");
     }
 
     @Override
-    public void updateExchangeRates() {
+    public void updateRates(String triggerIdentity) {
         // Removes old values from both collections
         currencyValues.clear();
+        dailyRates.clear();
 
         // Updates latest forex currency values
         getCurrencyForexValues();
@@ -86,10 +99,13 @@ public class RatesServiceImpl implements RatesService {
                 .map(forexRate -> setCarouselAndRates(forexRate, currencyValues))
                 .sorted(Comparator.comparing(ForexRates::getCountryName))
                 .collect(Collectors.toList());
+
+        updateDailyRates();
+        saveDailyRates(triggerIdentity);
     }
 
     @Override
-    public void updateExchangeRates(List<RatesRequest> ratesRequest) {
+    public void updateRates(List<ForexRequest> ratesRequest, String triggerIdentity) {
         ratesRequest.forEach(updatedRates -> exchangeRates
                 .forEach(forexRates -> {
             if (forexRates.getCountryCode().equals(updatedRates.getCountryCode())) {
@@ -97,12 +113,14 @@ public class RatesServiceImpl implements RatesService {
                 forexRates.setSellRate(updatedRates.getSellRate());
             }
         }));
+        updateDailyRates();
+        saveDailyRates(triggerIdentity);
     }
 
     @Override
     public List<ForexRates> getExchangeRates() {
-        if (exchangeRates.isEmpty()) {
-            updateExchangeRates();
+        if (exchangeRates.isEmpty() || dailyRates.isEmpty()) {
+            updateRates("Api call");
         }
         return exchangeRates;
     }
@@ -127,7 +145,29 @@ public class RatesServiceImpl implements RatesService {
         }
     }
 
-    private static ForexRates setCarouselAndRates(ForexRates forexRate, Map<String, Number> currencyValues) {
+    private void updateDailyRates() {
+        exchangeRates.forEach(exchangeRate -> {
+            DailyRates response = new DailyRates();
+            BeanUtils.copyProperties(exchangeRate, response);
+            dailyRates.add(response);
+        });
+    }
+
+    private void saveDailyRates(String triggerIdentity) {
+        DailyRatesData ratesData = new DailyRatesData();
+
+        ratesData.setTriggeredBy(triggerIdentity);
+        ratesData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)));
+
+        try {
+            ratesData.setRatesDetails(mapper.writeValueAsString(dailyRates));
+        } catch (JsonProcessingException e) {
+            ratesData.setRatesDetails("");
+        }
+        ratesRepository.save(ratesData);
+    }
+
+    private ForexRates setCarouselAndRates(ForexRates forexRate, Map<String, Number> currencyValues) {
         forexRate.setCarousel(true);
 
         if (noCarouselCountryList.contains(forexRate.getCountryCode())) {
@@ -142,7 +182,7 @@ public class RatesServiceImpl implements RatesService {
         return forexRate;
     }
 
-    private static double calculateBuyRate(double currencyValue) {
+    private double calculateBuyRate(double currencyValue) {
         int percent = 2;
 
         if (currencyValue < 0.01) {
@@ -158,7 +198,7 @@ public class RatesServiceImpl implements RatesService {
         return convertRate(currencyValue, 2);
     }
 
-    private static double calculateSellRate(double currencyValue) {
+    private double calculateSellRate(double currencyValue) {
         int percent = 1;
 
         if (currencyValue < 0.01) {
@@ -175,14 +215,27 @@ public class RatesServiceImpl implements RatesService {
         return convertRate(currencyValue, 2);
     }
 
-    private static double convertRate(double currencyValue, int scalingValue) {
+    private double convertRate(double currencyValue, int scalingValue) {
         return BigDecimal.valueOf(currencyValue).setScale(scalingValue, RoundingMode.HALF_EVEN).doubleValue();
     }
 
-    private static void getCurrencyForexValues() {
+    // Local testing
+//    private void getCurrencyForexValues() {
+//        try {
+//            currencyValues = (Map<String, Number>) new RestTemplate()
+//                    .getForEntity("https://api.exchangerate-api.com/v4/latest/INR", LinkedHashMap.class)
+//                    .getBody()
+//                    .get("rates");
+//        } catch (Exception e) {
+//            LOGGER.error("Error fetching data from exchange rate api @ Time - {}", dateTimeFormatter.format(LocalDateTime.now(ZoneId.of(ZONE))));
+//        }
+//    }
+
+    // Prod values
+    private void getCurrencyForexValues() {
         try {
             currencyValues = (Map<String, Number>) new RestTemplate()
-                    .getForEntity("https://api.exchangerate-api.com/v4/latest/INR", LinkedHashMap.class)
+                    .getForEntity("http://data.fixer.io/api/latest?access_key=4c29457e83b0090604057f85b8e874e3&format=1", LinkedHashMap.class)
                     .getBody()
                     .get("rates");
         } catch (Exception e) {

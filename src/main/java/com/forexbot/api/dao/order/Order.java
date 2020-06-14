@@ -36,7 +36,7 @@ public class Order {
 
     @NotNull
     @Column(name = "forexAmount")
-    private double forexAmount;
+    private int forexAmount;
 
     @NotNull
     @Column(name = "forexTotal")
@@ -118,11 +118,11 @@ public class Order {
         this.countryCode = countryCode;
     }
 
-    public double getForexAmount() {
+    public int getForexAmount() {
         return forexAmount;
     }
 
-    public void setForexAmount(double amount) {
+    public void setForexAmount(int amount) {
         this.forexAmount = amount;
     }
 

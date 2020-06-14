@@ -73,7 +73,7 @@ public class BackOfficeController {
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
-                    "Admin already registered with details",
+                    "Admin already registered",
                     null), HttpStatus.OK);
         }
     }
@@ -87,7 +87,7 @@ public class BackOfficeController {
 //            emailController.sendWelcomeEmail(userDataRequest);
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
-                    "User signed Up successfully",
+                    "Vendor registered successfully",
                     null), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
@@ -97,11 +97,11 @@ public class BackOfficeController {
         }
     }
 
-    @GetMapping(path = "/dailyRates")
-    public ResponseEntity<ResponseWrapper> getDailyRates() {
+    @GetMapping(path = "/dailyRates/{date}")
+    public ResponseEntity<ResponseWrapper> getRatesByDate(@PathVariable String date) {
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
-                "Rates have been fetched",
+                "Rates for " + date + "have been fetched",
                 ratesService.getExchangeRates()), HttpStatus.OK);
     }
 
@@ -109,7 +109,7 @@ public class BackOfficeController {
     public ResponseEntity<ResponseWrapper> getAllOrders() {
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
-                "Rates have been fetched",
+                "Orders have been fetched",
                 orderService.getAllOrders()), HttpStatus.OK);
     }
 }

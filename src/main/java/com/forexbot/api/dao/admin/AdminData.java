@@ -33,6 +33,7 @@ public class AdminData {
     private String mobileNum;
 
     public AdminData() {
+        super();
     }
 
     public String getUserName() {

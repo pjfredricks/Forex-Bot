@@ -62,6 +62,7 @@ public class VendorData {
     private String agentId;
 
     public VendorData() {
+        super();
     }
 
     public String getUserName() {

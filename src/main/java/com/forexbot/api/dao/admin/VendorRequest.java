@@ -13,6 +13,7 @@ public class VendorRequest {
     private String rbiagentId;
 
     public VendorRequest() {
+        super();
     }
 
     public String getUserName() {
