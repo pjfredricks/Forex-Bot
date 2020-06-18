@@ -1,7 +1,8 @@
 package com.forexbot.api.service.impl;
 
 import com.forexbot.api.dao.admin.*;
-import com.forexbot.api.repository.AdminRepository;
+import com.forexbot.api.repository.AddressRepository;
+import com.forexbot.api.repository.BackOfficeRepository;
 import com.forexbot.api.repository.VendorRepository;
 import com.forexbot.api.service.BackOfficeService;
 import org.apache.commons.lang3.ObjectUtils;
@@ -11,67 +12,88 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 public class BackOfficeServiceImpl implements BackOfficeService {
 
-    private final AdminRepository adminRepository;
+    private final BackOfficeRepository backOfficeRepository;
+    private final AddressRepository addressRepository;
     private final VendorRepository vendorRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public BackOfficeServiceImpl(AdminRepository adminRepository, VendorRepository vendorRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.adminRepository = adminRepository;
+    public BackOfficeServiceImpl(BackOfficeRepository backOfficeRepository,
+                                 AddressRepository addressRepository,
+                                 VendorRepository vendorRepository,
+                                 BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.backOfficeRepository = backOfficeRepository;
+        this.addressRepository = addressRepository;
         this.vendorRepository = vendorRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
-    public AdminData loginAdmin(AdminRequest adminRequest) throws Exception {
-        AdminData adminData = adminRepository.getAdminDataByUserName(adminRequest.getUserName());
-        if (ObjectUtils.isNotEmpty(adminData) && checkPasswordsMatch(adminRequest.getPassword(), adminData.getPassword())) {
-            return adminData;
-        }
-        throw new Exception("Login failed");
-    }
-
-    @Override
-    public VendorResponse loginVendor(VendorRequest vendorRequest) throws Exception {
-        VendorData vendorData = vendorRepository.getVendorDataByUserName(vendorRequest.getUserName());
-        if (ObjectUtils.isNotEmpty(vendorData) && checkPasswordsMatch(vendorRequest.getPassword(), vendorData.getPassword())) {
-            return new VendorResponse(vendorData.getUserName(), vendorData.getAgentId());
+    public BackOfficeLoginResponse login(BackOfficeLoginRequest loginRequest) throws Exception {
+        BackOfficeUserData userData = backOfficeRepository.getBackOfficeUserDataByEmailId(loginRequest.getEmailId());
+        VendorData vendorData = vendorRepository.getVendorDataByVendorAgentId(userData.getVendorAgentId());
+        if (ObjectUtils.isNotEmpty(vendorData) && checkPasswordsMatch(loginRequest.getPassword(), userData.getPassword())) {
+            return new BackOfficeLoginResponse(userData.getUserName(), vendorData.getVendorAgentId());
         }
         throw new Exception("Login failed");
     }
 
     @Override
     @Transactional
-    public void createAdmin(AdminRequest adminRequest) {
-        AdminData adminData = mapAdminRequestToData(adminRequest);
-        adminRepository.save(adminData);
+    public BackOfficeUserData createAdmin(BackOfficeSignInRequest signInRequest) {
+        BackOfficeUserData userData = createAndSaveAdminData(signInRequest);
+        return backOfficeRepository.save(userData);
     }
 
     @Override
     @Transactional
-    public void createVendor(VendorRequest vendorRequest) {
-        VendorData vendorData = mapVendorRequestToData(vendorRequest);
-        vendorRepository.save(vendorData);
+    public BackOfficeUserData createVendor(BackOfficeSignInRequest signInRequest) {
+        BackOfficeUserData userData = createAndSaveVendorData(signInRequest);
+        return backOfficeRepository.save(userData);
     }
 
     private boolean checkPasswordsMatch(String enteredPassword, String passwordFromDb) {
         return bCryptPasswordEncoder.matches(enteredPassword, passwordFromDb);
     }
 
-    private AdminData mapAdminRequestToData(AdminRequest request) {
-        AdminData adminData = new AdminData();
-        BeanUtils.copyProperties(request, adminData);
-        adminData.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
-        return adminData;
+    private BackOfficeUserData createAndSaveAdminData(BackOfficeSignInRequest signInRequest) {
+        BackOfficeUserData userData = createBackOfficeUserData(signInRequest);
+        userData.setUserCategory(UserCategory.ADMIN);
+
+        return userData;
     }
 
-    private VendorData mapVendorRequestToData(VendorRequest request) {
+    private BackOfficeUserData createAndSaveVendorData(BackOfficeSignInRequest signInRequest) {
+        BackOfficeUserData userData = createBackOfficeUserData(signInRequest);
+        userData.setUserCategory(UserCategory.VENDOR);
+
         VendorData vendorData = new VendorData();
-        BeanUtils.copyProperties(request, vendorData);
-        vendorData.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
-        vendorData.setAgentId(RandomStringUtils.randomAlphanumeric(12));
-        return vendorData;
+        BeanUtils.copyProperties(signInRequest.getVendorRequest(), vendorData);
+
+        vendorData.setVendorAgentId(RandomStringUtils.randomAlphanumeric(8));
+        vendorRepository.save(vendorData);
+
+        userData.setVendorAgentId(vendorData.getVendorAgentId());
+        return userData;
+    }
+
+    private BackOfficeUserData createBackOfficeUserData(BackOfficeSignInRequest signInRequest) {
+        BackOfficeUserData adminData = new BackOfficeUserData();
+        BeanUtils.copyProperties(signInRequest, adminData);
+
+        Address address = new Address();
+        BeanUtils.copyProperties(signInRequest.getAddress(), address);
+        address.setAddressId(UUID.randomUUID().toString());
+        addressRepository.save(address);
+
+        adminData.setUserId(UUID.randomUUID().toString());
+        adminData.setPassword(bCryptPasswordEncoder.encode(signInRequest.getPassword()));
+        adminData.setAddressId(address.getAddressId());
+
+        return adminData;
     }
 }

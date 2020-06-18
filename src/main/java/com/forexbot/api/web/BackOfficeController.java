@@ -1,7 +1,6 @@
 package com.forexbot.api.web;
 
-import com.forexbot.api.dao.admin.AdminRequest;
-import com.forexbot.api.dao.admin.VendorRequest;
+import com.forexbot.api.dao.admin.*;
 import com.forexbot.api.service.BackOfficeService;
 import com.forexbot.api.service.OrderService;
 import com.forexbot.api.service.RatesService;
@@ -21,39 +20,23 @@ public class BackOfficeController {
     private final OrderService orderService;
     private final UserDataService userDataService;
     private final RatesService ratesService;
-    private final BackOfficeService adminService;
+    private final BackOfficeService backOfficeService;
 
-    public BackOfficeController(OrderService orderService, UserDataService userDataService, RatesService ratesService, BackOfficeService adminService) {
+    public BackOfficeController(OrderService orderService, UserDataService userDataService, RatesService ratesService, BackOfficeService backOfficeService) {
         this.orderService = orderService;
         this.userDataService = userDataService;
         this.ratesService = ratesService;
-        this.adminService = adminService;
+        this.backOfficeService = backOfficeService;
     }
 
-    @PostMapping(path = "/login/admin")
-    public ResponseEntity<ResponseWrapper> loginAdmin(@RequestBody AdminRequest adminRequest) {
+    @PostMapping(path = "/login")
+    public ResponseEntity<ResponseWrapper> loginVendor(@RequestBody BackOfficeLoginRequest loginRequest) {
         try {
-            adminService.loginAdmin(adminRequest);
+            BackOfficeLoginResponse response = backOfficeService.login(loginRequest);
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
                     "Login success",
-                    null), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    ERROR,
-                    "Incorrect Credentials",
-                    null), HttpStatus.OK);
-        }
-    }
-
-    @PostMapping(path = "/login/vendor")
-    public ResponseEntity<ResponseWrapper> loginVendor(@RequestBody VendorRequest vendorRequest) {
-        try {
-            adminService.loginVendor(vendorRequest);
-            return new ResponseEntity<>(new ResponseWrapper(
-                    SUCCESS,
-                    "Login success",
-                    null), HttpStatus.OK);
+                    response), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
@@ -63,13 +46,13 @@ public class BackOfficeController {
     }
 
     @PostMapping(path = "/create/admin")
-    public ResponseEntity<ResponseWrapper> createAdmin(@RequestBody AdminRequest adminRequest) {
+    public ResponseEntity<ResponseWrapper> createAdmin(@RequestBody BackOfficeSignInRequest signInRequest) {
         try {
-            adminService.createAdmin(adminRequest);
+            BackOfficeUserData responseData = backOfficeService.createAdmin(signInRequest);
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
-                    "Admin created successfully",
-                    null), HttpStatus.OK);
+                    "Admin created successfully for user: " + responseData.getUserName(),
+                    responseData), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
@@ -79,16 +62,16 @@ public class BackOfficeController {
     }
 
     @PostMapping(path = "/create/vendor")
-    public ResponseEntity<ResponseWrapper> createVendor(@RequestBody VendorRequest vendorRequest) {
+    public ResponseEntity<ResponseWrapper> createVendor(@RequestBody BackOfficeSignInRequest signInRequest) {
 
         try {
-            adminService.createVendor(vendorRequest);
+            BackOfficeUserData responseData = backOfficeService.createVendor(signInRequest);
             //TODO: Send vendor email
 //            emailController.sendWelcomeEmail(userDataRequest);
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
-                    "Vendor registered successfully",
-                    null), HttpStatus.OK);
+                    "Vendor registered successfully for id: " + responseData.getVendorAgentId(),
+                    responseData), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,

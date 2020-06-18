@@ -1,17 +1,11 @@
 package com.forexbot.api.service;
 
-import com.forexbot.api.dao.admin.AdminData;
-import com.forexbot.api.dao.admin.AdminRequest;
-import com.forexbot.api.dao.admin.VendorRequest;
-import com.forexbot.api.dao.admin.VendorResponse;
+import com.forexbot.api.dao.admin.*;
 
 public interface BackOfficeService {
+    BackOfficeLoginResponse login(BackOfficeLoginRequest loginRequest) throws Exception;
 
-    AdminData loginAdmin(AdminRequest adminRequest) throws Exception;
+    BackOfficeUserData createAdmin(BackOfficeSignInRequest signInRequest);
 
-    VendorResponse loginVendor(VendorRequest vendorRequest) throws Exception;
-
-    void createAdmin(AdminRequest adminRequest);
-
-    void createVendor(VendorRequest vendorRequest);
+    BackOfficeUserData createVendor(BackOfficeSignInRequest signInRequest);
 }
