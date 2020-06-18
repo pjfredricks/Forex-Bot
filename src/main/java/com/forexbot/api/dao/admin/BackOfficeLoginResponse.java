@@ -2,14 +2,16 @@ package com.forexbot.api.dao.admin;
 
 public class BackOfficeLoginResponse {
     private String userName;
-    private String vendorAgentId;
+    private VendorData vendorData;
+    private Address address;
 
     public BackOfficeLoginResponse() {
     }
 
-    public BackOfficeLoginResponse(String userName, String vendorAgentId) {
+    public BackOfficeLoginResponse(String userName, VendorData vendorData, Address address) {
         this.userName = userName;
-        this.vendorAgentId = vendorAgentId;
+        this.vendorData = vendorData;
+        this.address = address;
     }
 
     public String getUserName() {
@@ -20,11 +22,19 @@ public class BackOfficeLoginResponse {
         this.userName = userName;
     }
 
-    public String getVendorAgentId() {
-        return vendorAgentId;
+    public VendorData getVendorData() {
+        return vendorData;
     }
 
-    public void setVendorAgentId(String vendorAgentId) {
-        this.vendorAgentId = vendorAgentId;
+    public void setVendorData(VendorData vendorData) {
+        this.vendorData = vendorData;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 }

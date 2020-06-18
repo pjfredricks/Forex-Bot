@@ -35,10 +35,16 @@ public class BackOfficeServiceImpl implements BackOfficeService {
     @Override
     public BackOfficeLoginResponse login(BackOfficeLoginRequest loginRequest) throws Exception {
         BackOfficeUserData userData = backOfficeRepository.getBackOfficeUserDataByEmailId(loginRequest.getEmailId());
-        VendorData vendorData = vendorRepository.getVendorDataByVendorAgentId(userData.getVendorAgentId());
-        if (ObjectUtils.isNotEmpty(vendorData) && checkPasswordsMatch(loginRequest.getPassword(), userData.getPassword())) {
-            return new BackOfficeLoginResponse(userData.getUserName(), vendorData.getVendorAgentId());
+
+        String vendorAgentId = userData.getVendorAgentId() != null ? userData.getVendorAgentId() : "";
+        VendorData vendorData = vendorRepository.getVendorDataByVendorAgentId(vendorAgentId);
+
+        Address address = addressRepository.getAddressByAddressId(userData.getAddressId());
+
+        if (checkPasswordsMatch(loginRequest.getPassword(), userData.getPassword())) {
+            return new BackOfficeLoginResponse(userData.getUserName(), vendorData, address);
         }
+
         throw new Exception("Login failed");
     }
 
