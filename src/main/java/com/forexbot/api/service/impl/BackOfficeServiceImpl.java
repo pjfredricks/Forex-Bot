@@ -42,7 +42,12 @@ public class BackOfficeServiceImpl implements BackOfficeService {
         Address address = addressRepository.getAddressByAddressId(userData.getAddressId());
 
         if (checkPasswordsMatch(loginRequest.getPassword(), userData.getPassword())) {
-            return new BackOfficeLoginResponse(userData.getUserName(), vendorData, address);
+            BackOfficeLoginResponse response = new BackOfficeLoginResponse();
+            BeanUtils.copyProperties(userData, response);
+
+            response.setAddress(address);
+            response.setVendorData(vendorData);
+            return response;
         }
 
         throw new Exception("Login failed");
