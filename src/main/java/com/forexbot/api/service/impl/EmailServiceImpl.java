@@ -28,13 +28,16 @@ public class EmailServiceImpl implements EmailService {
     public void sendEmail(String emailId, UserData userData, EmailType type) throws MessagingException, IOException {
         switch (type) {
             case RESET:
-                javaMailSender.send(constructMail(emailId, userData, "reset_pass.html", "Reset your Forex Bot password"));
+                javaMailSender.send(constructMail(emailId, userData, "email/reset_pass.html", "Reset your Forex Bot password"));
                 break;
             case WELCOME:
-                javaMailSender.send(constructMail(emailId, userData, "welcome_page.html", "Welcome to ForexBot"));
+                javaMailSender.send(constructMail(emailId, userData, "email/welcome_page.html", "Welcome to ForexBot"));
                 break;
             case VERIFY:
-                javaMailSender.send(constructMail(emailId, userData, "verify_email.html", "Verify your Email address"));
+                javaMailSender.send(constructMail(emailId, userData, "email/verify_email.html", "Verify your Email address"));
+                break;
+            case CONFIRM:
+                javaMailSender.send(constructMail(emailId, userData, "email/order_confirm.html", "Your order has been confirmed"));
                 break;
             default:
                 break;

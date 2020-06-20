@@ -46,6 +46,11 @@ public class EmailController {
         return sendEmail(userDataRequest.getEmailId(), EmailService.EmailType.VERIFY);
     }
 
+    @PostMapping(path = "/sendConfirmationMail")
+    public ResponseEntity<ResponseWrapper> sendConfirmationMail(@RequestBody UserDataRequest userDataRequest) throws IOException, MessagingException {
+        return sendEmail(userDataRequest.getEmailId(), EmailService.EmailType.CONFIRM);
+    }
+
     @PostMapping(path = "/verifyEmail")
     public ResponseEntity<ResponseWrapper> verifyEmail(@RequestBody UserDataRequest userDataRequest) {
         try {

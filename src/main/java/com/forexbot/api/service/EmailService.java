@@ -11,6 +11,7 @@ public interface EmailService {
         WELCOME,
         RESET,
         VERIFY,
+        CONFIRM,
         BACKUP
     }
 
