@@ -64,7 +64,7 @@ public class RatesServiceImpl implements RatesService {
                     Thread
                             .currentThread()
                             .getContextClassLoader()
-                            .getResourceAsStream("Country_Details.json"),
+                            .getResourceAsStream("countryData/Country_Details.json"),
                     mapper.getTypeFactory()
                             .constructCollectionType(List.class, ForexRates.class));
         } catch (IOException e) {
