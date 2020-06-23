@@ -121,7 +121,7 @@ public class BackOfficeServiceImpl implements BackOfficeService {
 
     private BackOfficeUserResponse createUserResponseFromData(BackOfficeUserData userData) {
         BackOfficeUserResponse userResponse = new BackOfficeUserResponse();
-        BeanUtils.copyProperties(userResponse, userData);
+        BeanUtils.copyProperties(userData, userResponse);
         return userResponse;
     }
 }
