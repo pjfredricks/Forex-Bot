@@ -12,7 +12,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class BackOfficeServiceImpl implements BackOfficeService {
@@ -67,6 +69,15 @@ public class BackOfficeServiceImpl implements BackOfficeService {
         return backOfficeRepository.save(userData);
     }
 
+    @Override
+    public List<BackOfficeUserResponse> getAllUsers() {
+        List<BackOfficeUserData> userDataList = backOfficeRepository.findAll();
+        return userDataList
+                .stream()
+                .map(this::createUserResponseFromData)
+                .collect(Collectors.toList());
+    }
+
     private boolean checkPasswordsMatch(String enteredPassword, String passwordFromDb) {
         return bCryptPasswordEncoder.matches(enteredPassword, passwordFromDb);
     }
@@ -106,5 +117,11 @@ public class BackOfficeServiceImpl implements BackOfficeService {
         adminData.setAddressId(address.getAddressId());
 
         return adminData;
+    }
+
+    private BackOfficeUserResponse createUserResponseFromData(BackOfficeUserData userData) {
+        BackOfficeUserResponse userResponse = new BackOfficeUserResponse();
+        BeanUtils.copyProperties(userResponse, userData);
+        return userResponse;
     }
 }

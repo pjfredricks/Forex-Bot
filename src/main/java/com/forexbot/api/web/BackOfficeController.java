@@ -95,4 +95,12 @@ public class BackOfficeController {
                 "Orders have been fetched",
                 orderService.getAllOrders()), HttpStatus.OK);
     }
+
+    @GetMapping(path = "/users")
+    public ResponseEntity<ResponseWrapper> getAllUsers() {
+        return new ResponseEntity<>(new ResponseWrapper(
+                SUCCESS,
+                "Users have been fetched",
+                backOfficeService.getAllUsers()), HttpStatus.OK);
+    }
 }
