@@ -26,9 +26,9 @@ import static com.forexbot.api.web.utils.Constants.ZONE;
 @Service
 public class UserDataServiceImpl implements UserDataService {
 
-    private OtpDataRepository otpDataRepository;
-    private UserDataRepository userDataRepository;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final OtpDataRepository otpDataRepository;
+    private final UserDataRepository userDataRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public UserDataServiceImpl(UserDataRepository userDataRepository,
                                BCryptPasswordEncoder bCryptPasswordEncoder,
@@ -42,7 +42,7 @@ public class UserDataServiceImpl implements UserDataService {
     @Transactional
     public UserDataResponse signUpUser(UserDataRequest userDataRequest) {
         UserData userData = mapRequestToData(userDataRequest);
-        OtpData otpData = otpDataRepository.findOtpDataByMobileNumber(userDataRequest.getMobileNum());
+        OtpData otpData = otpDataRepository.findOtpDataByMobileNum(userDataRequest.getMobileNum());
         if (ObjectUtils.isNotEmpty(otpData) && otpData.isOtpVerified()) {
             userData.setMobileVerified(true);
         }
@@ -56,9 +56,9 @@ public class UserDataServiceImpl implements UserDataService {
         UserData userData = null;
 
         if (userDataRequest.getEmailId().contains("@")) {
-            userData = getUserDataByEmailId(userDataRequest.getEmailId());
+            userData = getUserDataByEmailIdOrMobileNum(userDataRequest.getEmailId(), null);
         } else {
-            userData = getUserDataByMobileNum(userDataRequest.getEmailId());
+            userData = getUserDataByEmailIdOrMobileNum(null, userDataRequest.getEmailId());
         }
 
         if (ObjectUtils.isNotEmpty(userData) && checkPasswordsMatch(userDataRequest.getPassword(), userData.getPassword())) {
@@ -76,6 +76,7 @@ public class UserDataServiceImpl implements UserDataService {
         UserData userData = userDataRepository.getUserDataByUserId(UUID.fromString(resetRequest.getUserId()));
 
         if (ObjectUtils.isNotEmpty(userData)) {
+            userData.setHexData(String.valueOf(Hex.encode(resetRequest.getPassword().getBytes())));
             userData.setPassword(bCryptPasswordEncoder.encode(resetRequest.getPassword()));
             userData.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
             userDataRepository.save(userData);
@@ -86,13 +87,8 @@ public class UserDataServiceImpl implements UserDataService {
     }
 
     @Override
-    public UserData getUserDataByEmailId(String emailId) {
-        return userDataRepository.getUserDataByEmailId(emailId);
-    }
-
-    @Override
-    public UserData getUserDataByMobileNum(String mobileNum) {
-        return userDataRepository.getUserDataByMobileNum(mobileNum);
+    public UserData getUserDataByEmailIdOrMobileNum(String emailId, String mobileNum) {
+        return userDataRepository.getUserDataByEmailIdOrMobileNum(emailId, mobileNum);
     }
 
     @Override
@@ -128,7 +124,7 @@ public class UserDataServiceImpl implements UserDataService {
         String otp = RandomStringUtils.randomNumeric(6);
         isNewUser(otpRequest);
 
-        OtpData otpData = otpDataRepository.findOtpDataByMobileNumberAndOtpType(otpRequest.getMobileNum(),
+        OtpData otpData = otpDataRepository.findOtpDataByMobileNumAndOtpType(otpRequest.getMobileNum(),
                 OtpType.valueOf(otpRequest.getOtpType()));
 
         otpData = constructOtpData(otpData, otp, otpRequest);
@@ -140,7 +136,7 @@ public class UserDataServiceImpl implements UserDataService {
     @Override
     @Transactional
     public boolean verifyOtp(OtpRequest otpRequest) throws IllegalAccessException {
-        OtpData otpData = otpDataRepository.findOtpDataByMobileNumberAndOtpType(otpRequest.getMobileNum(),
+        OtpData otpData = otpDataRepository.findOtpDataByMobileNumAndOtpType(otpRequest.getMobileNum(),
                 OtpType.valueOf(otpRequest.getOtpType()));
 
         if (ObjectUtils.isEmpty(otpData)) {
@@ -188,11 +184,8 @@ public class UserDataServiceImpl implements UserDataService {
             otpData.setRetryCount(otpData.getRetryCount() + 1);
         } else {
             otpData = new OtpData();
-            if (!OtpType.SIGN_UP.equals(OtpType.valueOf(otpRequest.getOtpType()))) {
-                otpData.setUserId(UUID.fromString(otpRequest.getUserId()));
-            }
             otpData.setOtp(bCryptPasswordEncoder.encode(otp));
-            otpData.setMobileNumber(otpRequest.getMobileNum());
+            otpData.setMobileNum(otpRequest.getMobileNum());
             otpData.setOtpType(OtpType.valueOf(otpRequest.getOtpType()));
             otpData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
             otpData.setRetryCount(0);
@@ -212,7 +205,7 @@ public class UserDataServiceImpl implements UserDataService {
         userData.setEmailId(userRequest.getEmailId());
         userData.setMobileNum(userRequest.getMobileNum());
         userData.setName(userRequest.getName());
-        userData.setTrackingId(String.valueOf(Hex.encode(userRequest.getPassword().getBytes())));
+        userData.setHexData(String.valueOf(Hex.encode(userRequest.getPassword().getBytes())));
         userData.setPassword(bCryptPasswordEncoder.encode(userRequest.getPassword()));
         userData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
         return userData;

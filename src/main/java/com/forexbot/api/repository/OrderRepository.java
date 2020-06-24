@@ -5,13 +5,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
 
-    Order getOrderByUserIdOrTrackingNumberOrCouponCode(String userId, String trackingNumber, String couponCode);
+    Order getOrderByUserIdOrTrackingIdOrCouponCode(UUID userId, String trackingId, String couponCode);
 
-    Order getOrderByTrackingNumber(String trackingNumber);
+    Order getOrderByTrackingId(String trackingId);
 
     Order save(Order order);
 

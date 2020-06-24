@@ -23,12 +23,17 @@ public class Order {
 
     @NotNull
     @ApiModelProperty(hidden = true)
-    @Column(name = "trackingNumber", unique = true)
-    private String trackingNumber;
+    @Column(name = "trackingId", unique = true)
+    private String trackingId;
 
     @NotNull
     @Column(name = "orderType")
+    @Enumerated(EnumType.STRING)
     private OrderType orderType;
+
+    @NotNull
+    @Column(name = "orderRate")
+    private double orderRate;
 
     @NotNull
     @Column(name = "countryCode")
@@ -74,12 +79,12 @@ public class Order {
         this.couponCode = "";
     }
 
-    public String getTrackingNumber() {
-        return trackingNumber;
+    public String getTrackingId() {
+        return trackingId;
     }
 
-    public void setTrackingNumber(String trackingNumber) {
-        this.trackingNumber = trackingNumber;
+    public void setTrackingId(String trackingId) {
+        this.trackingId = trackingId;
     }
 
     public int getId() {
@@ -108,6 +113,14 @@ public class Order {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    public double getOrderRate() {
+        return orderRate;
+    }
+
+    public void setOrderRate(double forexRate) {
+        this.orderRate = forexRate;
     }
 
     public String getCountryCode() {
@@ -172,23 +185,5 @@ public class Order {
 
     public void setSalesTotal(int salesTotal) {
         this.salesTotal = salesTotal;
-    }
-
-    @Override
-    public String toString() {
-        return "order{" +
-                "userId=" + userId +
-                ", trackingNumber='" + trackingNumber + '\'' +
-                ", orderType=" + orderType +
-                ", countryCode='" + countryCode + '\'' +
-                ", forexAmount=" + forexAmount +
-                ", forexTotal=" + forexTotal +
-                ", gst=" + gst +
-                ", discountAmount=" + discountAmount +
-                ", salesTotal=" + salesTotal +
-                ", couponCode='" + couponCode + '\'' +
-                ", createDate='" + createDate + '\'' +
-                ", status=" + status +
-                '}';
     }
 }

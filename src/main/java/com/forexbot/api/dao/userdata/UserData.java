@@ -55,9 +55,10 @@ public class UserData {
     @Column(name = "modifiedDate")
     private String modifiedDate;
 
+    @NotNull
     @ApiModelProperty(hidden = true)
-    @Column(name = "trackingId", unique = true)
-    private String trackingId;
+    @Column(name = "hexData")
+    private String hexData;
 
     public UserData() {
         super();
@@ -143,11 +144,11 @@ public class UserData {
         this.modifiedDate = modifiedDate;
     }
 
-    public String getTrackingId() {
-        return trackingId;
+    public String getHexData() {
+        return hexData;
     }
 
-    public void setTrackingId(String trackingId) {
-        this.trackingId = trackingId;
+    public void setHexData(String hexData) {
+        this.hexData = hexData;
     }
 }

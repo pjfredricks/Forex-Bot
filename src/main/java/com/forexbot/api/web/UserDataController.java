@@ -116,7 +116,7 @@ public class UserDataController {
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
                     "User Details fetched for mobile number: " + mobileNum,
-                    userDataService.getUserDataByMobileNum(mobileNum)),
+                    userDataService.getUserDataByEmailIdOrMobileNum(null, mobileNum)),
                     HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ResponseWrapper(
@@ -134,7 +134,7 @@ public class UserDataController {
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
                     "User Details fetched for emailId: " + emailId,
-                    userDataService.getUserDataByEmailId(emailId)),
+                    userDataService.getUserDataByEmailIdOrMobileNum(emailId, null)),
                     HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ResponseWrapper(

@@ -6,13 +6,12 @@ import com.forexbot.api.dao.order.OrderResponse;
 import com.forexbot.api.dao.order.OrderType;
 import com.forexbot.api.service.OrderService;
 import com.forexbot.api.web.utils.ResponseWrapper;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Currency;
-import java.util.UUID;
 
 import static com.forexbot.api.web.utils.Constants.ERROR;
 import static com.forexbot.api.web.utils.Constants.SUCCESS;
@@ -32,16 +31,16 @@ public class OrderController {
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
                 "Order Details fetched for userId: " + userId,
-                orderService.getOrderByUserIdOrTrackingNumberOrCouponCode(userId, null, null)),
+                orderService.getOrderByUserIdOrTrackingIdOrCouponCode(userId, null, null)),
                 HttpStatus.OK);
     }
 
-    @GetMapping(path = "/order/trackingNumber/{trackingNumber}")
-    public ResponseEntity<ResponseWrapper> getOrderByTrackingNumber(@PathVariable String trackingNumber) {
+    @GetMapping(path = "/order/trackingId/{trackingId}")
+    public ResponseEntity<ResponseWrapper> getOrderByTrackingId(@PathVariable String trackingId) {
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
-                "Order Details fetched for trackingNumber: " + trackingNumber,
-                orderService.getOrderByUserIdOrTrackingNumberOrCouponCode(null, trackingNumber, null)),
+                "Order Details fetched for trackingId: " + trackingId,
+                orderService.getOrderByUserIdOrTrackingIdOrCouponCode(null, trackingId, null)),
                 HttpStatus.OK);
     }
 
@@ -50,7 +49,7 @@ public class OrderController {
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
                 "Order Details fetched for couponCode: " + couponCode,
-                orderService.getOrderByUserIdOrTrackingNumberOrCouponCode(null, null, couponCode)),
+                orderService.getOrderByUserIdOrTrackingIdOrCouponCode(null, null, couponCode)),
                 HttpStatus.OK);
     }
 
@@ -112,12 +111,11 @@ public class OrderController {
 
     public static void validateRequest(CalculateRequest request) {
         try {
-            UUID.fromString(request.getUserId());
             Currency.getInstance(request.getCountryCode());
             if (request.getForexAmount() < 0) {
                 throw new IllegalArgumentException("Amount not valid");
             }
-            if (!StringUtils.isNotBlank(OrderType.valueOf(request.getOrderType()).toString())) {
+            if (ObjectUtils.isEmpty(OrderType.valueOf(request.getOrderType()))) {
                 throw new IllegalArgumentException("OrderType not valid");
             }
             if (null == request.getCouponCode()) {

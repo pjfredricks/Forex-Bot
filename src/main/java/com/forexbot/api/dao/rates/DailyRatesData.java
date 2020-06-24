@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 
 @Table(name = "ratesData")
 @Entity
@@ -23,7 +22,7 @@ public class DailyRatesData {
 
     @NotNull
     @Column(name = "createDate")
-    private LocalDateTime createDate;
+    private String createDate;
 
     @NotNull
     @Column(name = "triggeredBy")
@@ -37,11 +36,11 @@ public class DailyRatesData {
         this.ratesDetails = ratesDetails;
     }
 
-    public LocalDateTime getCreateDate() {
+    public String getCreateDate() {
         return createDate;
     }
 
-    public void setCreateDate(LocalDateTime createDate) {
+    public void setCreateDate(String createDate) {
         this.createDate = createDate;
     }
 

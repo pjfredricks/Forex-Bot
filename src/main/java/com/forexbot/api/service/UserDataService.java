@@ -11,9 +11,7 @@ public interface UserDataService {
 
 	UserDataResponse signUpUser(UserDataRequest userDataRequest) throws Exception;
 
-	UserData getUserDataByEmailId(String emailId);
-
-	UserData getUserDataByMobileNum(String mobileNum);
+	UserData getUserDataByEmailIdOrMobileNum(String emailId, String mobileNum);
 
 	UserDataResponse login(UserDataRequest userDataRequest);
 

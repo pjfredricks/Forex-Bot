@@ -157,7 +157,7 @@ public class RatesServiceImpl implements RatesService {
         DailyRatesData ratesData = new DailyRatesData();
 
         ratesData.setTriggeredBy(triggerIdentity);
-        ratesData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)));
+        ratesData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
 
         try {
             ratesData.setRatesDetails(mapper.writeValueAsString(dailyRates));

@@ -28,9 +28,9 @@ public class SmsServiceImpl implements SmsService {
             "Kindly follow the instructions in link below,%n" +
             " forexbot.in/instructions";
 
-    private OtpDataRepository otpDataRepository;
-    private OrderRepository orderRepository;
-    private UserDataRepository userDataRepository;
+    private final OtpDataRepository otpDataRepository;
+    private final OrderRepository orderRepository;
+    private final UserDataRepository userDataRepository;
 
     public SmsServiceImpl(OtpDataRepository otpDataRepository, OrderRepository orderRepository, UserDataRepository userDataRepository) {
         this.otpDataRepository = otpDataRepository;
@@ -48,9 +48,9 @@ public class SmsServiceImpl implements SmsService {
     }
 
     @Override
-    public void sendConfirmation(String trackingNumber, String mobileNum) throws IOException {
+    public void sendConfirmation(String trackingId, String mobileNum) throws IOException {
         String message = ORDER_CONFIRM_MESSAGE;
-        Order order = orderRepository.getOrderByTrackingNumber(trackingNumber);
+        Order order = orderRepository.getOrderByTrackingId(trackingId);
         String name = userDataRepository.getUserDataByMobileNum(mobileNum).getName();
 
         message = message.replace("{userName}", name.substring(0, Math.min(name.length(), 15)));
@@ -89,7 +89,7 @@ public class SmsServiceImpl implements SmsService {
         }
         rd.close();
 
-        OtpData otpData = otpDataRepository.findOtpDataByMobileNumber(mobileNum);
+        OtpData otpData = otpDataRepository.findOtpDataByMobileNum(mobileNum);
         if (ObjectUtils.isNotEmpty(otpData)) {
             otpData.setTextLocalResponse(builder.toString());
             otpDataRepository.save(otpData);

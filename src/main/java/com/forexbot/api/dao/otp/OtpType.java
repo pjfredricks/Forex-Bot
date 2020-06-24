@@ -8,7 +8,6 @@ public enum OtpType {
     RESET(1),
     ORDER_CONFIRM(2);
 
-
     private final Integer value;
     private static final Map<Integer, OtpType> map = new HashMap<>();
 
@@ -24,9 +23,5 @@ public enum OtpType {
 
     public static OtpType valueOf(int otpType) {
         return map.get(otpType);
-    }
-
-    public int getValue() {
-        return value;
     }
 }

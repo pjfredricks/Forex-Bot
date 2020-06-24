@@ -68,16 +68,14 @@ public class EmailController {
     }
 
     private ResponseEntity<ResponseWrapper> sendEmail(String emailId, EmailService.EmailType emailType) throws IOException, MessagingException {
-        UserData userData = userDataService.getUserDataByEmailId(emailId);
-
-        if (ObjectUtils.isEmpty(userData)) {
+        try {
+            emailService.sendEmail(emailId, emailType);
+        } catch (IllegalAccessException ex) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
-                    "No User registered with email " + emailId,
+                    ex.getMessage(),
                     null), HttpStatus.OK);
         }
-
-        emailService.sendEmail(emailId, userData, emailType);
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
                 "Email sent successfully",

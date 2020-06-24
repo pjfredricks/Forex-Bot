@@ -24,9 +24,9 @@ import static com.forexbot.api.web.utils.Constants.ZONE;
 @Service
 public class OrderServiceImpl implements OrderService {
 
-    private OrderRepository orderRepository;
-    private RatesService ratesService;
-    private UserDataRepository userDataRepository;
+    private final OrderRepository orderRepository;
+    private final RatesService ratesService;
+    private final UserDataRepository userDataRepository;
 
     public OrderServiceImpl(OrderRepository repository, RatesService ratesService, UserDataRepository userDataRepository) {
         this.orderRepository = repository;
@@ -40,10 +40,10 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order getOrderByUserIdOrTrackingNumberOrCouponCode(String userId,
-                                                              String trackingNumber,
+    public Order getOrderByUserIdOrTrackingIdOrCouponCode(String userId,
+                                                              String trackingId,
                                                               String couponCode) {
-        return orderRepository.getOrderByUserIdOrTrackingNumberOrCouponCode(userId, trackingNumber, couponCode);
+        return orderRepository.getOrderByUserIdOrTrackingIdOrCouponCode(UUID.fromString(userId), trackingId, couponCode);
     }
 
     @Override
@@ -64,11 +64,12 @@ public class OrderServiceImpl implements OrderService {
 
         CalculateResponse response = calculateOrder(request);
         Order order = createOrder(request, response);
+        order.setOrderRate(response.getForexTotal()/request.getForexAmount());
 
         //TODO: update status based on vendor
         order.setStatus(OrderStatus.COMPLETED);
 
-        orderResponse.setTransactionId(orderRepository.save(order).getTrackingNumber());
+        orderResponse.setTransactionId(orderRepository.save(order).getTrackingId());
         return orderResponse;
     }
 
@@ -102,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
         BeanUtils.copyProperties(response, order, "userId");
 
         order.setUserId(UUID.fromString(request.getUserId()));
-        order.setTrackingNumber(RandomStringUtils.randomAlphanumeric(12));
+        order.setTrackingId(RandomStringUtils.randomAlphanumeric(12));
         order.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
         order.setOrderType(OrderType.valueOf(request.getOrderType()));
 

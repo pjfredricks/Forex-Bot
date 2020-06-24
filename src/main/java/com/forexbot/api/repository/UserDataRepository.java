@@ -14,6 +14,8 @@ public interface UserDataRepository extends JpaRepository<UserData, Integer> {
 
     UserData getUserDataByMobileNum(String mobileNum);
 
+    UserData getUserDataByEmailIdOrMobileNum(String emailId, String mobileNum);
+
     UserData getUserDataByUserId(UUID userId);
 
     List<UserData> findAll();

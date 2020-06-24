@@ -14,7 +14,7 @@ public interface OtpDataRepository extends JpaRepository<OtpData, Integer> {
 
     OtpData save(OtpData otpData);
 
-    OtpData findOtpDataByMobileNumberAndOtpType(String mobileNumber, OtpType otpType);
+    OtpData findOtpDataByMobileNumAndOtpType(String mobileNum, OtpType otpType);
 
-    OtpData findOtpDataByMobileNumber(String mobileNumber);
+    OtpData findOtpDataByMobileNum(String mobileNum);
 }

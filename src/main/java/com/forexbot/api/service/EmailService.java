@@ -15,5 +15,5 @@ public interface EmailService {
         BACKUP
     }
 
-    void sendEmail(String emailId, UserData userData, EmailType emailType) throws MessagingException, IOException;
+    void sendEmail(String emailId, EmailType emailType) throws MessagingException, IOException, IllegalAccessException;
 }

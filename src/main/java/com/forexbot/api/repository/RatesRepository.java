@@ -12,5 +12,5 @@ public interface RatesRepository extends JpaRepository<DailyRatesData, Integer> 
 
     DailyRatesData save(DailyRatesData ratesData);
 
-    DailyRatesData getAllByCreateDate(String date);
+    DailyRatesData findAllByCreateDate(String date);
 }

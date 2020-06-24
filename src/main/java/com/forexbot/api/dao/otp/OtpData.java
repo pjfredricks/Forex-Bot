@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.UUID;
 
 @Table(name = "otpData")
 @Entity
@@ -17,16 +16,13 @@ public class OtpData {
     @JsonIgnore
     private int id;
 
-    @ApiModelProperty(hidden = true)
-    @Column(name = "userId")
-    private UUID userId;
-
     @NotNull
     @Column(name = "otp")
     private String otp;
 
     @NotNull
     @Column(name = "otpType")
+    @Enumerated(EnumType.STRING)
     private OtpType otpType;
 
     @NotNull
@@ -39,8 +35,8 @@ public class OtpData {
     private boolean otpVerified;
 
     @NotNull
-    @Column(name = "mobileNumber", unique = true)
-    private String mobileNumber;
+    @Column(name = "mobileNum", unique = true)
+    private String mobileNum;
 
     @NotNull
     @ApiModelProperty(hidden = true)
@@ -56,14 +52,6 @@ public class OtpData {
 
     public OtpData() {
         super();
-    }
-
-    public UUID getUserId() {
-        return userId;
-    }
-
-    public void setUserId(UUID userId) {
-        this.userId = userId;
     }
 
     public String getOtp() {
@@ -98,12 +86,12 @@ public class OtpData {
         this.retryCount = retryCount;
     }
 
-    public String getMobileNumber() {
-        return mobileNumber;
+    public String getMobileNum() {
+        return mobileNum;
     }
 
-    public void setMobileNumber(String mobileNumber) {
-        this.mobileNumber = mobileNumber;
+    public void setMobileNum(String mobileNum) {
+        this.mobileNum = mobileNum;
     }
 
     public String getCreateDate() {

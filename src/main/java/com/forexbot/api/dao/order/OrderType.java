@@ -23,8 +23,4 @@ public enum OrderType {
     public static OrderType valueOf(int orderType) {
         return map.get(orderType);
     }
-
-    public int getValue() {
-        return value;
-    }
 }
