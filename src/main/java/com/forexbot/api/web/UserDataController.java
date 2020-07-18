@@ -110,7 +110,7 @@ public class UserDataController {
     }
 
     // Not integrated with UI
-    @GetMapping(path = "/user/{mobileNum}")
+    @GetMapping(path = "/user/mobileNum/{mobileNum}")
     public ResponseEntity<ResponseWrapper> getUserDetailsByMobileNum(@PathVariable String mobileNum) {
         try {
             return new ResponseEntity<>(new ResponseWrapper(
@@ -128,7 +128,7 @@ public class UserDataController {
     }
 
     // Not integrated with UI
-    @GetMapping(path = "/user/{emailId}")
+    @GetMapping(path = "/user/emailId/{emailId}")
     public ResponseEntity<ResponseWrapper> getUserDetailsByEmailId(@PathVariable String emailId) {
         try {
             return new ResponseEntity<>(new ResponseWrapper(
