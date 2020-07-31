@@ -25,6 +25,14 @@ public class UserDataController {
         this.emailController = emailController;
     }
 
+    @GetMapping
+    public ResponseEntity<ResponseWrapper> getAllUsers() {
+        return new ResponseEntity<>(new ResponseWrapper(
+                SUCCESS,
+                "All users details fetched",
+                userDataService.getAllUsers()), HttpStatus.OK);
+    }
+
     @PostMapping(path = "/signUp")
     public ResponseEntity<ResponseWrapper> signUpUser(@RequestBody UserDataRequest userDataRequest) {
         try {
