@@ -5,9 +5,12 @@ import com.forexbot.api.dao.userdata.UserData;
 import com.forexbot.api.dao.userdata.UserDataRequest;
 import com.forexbot.api.dao.userdata.UserDataResponse;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface UserDataService {
+
+	List<UserData> getAllUsers();
 
 	UserDataResponse signUpUser(UserDataRequest userDataRequest) throws Exception;
 

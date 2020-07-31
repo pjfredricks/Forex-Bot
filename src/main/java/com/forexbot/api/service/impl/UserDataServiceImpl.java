@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.UUID;
 
 import static com.forexbot.api.web.utils.Constants.ZONE;
@@ -36,6 +37,11 @@ public class UserDataServiceImpl implements UserDataService {
         this.userDataRepository = userDataRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.otpDataRepository = otpDataRepository;
+    }
+
+    @Override
+    public List<UserData> getAllUsers() {
+        return userDataRepository.findAll();
     }
 
     @Override
