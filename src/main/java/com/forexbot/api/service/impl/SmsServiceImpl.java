@@ -42,7 +42,7 @@ public class SmsServiceImpl implements SmsService {
     public void sendOtp(String mobileNum, String otp) throws IOException {
         String message = "&message=" + OTP_MESSAGE + otp;
         String numbers = "&numbers=" + mobileNum;
-        String data = API_KEY + numbers + message + SENDER;
+        String data = API_KEY + numbers + message;
 
         sendSms(mobileNum, data);
     }
