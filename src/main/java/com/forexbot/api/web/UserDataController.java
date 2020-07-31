@@ -25,7 +25,7 @@ public class UserDataController {
         this.emailController = emailController;
     }
 
-    @GetMapping
+    @GetMapping(path = "/users")
     public ResponseEntity<ResponseWrapper> getAllUsers() {
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
