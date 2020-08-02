@@ -29,4 +29,6 @@ public interface UserDataService {
 	boolean verifyOtp(OtpRequest otpRequest) throws IllegalAccessException;
 
 	void verifyEmail(UserDataRequest userDataRequest) throws IllegalAccessException;
+
+	void deleteUser(UUID userId);
 }

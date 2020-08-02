@@ -175,6 +175,12 @@ public class UserDataServiceImpl implements UserDataService {
         userDataRepository.save(userData);
     }
 
+    @Override
+    @Transactional
+    public void deleteUser(UUID userId) {
+        userDataRepository.delete(getUserDetailsById(userId));
+    }
+
     private void isNewUser(OtpRequest otpRequest) throws IllegalAccessException {
         if (OtpType.SIGN_UP.equals(OtpType.valueOf(otpRequest.getOtpType()))
                 && (ObjectUtils.isNotEmpty(userDataRepository.getUserDataByMobileNum(otpRequest.getMobileNum()))

@@ -99,7 +99,16 @@ public class UserDataController {
         }
     }
 
-    // Not integrated with UI
+    @DeleteMapping(path = "/user/{userId}")
+    public ResponseEntity<ResponseWrapper> deleteUserById(@PathVariable String userId) {
+        userDataService.deleteUser(UUID.fromString(userId));
+        return new ResponseEntity<>(new ResponseWrapper(
+                SUCCESS,
+                "User deleted successfully",
+                null),
+                HttpStatus.OK);
+    }
+
     @GetMapping(path = "/user/{userId}")
     public ResponseEntity<ResponseWrapper> getUserDetailsByUserId(@PathVariable String userId) {
         try {
@@ -117,7 +126,6 @@ public class UserDataController {
         }
     }
 
-    // Not integrated with UI
     @GetMapping(path = "/user/mobileNum/{mobileNum}")
     public ResponseEntity<ResponseWrapper> getUserDetailsByMobileNum(@PathVariable String mobileNum) {
         try {
@@ -135,7 +143,6 @@ public class UserDataController {
         }
     }
 
-    // Not integrated with UI
     @GetMapping(path = "/user/emailId/{emailId}")
     public ResponseEntity<ResponseWrapper> getUserDetailsByEmailId(@PathVariable String emailId) {
         try {
