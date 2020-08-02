@@ -1,9 +1,7 @@
 package com.forexbot.api.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forexbot.api.dao.order.OrderType;
-import com.forexbot.api.dao.rates.DailyRates;
 import com.forexbot.api.dao.rates.DailyRatesData;
 import com.forexbot.api.dao.rates.ForexRates;
 import com.forexbot.api.dao.rates.ForexRequest;
@@ -49,7 +47,7 @@ public class RatesServiceImpl implements RatesService {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static Map<String, Number> currencyValues = new HashMap<>();
     private List<ForexRates> exchangeRates = new ArrayList<>();
-    private List<DailyRates> dailyRates = new ArrayList<>();
+    private List<DailyRatesData> dailyRatesDataList = new ArrayList<>();
 
     private final RatesRepository ratesRepository;
 
@@ -83,7 +81,7 @@ public class RatesServiceImpl implements RatesService {
     public void updateRates(String triggerIdentity) {
         // Removes old values from both collections
         currencyValues.clear();
-        dailyRates.clear();
+        dailyRatesDataList.clear();
 
         // Updates latest forex currency values
         getCurrencyForexValues();
@@ -101,7 +99,7 @@ public class RatesServiceImpl implements RatesService {
                 .collect(Collectors.toList());
 
         updateDailyRates();
-        saveDailyRates(triggerIdentity);
+        //saveDailyRates(triggerIdentity);
     }
 
     @Override
@@ -114,12 +112,12 @@ public class RatesServiceImpl implements RatesService {
             }
         }));
         updateDailyRates();
-        saveDailyRates(triggerIdentity);
+        //saveDailyRates(triggerIdentity);
     }
 
     @Override
     public List<ForexRates> getExchangeRates() {
-        if (exchangeRates.isEmpty() || dailyRates.isEmpty()) {
+        if (exchangeRates.isEmpty() || dailyRatesDataList.isEmpty()) {
             updateRates("Api call");
         }
         return exchangeRates;
@@ -147,24 +145,20 @@ public class RatesServiceImpl implements RatesService {
 
     private void updateDailyRates() {
         exchangeRates.forEach(exchangeRate -> {
-            DailyRates response = new DailyRates();
-            BeanUtils.copyProperties(exchangeRate, response);
-            dailyRates.add(response);
+            DailyRatesData dailyRatesData = new DailyRatesData();
+            BeanUtils.copyProperties(exchangeRate, dailyRatesData);
+            dailyRatesDataList.add(dailyRatesData);
         });
     }
 
     private void saveDailyRates(String triggerIdentity) {
-        DailyRatesData ratesData = new DailyRatesData();
-
-        ratesData.setTriggeredBy(triggerIdentity);
-        ratesData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
-
-        try {
-            ratesData.setRatesDetails(mapper.writeValueAsString(dailyRates));
-        } catch (JsonProcessingException e) {
-            ratesData.setRatesDetails("");
+        if (!dailyRatesDataList.isEmpty()) {
+            dailyRatesDataList.forEach(ratesData -> {
+                ratesData.setTriggeredBy(triggerIdentity);
+                ratesData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
+                ratesRepository.save(ratesData);
+            });
         }
-        ratesRepository.save(ratesData);
     }
 
     private ForexRates setCarouselAndRates(ForexRates forexRate, Map<String, Number> currencyValues) {

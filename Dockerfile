@@ -1,10 +1,7 @@
-FROM maven:3-jdk-8-alpine
+FROM openjdk:11-jre-slim
 
-WORKDIR /usr/src/app
+ADD target/api-1.0.0.jar app.jar
 
-COPY . /usr/src/app
-RUN mvn package
+EXPOSE 8080
 
-ENV PORT 5000
-EXPOSE $PORT
-CMD [ "sh", "-c", "mvn -Dserver.port=${PORT} spring-boot:run" ]
+ENTRYPOINT ["java", "-jar", "app.jar"]
