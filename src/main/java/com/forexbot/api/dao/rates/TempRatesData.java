@@ -6,9 +6,9 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-@Table(name = "ratesData")
+@Table(name = "tempRatesData")
 @Entity
-public class DailyRatesData {
+public class TempRatesData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -41,8 +41,8 @@ public class DailyRatesData {
     private String createDate;
 
     @NotNull
-    @Column(name = "triggeredBy")
-    private String triggeredBy;
+    @Column(name = "approvedBy")
+    private String approvedBy;
 
     public double getBuyRate() {
         return buyRate;
@@ -92,11 +92,11 @@ public class DailyRatesData {
         this.createDate = createDate;
     }
 
-    public String getTriggeredBy() {
-        return triggeredBy;
+    public String getApprovedBy() {
+        return approvedBy;
     }
 
-    public void setTriggeredBy(String triggeredBy) {
-        this.triggeredBy = triggeredBy;
+    public void setApprovedBy(String approvedBy) {
+        this.approvedBy = approvedBy;
     }
 }

@@ -1,8 +1,8 @@
-package com.forexbot.api.web;
+package com.forexbot.api.web.customer;
 
-import com.forexbot.api.dao.userdata.UserDataRequest;
-import com.forexbot.api.dao.userdata.UserDataResponse;
-import com.forexbot.api.service.UserDataService;
+import com.forexbot.api.dao.customer.CustomerRequest;
+import com.forexbot.api.dao.customer.CustomerResponse;
+import com.forexbot.api.service.CustomerService;
 import com.forexbot.api.web.utils.ResponseWrapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,50 +14,50 @@ import static com.forexbot.api.web.utils.Constants.ERROR;
 import static com.forexbot.api.web.utils.Constants.SUCCESS;
 
 @RestController
-@RequestMapping("/api/v1")
-public class UserDataController {
+@RequestMapping("/api/v1/forexbot")
+public class CustomerController {
 
-    private final UserDataService userDataService;
+    private final CustomerService customerService;
     private final EmailController emailController;
 
-    public UserDataController(UserDataService userDataService, EmailController emailController) {
-        this.userDataService = userDataService;
+    public CustomerController(CustomerService customerService, EmailController emailController) {
+        this.customerService = customerService;
         this.emailController = emailController;
     }
 
-    @GetMapping(path = "/users")
-    public ResponseEntity<ResponseWrapper> getAllUsers() {
+    @GetMapping(path = "/customer")
+    public ResponseEntity<ResponseWrapper> getAllCustomers() {
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
-                "All users details fetched",
-                userDataService.getAllUsers()), HttpStatus.OK);
+                "All customer details fetched",
+                customerService.getAllCustomers()), HttpStatus.OK);
     }
 
     @PostMapping(path = "/signUp")
-    public ResponseEntity<ResponseWrapper> signUpUser(@RequestBody UserDataRequest userDataRequest) {
+    public ResponseEntity<ResponseWrapper> signUpCustomer(@RequestBody CustomerRequest customerRequest) {
         try {
-            UserDataResponse response = userDataService.signUpUser(userDataRequest);
-            emailController.sendWelcomeEmail(userDataRequest);
+            CustomerResponse response = customerService.signUpCustomer(customerRequest);
+            emailController.sendWelcomeEmail(customerRequest);
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
-                    "User signed Up successfully",
+                    "Customer signed Up successfully",
                     response), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
-                    "User details already exist for " + userDataRequest.getMobileNum() + " and " + userDataRequest.getEmailId(),
+                    "Customer details already exist for " + customerRequest.getMobileNum() + " and " + customerRequest.getEmailId(),
                     null), HttpStatus.OK);
         }
     }
 
     @PostMapping(path = "/login")
-    public ResponseEntity<ResponseWrapper> login(@RequestBody UserDataRequest userDataRequest) {
-        UserDataResponse userDataResponse = userDataService.login(userDataRequest);
-        if (userDataResponse != null) {
+    public ResponseEntity<ResponseWrapper> login(@RequestBody CustomerRequest customerRequest) {
+        CustomerResponse customerResponse = customerService.login(customerRequest);
+        if (customerResponse != null) {
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
                     "Login success",
-                    userDataResponse), HttpStatus.OK);
+                    customerResponse), HttpStatus.OK);
         }
         return new ResponseEntity<>(new ResponseWrapper(
                 ERROR,
@@ -67,9 +67,9 @@ public class UserDataController {
 
     // Not integrated with UI
     @PutMapping(path = "/resetPassword")
-    public ResponseEntity<ResponseWrapper> resetUserPassword(@RequestBody UserDataRequest resetRequest) {
+    public ResponseEntity<ResponseWrapper> resetCustomerPassword(@RequestBody CustomerRequest resetRequest) {
         try {
-            UserDataResponse response = userDataService.resetPassword(resetRequest);
+            CustomerResponse response = customerService.resetCustomerPassword(resetRequest);
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
                     "Password updated successfully",
@@ -82,14 +82,13 @@ public class UserDataController {
         }
     }
 
-    // Not integrated with UI
     @PutMapping(path = "/updateDetails")
-    public ResponseEntity<ResponseWrapper> updateUserDetails(@RequestBody UserDataRequest resetRequest) {
+    public ResponseEntity<ResponseWrapper> updateCustomerDetails(@RequestBody CustomerRequest resetRequest) {
         try {
-            UserDataResponse response = userDataService.updateUserDetails(resetRequest);
+            CustomerResponse response = customerService.updateCustomerDetails(resetRequest);
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
-                    "User details updated successfully",
+                    "Customer details updated successfully",
                     response), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
@@ -99,40 +98,40 @@ public class UserDataController {
         }
     }
 
-    @DeleteMapping(path = "/user/{userId}")
-    public ResponseEntity<ResponseWrapper> deleteUserById(@PathVariable String userId) {
-        userDataService.deleteUser(UUID.fromString(userId));
+    @DeleteMapping(path = "/customer/{customerId}")
+    public ResponseEntity<ResponseWrapper> deleteCustomerById(@PathVariable String customerId) {
+        customerService.deleteCustomer(UUID.fromString(customerId));
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
-                "User deleted successfully",
+                "Customer deleted successfully",
                 null),
                 HttpStatus.OK);
     }
 
-    @GetMapping(path = "/user/{userId}")
-    public ResponseEntity<ResponseWrapper> getUserDetailsByUserId(@PathVariable String userId) {
+    @GetMapping(path = "/customer/{customerId}")
+    public ResponseEntity<ResponseWrapper> getCustomerDetailsByCustomerId(@PathVariable String customerId) {
         try {
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
-                    "User Details fetched for userId: " + userId,
-                    userDataService.getUserDetailsById(UUID.fromString(userId))),
+                    "Customer Details fetched for customerId: " + customerId,
+                    customerService.getCustomerIdDetailsById(UUID.fromString(customerId))),
                     HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,
-                    "Invalid UserId " + userId,
+                    "Invalid CustomerId " + customerId,
                     null),
                     HttpStatus.BAD_REQUEST);
         }
     }
 
-    @GetMapping(path = "/user/mobileNum/{mobileNum}")
-    public ResponseEntity<ResponseWrapper> getUserDetailsByMobileNum(@PathVariable String mobileNum) {
+    @GetMapping(path = "/customer/mobileNum/{mobileNum}")
+    public ResponseEntity<ResponseWrapper> getCustomerDetailsByMobileNum(@PathVariable String mobileNum) {
         try {
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
-                    "User Details fetched for mobile number: " + mobileNum,
-                    userDataService.getUserDataByEmailIdOrMobileNum(null, mobileNum)),
+                    "Customer Details fetched for mobile number: " + mobileNum,
+                    customerService.getCustomerDataByEmailIdOrMobileNum(null, mobileNum)),
                     HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ResponseWrapper(
@@ -143,13 +142,13 @@ public class UserDataController {
         }
     }
 
-    @GetMapping(path = "/user/emailId/{emailId}")
-    public ResponseEntity<ResponseWrapper> getUserDetailsByEmailId(@PathVariable String emailId) {
+    @GetMapping(path = "/customer/emailId/{emailId}")
+    public ResponseEntity<ResponseWrapper> getCustomerDetailsByEmailId(@PathVariable String emailId) {
         try {
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
-                    "User Details fetched for emailId: " + emailId,
-                    userDataService.getUserDataByEmailIdOrMobileNum(emailId, null)),
+                    "Customer Details fetched for emailId: " + emailId,
+                    customerService.getCustomerDataByEmailIdOrMobileNum(emailId, null)),
                     HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(new ResponseWrapper(

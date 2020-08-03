@@ -2,14 +2,14 @@ package com.forexbot.api.dao.order;
 
 public class OrderResponse {
     private String transactionId;
-    private boolean userExists;
+    private boolean customerExists;
     private boolean isEmailVerified;
 
     public OrderResponse() {
         super();
         // Set default values
         transactionId = null;
-        userExists = false;
+        customerExists = false;
         isEmailVerified = false;
     }
 
@@ -29,11 +29,11 @@ public class OrderResponse {
         isEmailVerified = emailVerified;
     }
 
-    public boolean isUserExists() {
-        return userExists;
+    public boolean isCustomerExists() {
+        return customerExists;
     }
 
-    public void setUserExists(boolean userExists) {
-        this.userExists = userExists;
+    public void setCustomerExists(boolean customerExists) {
+        this.customerExists = customerExists;
     }
 }

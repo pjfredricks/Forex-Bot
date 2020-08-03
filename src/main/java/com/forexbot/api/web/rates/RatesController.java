@@ -1,6 +1,5 @@
-package com.forexbot.api.web;
+package com.forexbot.api.web.rates;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.forexbot.api.dao.rates.ForexRequest;
 import com.forexbot.api.service.RatesService;
 import com.forexbot.api.web.utils.ResponseWrapper;
@@ -41,8 +40,17 @@ public class RatesController {
 
     @PutMapping(path = "/update/rates")
     public ResponseEntity<ResponseWrapper> updateExchangeRatesManual(@RequestBody List<ForexRequest> ratesRequest,
-                                                                     @RequestHeader String triggerIdentity) {
-        ratesService.updateRates(ratesRequest, triggerIdentity);
+                                                                     @RequestHeader String approvedBy) {
+        ratesService.updateRates(ratesRequest, approvedBy);
+        return new ResponseEntity<>(new ResponseWrapper(
+                SUCCESS,
+                "Rates have been updated",
+                null), HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/rates")
+    public ResponseEntity<ResponseWrapper> deleteRates() {
+        ratesService.deleteTempRates();
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
                 "Rates have been updated",

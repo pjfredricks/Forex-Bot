@@ -2,18 +2,18 @@ package com.forexbot.api.dao.order;
 
 public class CalculateRequest {
 
-    private String userId;
+    private String customerId;
     private String countryCode;
     private int orderType;
     private int forexAmount;
     private String couponCode;
 
-    public String getUserId() {
-        return userId;
+    public String getCustomerId() {
+        return customerId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
     public String getCountryCode() {

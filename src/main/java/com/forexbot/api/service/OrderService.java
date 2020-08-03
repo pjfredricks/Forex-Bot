@@ -11,7 +11,7 @@ public interface OrderService {
 
     List<Order> getAllOrders();
 
-    Order getOrderByUserIdOrTrackingIdOrCouponCode(String userId, String trackingId, String couponCode);
+    Order getOrderByCustomerIdOrTrackingIdOrCouponCode(String customerId, String trackingId, String couponCode);
 
     OrderResponse placeOrder(CalculateRequest request);
 

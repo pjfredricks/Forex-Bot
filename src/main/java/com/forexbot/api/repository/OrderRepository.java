@@ -10,7 +10,7 @@ import java.util.UUID;
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Integer> {
 
-    Order getOrderByUserIdOrTrackingIdOrCouponCode(UUID userId, String trackingId, String couponCode);
+    Order getOrderByCustomerIdOrTrackingIdOrCouponCode(UUID customerId, String trackingId, String couponCode);
 
     Order getOrderByTrackingId(String trackingId);
 

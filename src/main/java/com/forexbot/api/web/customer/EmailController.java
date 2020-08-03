@@ -1,11 +1,9 @@
-package com.forexbot.api.web;
+package com.forexbot.api.web.customer;
 
-import com.forexbot.api.dao.userdata.UserData;
-import com.forexbot.api.dao.userdata.UserDataRequest;
+import com.forexbot.api.dao.customer.CustomerRequest;
 import com.forexbot.api.service.EmailService;
-import com.forexbot.api.service.UserDataService;
+import com.forexbot.api.service.CustomerService;
 import com.forexbot.api.web.utils.ResponseWrapper;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,37 +22,37 @@ import static com.forexbot.api.web.utils.Constants.SUCCESS;
 public class EmailController {
 
     private final EmailService emailService;
-    private final UserDataService userDataService;
+    private final CustomerService customerService;
 
-    public EmailController(EmailService emailService, UserDataService userDataService) {
+    public EmailController(EmailService emailService, CustomerService customerService) {
         this.emailService = emailService;
-        this.userDataService = userDataService;
+        this.customerService = customerService;
     }
 
     @PostMapping(path = "/sendResetEmail")
-    public ResponseEntity<ResponseWrapper> sendResetEmail(@RequestBody UserDataRequest userRequest) throws IOException, MessagingException {
-        return sendEmail(userRequest.getEmailId(), EmailService.EmailType.RESET);
+    public ResponseEntity<ResponseWrapper> sendResetEmail(@RequestBody CustomerRequest customerRequest) throws IOException, MessagingException {
+        return sendEmail(customerRequest.getEmailId(), EmailService.EmailType.RESET);
     }
 
     @PostMapping(path = "/sendWelcomeEmail")
-    public ResponseEntity<ResponseWrapper> sendWelcomeEmail(@RequestBody UserDataRequest userRequest) throws IOException, MessagingException {
-        return sendEmail(userRequest.getEmailId(), EmailService.EmailType.WELCOME);
+    public ResponseEntity<ResponseWrapper> sendWelcomeEmail(@RequestBody CustomerRequest customerRequest) throws IOException, MessagingException {
+        return sendEmail(customerRequest.getEmailId(), EmailService.EmailType.WELCOME);
     }
 
     @PostMapping(path = "/sendVerificationMail")
-    public ResponseEntity<ResponseWrapper> sendVerificationMail(@RequestBody UserDataRequest userDataRequest) throws IOException, MessagingException {
-        return sendEmail(userDataRequest.getEmailId(), EmailService.EmailType.VERIFY);
+    public ResponseEntity<ResponseWrapper> sendVerificationMail(@RequestBody CustomerRequest customerRequest) throws IOException, MessagingException {
+        return sendEmail(customerRequest.getEmailId(), EmailService.EmailType.VERIFY);
     }
 
     @PostMapping(path = "/sendConfirmationMail")
-    public ResponseEntity<ResponseWrapper> sendConfirmationMail(@RequestBody UserDataRequest userDataRequest) throws IOException, MessagingException {
-        return sendEmail(userDataRequest.getEmailId(), EmailService.EmailType.CONFIRM);
+    public ResponseEntity<ResponseWrapper> sendConfirmationMail(@RequestBody CustomerRequest customerRequest) throws IOException, MessagingException {
+        return sendEmail(customerRequest.getEmailId(), EmailService.EmailType.CONFIRM);
     }
 
     @PostMapping(path = "/verifyEmail")
-    public ResponseEntity<ResponseWrapper> verifyEmail(@RequestBody UserDataRequest userDataRequest) {
+    public ResponseEntity<ResponseWrapper> verifyEmail(@RequestBody CustomerRequest customerRequest) {
         try {
-            userDataService.verifyEmail(userDataRequest);
+            customerService.verifyEmail(customerRequest);
         } catch (Exception e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     ERROR,

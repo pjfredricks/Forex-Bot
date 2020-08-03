@@ -5,7 +5,7 @@ import com.forexbot.api.dao.order.OrderType;
 import com.forexbot.api.dao.otp.OtpData;
 import com.forexbot.api.repository.OrderRepository;
 import com.forexbot.api.repository.OtpDataRepository;
-import com.forexbot.api.repository.UserDataRepository;
+import com.forexbot.api.repository.CustomerRepository;
 import com.forexbot.api.service.SmsService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
@@ -30,12 +30,12 @@ public class SmsServiceImpl implements SmsService {
 
     private final OtpDataRepository otpDataRepository;
     private final OrderRepository orderRepository;
-    private final UserDataRepository userDataRepository;
+    private final CustomerRepository customerRepository;
 
-    public SmsServiceImpl(OtpDataRepository otpDataRepository, OrderRepository orderRepository, UserDataRepository userDataRepository) {
+    public SmsServiceImpl(OtpDataRepository otpDataRepository, OrderRepository orderRepository, CustomerRepository customerRepository) {
         this.otpDataRepository = otpDataRepository;
         this.orderRepository = orderRepository;
-        this.userDataRepository = userDataRepository;
+        this.customerRepository = customerRepository;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class SmsServiceImpl implements SmsService {
     public void sendConfirmation(String trackingId, String mobileNum) throws IOException {
         String message = ORDER_CONFIRM_MESSAGE;
         Order order = orderRepository.getOrderByTrackingId(trackingId);
-        String name = userDataRepository.getUserDataByMobileNum(mobileNum).getName();
+        String name = customerRepository.getCustomerDataByMobileNum(mobileNum).getName();
 
         message = message.replace("{userName}", name.substring(0, Math.min(name.length(), 15)));
 

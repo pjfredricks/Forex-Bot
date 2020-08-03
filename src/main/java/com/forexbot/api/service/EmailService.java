@@ -1,7 +1,5 @@
 package com.forexbot.api.service;
 
-import com.forexbot.api.dao.userdata.UserData;
-
 import javax.mail.MessagingException;
 import java.io.IOException;
 

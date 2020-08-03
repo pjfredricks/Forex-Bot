@@ -1,4 +1,4 @@
-package com.forexbot.api.web;
+package com.forexbot.api.web.order;
 
 import com.forexbot.api.dao.order.CalculateRequest;
 import com.forexbot.api.dao.order.Order;
@@ -26,12 +26,12 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @GetMapping(path = "/order/userId/{userId}")
-    public ResponseEntity<ResponseWrapper> getOrderByUserId(@PathVariable String userId) {
+    @GetMapping(path = "/order/customerId/{customerId}")
+    public ResponseEntity<ResponseWrapper> getOrderByCustomerId(@PathVariable String customerId) {
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
-                "Order Details fetched for userId: " + userId,
-                orderService.getOrderByUserIdOrTrackingIdOrCouponCode(userId, null, null)),
+                "Order Details fetched for customerId: " + customerId,
+                orderService.getOrderByCustomerIdOrTrackingIdOrCouponCode(customerId, null, null)),
                 HttpStatus.OK);
     }
 
@@ -40,7 +40,7 @@ public class OrderController {
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
                 "Order Details fetched for trackingId: " + trackingId,
-                orderService.getOrderByUserIdOrTrackingIdOrCouponCode(null, trackingId, null)),
+                orderService.getOrderByCustomerIdOrTrackingIdOrCouponCode(null, trackingId, null)),
                 HttpStatus.OK);
     }
 
@@ -49,7 +49,7 @@ public class OrderController {
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
                 "Order Details fetched for couponCode: " + couponCode,
-                orderService.getOrderByUserIdOrTrackingIdOrCouponCode(null, null, couponCode)),
+                orderService.getOrderByCustomerIdOrTrackingIdOrCouponCode(null, null, couponCode)),
                 HttpStatus.OK);
     }
 

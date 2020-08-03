@@ -1,22 +1,22 @@
-package com.forexbot.api.dao.userdata;
+package com.forexbot.api.dao.customer;
 
-public class UserDataResponse {
+public class CustomerResponse {
 
-	private String userId;
+	private String customerId;
 	private String name;
 	private String emailId;
 	private String mobileNum;
 
-	public UserDataResponse() {
+	public CustomerResponse() {
 		super();
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getCustomerId() {
+		return customerId;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
 	}
 
 	public String getName() {

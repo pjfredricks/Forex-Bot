@@ -1,4 +1,4 @@
-package com.forexbot.api.web;
+package com.forexbot.api.web.backup;
 
 import com.forexbot.api.service.BackupService;
 import com.forexbot.api.web.utils.ResponseWrapper;
@@ -26,7 +26,7 @@ public class BackupController {
         if (backupService.runBackup()) {
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
-                    "Orders and Users backup successful",
+                    "Orders and Customers backup successful",
                     null),
                     HttpStatus.CREATED);
         }

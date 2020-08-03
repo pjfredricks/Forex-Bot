@@ -2,18 +2,18 @@ package com.forexbot.api.dao.order;
 
 public class CalculateResponse {
 
-    private String userId;
+    private String customerId;
     private double forexTotal;
     private double gst;
     private double discountAmount;
     private int salesTotal;
 
-    public String getUserId() {
-        return userId;
+    public String getCustomerId() {
+        return customerId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
     public double getForexTotal() {

@@ -2,7 +2,7 @@ package com.forexbot.api.dao.otp;
 
 public class OtpRequest {
 
-    private String userId;
+    private String customerId;
     private String otp;
     private String mobileNum;
     private String emailId;
@@ -13,12 +13,12 @@ public class OtpRequest {
         super();
     }
 
-    public String getUserId() {
-        return userId;
+    public String getCustomerId() {
+        return customerId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
     public String getOtp() {

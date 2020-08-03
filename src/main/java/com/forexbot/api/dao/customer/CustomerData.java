@@ -1,4 +1,4 @@
-package com.forexbot.api.dao.userdata;
+package com.forexbot.api.dao.customer;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,9 +7,9 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
-@Table(name = "userDataDetails")
+@Table(name = "customerDetails")
 @Entity
-public class UserData {
+public class CustomerData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,8 +19,8 @@ public class UserData {
 
     @NotNull
     @ApiModelProperty(hidden = true)
-    @Column(name = "userId", unique = true)
-    private UUID userId;
+    @Column(name = "customerId", unique = true)
+    private UUID customerId;
 
     @NotNull
     @Column(name = "name")
@@ -52,6 +52,10 @@ public class UserData {
     private String createDate;
 
     @ApiModelProperty(hidden = true)
+    @Column(name = "modifiedBy")
+    private String modifiedBy;
+
+    @ApiModelProperty(hidden = true)
     @Column(name = "modifiedDate")
     private String modifiedDate;
 
@@ -60,7 +64,7 @@ public class UserData {
     @Column(name = "hexData")
     private String hexData;
 
-    public UserData() {
+    public CustomerData() {
         super();
     }
 
@@ -72,12 +76,12 @@ public class UserData {
         this.id = id;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UUID getCustomerId() {
+        return customerId;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setCustomerId(UUID customerId) {
+        this.customerId = customerId;
     }
 
     public String getName() {
@@ -134,6 +138,14 @@ public class UserData {
 
     public void setCreateDate(String createDate) {
         this.createDate = createDate;
+    }
+
+    public String getModifiedBy() {
+        return modifiedBy;
+    }
+
+    public void setModifiedBy(String modifiedBy) {
+        this.modifiedBy = modifiedBy;
     }
 
     public String getModifiedDate() {

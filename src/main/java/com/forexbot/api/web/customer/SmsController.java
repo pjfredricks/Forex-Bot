@@ -1,8 +1,8 @@
-package com.forexbot.api.web;
+package com.forexbot.api.web.customer;
 
 import com.forexbot.api.dao.otp.OtpRequest;
 import com.forexbot.api.service.SmsService;
-import com.forexbot.api.service.UserDataService;
+import com.forexbot.api.service.CustomerService;
 import com.forexbot.api.web.utils.ResponseWrapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,17 +21,17 @@ import static com.forexbot.api.web.utils.Constants.SUCCESS;
 public class SmsController {
 
     private final SmsService smsService;
-    private final UserDataService userDataService;
+    private final CustomerService customerService;
 
-    public SmsController(SmsService smsService, UserDataService userDataService) {
+    public SmsController(SmsService smsService, CustomerService customerService) {
         this.smsService = smsService;
-        this.userDataService = userDataService;
+        this.customerService = customerService;
     }
 
     @PostMapping(path = "/sendOtp")
     public ResponseEntity<ResponseWrapper> sendOtp(@RequestBody OtpRequest otpRequest) {
         try {
-            smsService.sendOtp(otpRequest.getMobileNum(), userDataService.generateAndSaveOtp(otpRequest));
+            smsService.sendOtp(otpRequest.getMobileNum(), customerService.generateAndSaveOtp(otpRequest));
         } catch (IOException | IllegalAccessException e) {
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,
@@ -48,7 +48,7 @@ public class SmsController {
     @PostMapping(path = "/verifyOtp")
     public ResponseEntity<ResponseWrapper> verifyOtp(@RequestBody OtpRequest otpRequest) {
         try {
-            if (userDataService.verifyOtp(otpRequest)) {
+            if (customerService.verifyOtp(otpRequest)) {
                 return new ResponseEntity<>(new ResponseWrapper(
                         SUCCESS,
                         "Otp verification successful",

@@ -1,16 +1,17 @@
 package com.forexbot.api.repository;
 
-import com.forexbot.api.dao.rates.DailyRatesData;
+import com.forexbot.api.dao.rates.RatesData;
+import com.forexbot.api.dao.rates.TempRatesData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface RatesRepository extends JpaRepository<DailyRatesData, Integer> {
-    List<DailyRatesData> findAll();
+public interface RatesRepository extends JpaRepository<RatesData, Integer> {
+    List<RatesData> findAll();
 
-    DailyRatesData save(DailyRatesData ratesData);
+    RatesData save(TempRatesData ratesData);
 
-    DailyRatesData findAllByCreateDate(String date);
+    RatesData findAllByCreateDate(String date);
 }

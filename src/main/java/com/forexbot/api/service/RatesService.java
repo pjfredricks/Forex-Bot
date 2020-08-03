@@ -8,11 +8,13 @@ import java.util.List;
 
 public interface RatesService {
 
-	void updateRates(String triggerIdentity);
+	void updateRates(String approvedBy);
 
-	void updateRates(List<ForexRequest> ratesRequest, String triggerIdentity);
+	void updateRates(List<ForexRequest> ratesRequest, String approvedBy);
 	
 	List<ForexRates> getExchangeRates();
 
 	double getRateByCountryCodeAndType(String countryCode, OrderType orderType);
+
+	void deleteTempRates();
 }

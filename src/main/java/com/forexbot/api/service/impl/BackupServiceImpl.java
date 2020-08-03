@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forexbot.api.dao.order.Order;
 import com.forexbot.api.dao.otp.OtpData;
-import com.forexbot.api.dao.userdata.UserData;
+import com.forexbot.api.dao.customer.CustomerData;
 import com.forexbot.api.repository.OrderRepository;
 import com.forexbot.api.repository.OtpDataRepository;
-import com.forexbot.api.repository.UserDataRepository;
+import com.forexbot.api.repository.CustomerRepository;
 import com.forexbot.api.service.BackupService;
 import org.springframework.stereotype.Service;
 
@@ -17,16 +17,16 @@ import java.util.List;
 public class BackupServiceImpl implements BackupService {
 
     private OrderRepository orderRepository;
-    private UserDataRepository userDataRepository;
+    private CustomerRepository customerRepository;
     private OtpDataRepository otpDataRepository;
     private ObjectMapper mapper;
 
     public BackupServiceImpl(OrderRepository orderRepository,
-                             UserDataRepository userDataRepository,
+                             CustomerRepository customerRepository,
                              OtpDataRepository otpDataRepository,
                              ObjectMapper mapper) {
         this.orderRepository = orderRepository;
-        this.userDataRepository = userDataRepository;
+        this.customerRepository = customerRepository;
         this.otpDataRepository = otpDataRepository;
         this.mapper = mapper;
     }
@@ -34,7 +34,7 @@ public class BackupServiceImpl implements BackupService {
     @Override
     public boolean runBackup() {
         List<Order> orders = orderRepository.findAll();
-        List<UserData> users = userDataRepository.findAll();
+        List<CustomerData> users = customerRepository.findAll();
         List<OtpData> otpDataList = otpDataRepository.findAll();
         try {
             mapper.writeValueAsString(orders);

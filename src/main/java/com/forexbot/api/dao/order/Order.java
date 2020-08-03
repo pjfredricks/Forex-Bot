@@ -18,8 +18,8 @@ public class Order {
     private int id;
 
     @NotNull
-    @Column(name = "userId")
-    private UUID userId;
+    @Column(name = "customerId")
+    private UUID customerId;
 
     @NotNull
     @ApiModelProperty(hidden = true)
@@ -91,12 +91,12 @@ public class Order {
         return id;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UUID getCustomerId() {
+        return customerId;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setCustomerId(UUID customerId) {
+        this.customerId = customerId;
     }
 
     public OrderType getOrderType() {

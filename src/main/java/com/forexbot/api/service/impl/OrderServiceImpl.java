@@ -1,9 +1,9 @@
 package com.forexbot.api.service.impl;
 
 import com.forexbot.api.dao.order.*;
-import com.forexbot.api.dao.userdata.UserData;
+import com.forexbot.api.dao.customer.CustomerData;
 import com.forexbot.api.repository.OrderRepository;
-import com.forexbot.api.repository.UserDataRepository;
+import com.forexbot.api.repository.CustomerRepository;
 import com.forexbot.api.service.OrderService;
 import com.forexbot.api.service.RatesService;
 import org.apache.commons.lang3.ObjectUtils;
@@ -26,12 +26,12 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final RatesService ratesService;
-    private final UserDataRepository userDataRepository;
+    private final CustomerRepository customerRepository;
 
-    public OrderServiceImpl(OrderRepository repository, RatesService ratesService, UserDataRepository userDataRepository) {
+    public OrderServiceImpl(OrderRepository repository, RatesService ratesService, CustomerRepository customerRepository) {
         this.orderRepository = repository;
         this.ratesService = ratesService;
-        this.userDataRepository = userDataRepository;
+        this.customerRepository = customerRepository;
     }
 
     @Override
@@ -40,24 +40,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Order getOrderByUserIdOrTrackingIdOrCouponCode(String userId,
+    public Order getOrderByCustomerIdOrTrackingIdOrCouponCode(String customerId,
                                                               String trackingId,
                                                               String couponCode) {
-        return orderRepository.getOrderByUserIdOrTrackingIdOrCouponCode(UUID.fromString(userId), trackingId, couponCode);
+        return orderRepository.getOrderByCustomerIdOrTrackingIdOrCouponCode(UUID.fromString(customerId), trackingId, couponCode);
     }
 
     @Override
     @Transactional
     public OrderResponse placeOrder(CalculateRequest request) {
-        UserData userData = userDataRepository.getUserDataByUserId(UUID.fromString(request.getUserId()));
+        CustomerData customerData = customerRepository.getCustomerDataByCustomerId(UUID.fromString(request.getCustomerId()));
 
         OrderResponse orderResponse = new OrderResponse();
-        if (ObjectUtils.isEmpty(userData)) {
+        if (ObjectUtils.isEmpty(customerData)) {
             return orderResponse;
         }
-        orderResponse.setUserExists(true);
+        orderResponse.setCustomerExists(true);
 
-        if (!userData.isEmailVerified()) {
+        if (!customerData.isEmailVerified()) {
             return orderResponse;
         }
         orderResponse.setEmailVerified(true);
@@ -89,7 +89,7 @@ public class OrderServiceImpl implements OrderService {
         int salesTotal = (int) (forexTotal + gstAmount - discountAmount);
 
         CalculateResponse response = new CalculateResponse();
-        response.setUserId(request.getUserId());
+        response.setCustomerId(request.getCustomerId());
         response.setDiscountAmount(discountAmount);
         response.setGst(gstAmount);
         response.setForexTotal(forexTotal);
@@ -100,10 +100,10 @@ public class OrderServiceImpl implements OrderService {
 
     private Order createOrder(CalculateRequest request, CalculateResponse response) {
         Order order = new Order();
-        BeanUtils.copyProperties(request, order, "userId");
-        BeanUtils.copyProperties(response, order, "userId");
+        BeanUtils.copyProperties(request, order, "customerId");
+        BeanUtils.copyProperties(response, order, "customerId");
 
-        order.setUserId(UUID.fromString(request.getUserId()));
+        order.setCustomerId(UUID.fromString(request.getCustomerId()));
         order.setTrackingId(RandomStringUtils.randomAlphanumeric(12));
         order.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
         order.setOrderType(OrderType.valueOf(request.getOrderType()));

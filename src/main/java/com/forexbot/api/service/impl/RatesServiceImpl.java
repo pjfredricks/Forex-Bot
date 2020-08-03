@@ -1,11 +1,14 @@
 package com.forexbot.api.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forexbot.api.dao.order.OrderType;
-import com.forexbot.api.dao.rates.DailyRatesData;
+import com.forexbot.api.dao.rates.RatesData;
+import com.forexbot.api.dao.rates.TempRatesData;
 import com.forexbot.api.dao.rates.ForexRates;
 import com.forexbot.api.dao.rates.ForexRequest;
 import com.forexbot.api.repository.RatesRepository;
+import com.forexbot.api.repository.TempRatesRepository;
 import com.forexbot.api.service.RatesService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
@@ -47,12 +50,14 @@ public class RatesServiceImpl implements RatesService {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static Map<String, Number> currencyValues = new HashMap<>();
     private List<ForexRates> exchangeRates = new ArrayList<>();
-    private List<DailyRatesData> dailyRatesDataList = new ArrayList<>();
+    private List<TempRatesData> tempRatesDataList = new ArrayList<>();
 
     private final RatesRepository ratesRepository;
+    private final TempRatesRepository tempRatesRepository;
 
-    public RatesServiceImpl(RatesRepository ratesRepository) {
+    public RatesServiceImpl(RatesRepository ratesRepository, TempRatesRepository tempRatesRepository) {
         this.ratesRepository = ratesRepository;
+        this.tempRatesRepository = tempRatesRepository;
     }
 
     @PostConstruct
@@ -78,10 +83,10 @@ public class RatesServiceImpl implements RatesService {
     }
 
     @Override
-    public void updateRates(String triggerIdentity) {
+    public void updateRates(String approvedBy) {
         // Removes old values from both collections
         currencyValues.clear();
-        dailyRatesDataList.clear();
+        tempRatesDataList.clear();
 
         // Updates latest forex currency values
         getCurrencyForexValues();
@@ -98,12 +103,13 @@ public class RatesServiceImpl implements RatesService {
                 .sorted(Comparator.comparing(ForexRates::getCountryName))
                 .collect(Collectors.toList());
 
-        updateDailyRates();
-        //saveDailyRates(triggerIdentity);
+        updateTempRates();
+        saveTempRates(approvedBy);
+        saveFinalRates(approvedBy);
     }
 
     @Override
-    public void updateRates(List<ForexRequest> ratesRequest, String triggerIdentity) {
+    public void updateRates(List<ForexRequest> ratesRequest, String approvedBy) {
         ratesRequest.forEach(updatedRates -> exchangeRates
                 .forEach(forexRates -> {
             if (forexRates.getCountryCode().equals(updatedRates.getCountryCode())) {
@@ -111,13 +117,14 @@ public class RatesServiceImpl implements RatesService {
                 forexRates.setSellRate(updatedRates.getSellRate());
             }
         }));
-        updateDailyRates();
-        //saveDailyRates(triggerIdentity);
+        updateTempRates();
+        saveTempRates(approvedBy);
+        saveFinalRates(approvedBy);
     }
 
     @Override
     public List<ForexRates> getExchangeRates() {
-        if (exchangeRates.isEmpty() || dailyRatesDataList.isEmpty()) {
+        if (exchangeRates.isEmpty() || tempRatesDataList.isEmpty()) {
             updateRates("Api call");
         }
         return exchangeRates;
@@ -143,22 +150,44 @@ public class RatesServiceImpl implements RatesService {
         }
     }
 
-    private void updateDailyRates() {
+    @Override
+    @Scheduled(cron = "0 0 11 * * *")
+    public void deleteTempRates() {
+        saveFinalRates("End of time");
+        tempRatesRepository.deleteAll();
+        tempRatesDataList.clear();
+    }
+
+    private void updateTempRates() {
         exchangeRates.forEach(exchangeRate -> {
-            DailyRatesData dailyRatesData = new DailyRatesData();
-            BeanUtils.copyProperties(exchangeRate, dailyRatesData);
-            dailyRatesDataList.add(dailyRatesData);
+            TempRatesData tempRatesData = new TempRatesData();
+            BeanUtils.copyProperties(exchangeRate, tempRatesData);
+            tempRatesDataList.add(tempRatesData);
         });
     }
 
-    private void saveDailyRates(String triggerIdentity) {
-        if (!dailyRatesDataList.isEmpty()) {
-            dailyRatesDataList.forEach(ratesData -> {
-                ratesData.setTriggeredBy(triggerIdentity);
+    private void saveTempRates(String approvedBy) {
+        if (!tempRatesDataList.isEmpty()) {
+            tempRatesDataList.forEach(ratesData -> {
+                ratesData.setApprovedBy(approvedBy);
                 ratesData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
-                ratesRepository.save(ratesData);
+                //tempRatesRepository.save(ratesData);
             });
         }
+    }
+
+    private void saveFinalRates(String approvedBy) {
+        RatesData ratesData = new RatesData();
+        ratesData.setApprovedBy(approvedBy);
+        ratesData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
+
+        try {
+            ratesData.setRatesDetails(mapper.writeValueAsString(tempRatesDataList));
+        } catch (JsonProcessingException e) {
+            ratesData.setRatesDetails("");
+        }
+
+        ratesRepository.save(ratesData);
     }
 
     private ForexRates setCarouselAndRates(ForexRates forexRate, Map<String, Number> currencyValues) {
