@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomerDataResponse {
 
-	private String userId;
+	private String customerId;
 	private String name;
 	private String password;
 	private String emailId;
@@ -16,12 +16,12 @@ public class CustomerDataResponse {
 	public CustomerDataResponse() {
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getCustomerId() {
+		return customerId;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
 	}
 
 	public String getName() {

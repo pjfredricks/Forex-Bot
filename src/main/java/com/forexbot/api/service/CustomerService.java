@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface CustomerService {
 
-	List<CustomerData> getAllCustomers();
+	List<CustomerDataResponse> getAllCustomers();
 
 	CustomerResponse signUpCustomer(CustomerRequest customerRequest) throws Exception;
 

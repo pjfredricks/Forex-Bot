@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.forexbot.api.web.utils.Constants.ZONE;
 
@@ -48,8 +49,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerData> getAllCustomers() {
-        return customerRepository.findAll();
+    public List<CustomerDataResponse> getAllCustomers() {
+        List<CustomerData> customerDataList = customerRepository.findAll();
+        return customerDataList.stream()
+                .map(customerData -> convertDataToDataResponse(customerData))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -84,6 +88,10 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerDataResponse getCustomerIdDetailsById(UUID customerId) {
         CustomerData customerData = customerRepository.getCustomerDataByCustomerId(customerId);
+        return convertDataToDataResponse(customerData);
+    }
+
+    private CustomerDataResponse convertDataToDataResponse(CustomerData customerData) {
         customerData.setPassword(new String(Hex.decode(customerData.getHexData())));
         return mapper.convertValue(customerData, CustomerDataResponse.class);
     }
