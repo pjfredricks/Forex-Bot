@@ -12,15 +12,13 @@ import static com.forexbot.api.web.utils.Constants.ERROR;
 import static com.forexbot.api.web.utils.Constants.SUCCESS;
 
 @RestController
-@RequestMapping("/api/v1/forexbot")
+@RequestMapping("/api/v1")
 public class CustomerBackOfficeController {
 
     private final CustomerService customerService;
-    private final EmailController emailController;
 
-    public CustomerBackOfficeController(CustomerService customerService, EmailController emailController) {
+    public CustomerBackOfficeController(CustomerService customerService) {
         this.customerService = customerService;
-        this.emailController = emailController;
     }
 
     @GetMapping(path = "/customer")

@@ -11,7 +11,7 @@ import static com.forexbot.api.web.utils.Constants.ERROR;
 import static com.forexbot.api.web.utils.Constants.SUCCESS;
 
 @RestController
-@RequestMapping("api/v1/backoffice")
+@RequestMapping("api/v1")
 public class BackOfficeController {
 
     private final BackOfficeService backOfficeService;

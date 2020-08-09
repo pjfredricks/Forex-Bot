@@ -12,7 +12,7 @@ import static com.forexbot.api.web.utils.Constants.ERROR;
 import static com.forexbot.api.web.utils.Constants.SUCCESS;
 
 @RestController
-@RequestMapping("/api/v1/forexbot")
+@RequestMapping("/api/v1")
 public class CustomerController {
 
     private final CustomerService customerService;
