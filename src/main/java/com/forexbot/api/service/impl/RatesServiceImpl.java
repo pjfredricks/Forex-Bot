@@ -245,7 +245,7 @@ public class RatesServiceImpl implements RatesService {
     private void getCurrencyForexValues() {
         try {
             currencyValues = (Map<String, Number>) new RestTemplate()
-                    .getForEntity("http://data.fixer.io/api/latest?access_key=4c29457e83b0090604057f85b8e874e3&format=1", LinkedHashMap.class)
+                    .getForEntity("https://api.exchangerate-api.com/v4/latest/INR", LinkedHashMap.class)
                     .getBody()
                     .get("rates");
         } catch (Exception e) {
