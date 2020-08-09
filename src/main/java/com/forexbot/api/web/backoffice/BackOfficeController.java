@@ -20,7 +20,7 @@ public class BackOfficeController {
         this.backOfficeService = backOfficeService;
     }
 
-    @PostMapping(path = "/login")
+    @PostMapping(path = "/backOfficeLogin")
     public ResponseEntity<ResponseWrapper> loginVendor(@RequestBody BackOfficeLoginRequest loginRequest) {
         try {
             BackOfficeLoginResponse response = backOfficeService.login(loginRequest);
