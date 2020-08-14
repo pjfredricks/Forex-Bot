@@ -194,8 +194,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public void deleteCustomer(UUID customerId) {
-        customerRepository.delete(customerRepository.getCustomerDataByCustomerId(customerId));
+    public void deleteCustomer(UUID customerId, String deletedBy) {
+        CustomerData customerData = customerRepository.getCustomerDataByCustomerId(customerId);
+        customerData.setActive(false);
+        customerData.setDeletedBy(deletedBy);
+        customerRepository.save(customerData);
     }
 
     private void isNewCustomer(OtpRequest otpRequest) throws IllegalAccessException {

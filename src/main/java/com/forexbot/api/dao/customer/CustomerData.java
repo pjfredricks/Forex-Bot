@@ -27,7 +27,11 @@ public class CustomerData {
     private String name;
 
     @NotNull
-    @Column(name = "emailId", unique = true)
+    @Column(name = "password")
+    private String password;
+
+    @NotNull
+    @Column(name = "emailId")
     private String emailId;
 
     @NotNull
@@ -35,16 +39,16 @@ public class CustomerData {
     private boolean isEmailVerified;
 
     @NotNull
-    @Column(name = "password")
-    private String password;
-
-    @NotNull
-    @Column(name = "mobileNum", unique = true)
+    @Column(name = "mobileNum")
     private String mobileNum;
 
     @NotNull
     @Column(name = "isMobileVerified", columnDefinition = "boolean default false")
     private boolean isMobileVerified;
+
+    @NotNull
+    @Column(name = "isActive", columnDefinition = "boolean default true")
+    private boolean isActive;
 
     @NotNull
     @ApiModelProperty(hidden = true)
@@ -58,6 +62,10 @@ public class CustomerData {
     @ApiModelProperty(hidden = true)
     @Column(name = "modifiedDate")
     private String modifiedDate;
+
+    @ApiModelProperty(hidden = true)
+    @Column(name = "deletedBy")
+    private String deletedBy;
 
     @NotNull
     @ApiModelProperty(hidden = true)
@@ -124,6 +132,14 @@ public class CustomerData {
         isMobileVerified = mobileVerified;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
     public String getPassword() {
         return password;
     }
@@ -154,6 +170,14 @@ public class CustomerData {
 
     public void setModifiedDate(String modifiedDate) {
         this.modifiedDate = modifiedDate;
+    }
+
+    public String getDeletedBy() {
+        return deletedBy;
+    }
+
+    public void setDeletedBy(String deletedBy) {
+        this.deletedBy = deletedBy;
     }
 
     public String getHexData() {

@@ -31,5 +31,5 @@ public interface CustomerService {
 
 	void verifyEmail(CustomerRequest customerRequest) throws IllegalAccessException;
 
-	void deleteCustomer(UUID customerId);
+	void deleteCustomer(UUID customerId, String deletedBy);
 }

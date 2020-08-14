@@ -30,8 +30,9 @@ public class CustomerBackOfficeController {
     }
 
     @DeleteMapping(path = "/customer/{customerId}")
-    public ResponseEntity<ResponseWrapper> deleteCustomerById(@PathVariable String customerId) {
-        customerService.deleteCustomer(UUID.fromString(customerId));
+    public ResponseEntity<ResponseWrapper> deleteCustomerById(@PathVariable String customerId,
+                                                              @RequestParam String deletedBy) {
+        customerService.deleteCustomer(UUID.fromString(customerId), deletedBy);
         return new ResponseEntity<>(new ResponseWrapper(
                 SUCCESS,
                 "Customer deleted successfully",

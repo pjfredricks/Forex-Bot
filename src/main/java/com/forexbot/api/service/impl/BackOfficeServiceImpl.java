@@ -110,7 +110,7 @@ public class BackOfficeServiceImpl implements BackOfficeService {
     public void deleteUser(String userId, String deletedBy) {
         BackOfficeUserData userData = backOfficeRepository.getBackOfficeUserDataByUserId(userId);
         userData.setActive(false);
-        userData.setModifiedBy(deletedBy);
+        userData.setDeletedBy(deletedBy);
         backOfficeRepository.save(userData);
     }
 
@@ -140,7 +140,6 @@ public class BackOfficeServiceImpl implements BackOfficeService {
 
         userData.setUserCategory(userCategory);
         userData.setUserId(UUID.randomUUID().toString());
-        userData.setActive(true);
         userData.setPassword(
                 bCryptPasswordEncoder.encode(signInRequest.getPassword())
         );

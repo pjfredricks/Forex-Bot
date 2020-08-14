@@ -29,7 +29,7 @@ public class BackOfficeUserData {
     private String userName;
 
     @NotNull
-    @Column(name = "isActive")
+    @Column(name = "isActive", columnDefinition = "boolean default true")
     private boolean isActive;
 
     @NotNull
@@ -68,6 +68,10 @@ public class BackOfficeUserData {
     @ApiModelProperty(hidden = true)
     @Column(name = "modifiedBy")
     private String modifiedBy;
+
+    @ApiModelProperty(hidden = true)
+    @Column(name = "deletedBy")
+    private String deletedBy;
 
     @ApiModelProperty(hidden = true)
     @Column(name = "hexData")
@@ -179,6 +183,14 @@ public class BackOfficeUserData {
 
     public void setModifiedBy(String modifiedBy) {
         this.modifiedBy = modifiedBy;
+    }
+
+    public String getDeletedBy() {
+        return deletedBy;
+    }
+
+    public void setDeletedBy(String deletedBy) {
+        this.deletedBy = deletedBy;
     }
 
     public String getHexData() {
