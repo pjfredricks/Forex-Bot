@@ -14,5 +14,5 @@ CREATE TABLE order_details (
 	status int4 NULL,
 	tracking_id varchar(255) NULL,
 	CONSTRAINT order_details_pkey PRIMARY KEY (id),
-	CONSTRAINT uk_f82l3ksc1xirqn96hc6o0ixbx UNIQUE (tracking_id)
+	CONSTRAINT uk_tracking_id UNIQUE (tracking_id)
 );

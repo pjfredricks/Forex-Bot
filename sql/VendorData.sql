@@ -4,9 +4,9 @@ CREATE TABLE vendor_data (
 	pan_number varchar(255) NULL,
 	rbiagent_id varchar(255) NULL,
 	vendor_agent_id varchar(255) NULL,
-	CONSTRAINT uk_a8t51d1u7gfp8cuq157og0rxr UNIQUE (vendor_agent_id),
-	CONSTRAINT uk_bblvw0359875nohmwbbswfbqc UNIQUE (rbiagent_id),
-	CONSTRAINT uk_jp8sr3dndf9rsm5knklhcoxhb UNIQUE (gst_number),
-	CONSTRAINT uk_rketfegiwcptsmgorpcr36hna UNIQUE (pan_number),
+	CONSTRAINT uk_vendor_agent_id UNIQUE (vendor_agent_id),
+	CONSTRAINT uk_rbiagent_id UNIQUE (rbiagent_id),
+	CONSTRAINT uk_gst_number UNIQUE (gst_number),
+	CONSTRAINT uk_pan_number UNIQUE (pan_number),
 	CONSTRAINT vendor_data_pkey PRIMARY KEY (id)
 );

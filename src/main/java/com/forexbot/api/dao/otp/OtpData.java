@@ -31,7 +31,7 @@ public class OtpData {
 
     @NotNull
     @ApiModelProperty(hidden = true)
-    @Column(name = "otpVerified", columnDefinition = "boolean default false")
+    @Column(name = "otpVerified")
     private boolean otpVerified;
 
     @NotNull
@@ -52,6 +52,7 @@ public class OtpData {
 
     public OtpData() {
         super();
+        this.otpVerified = false;
     }
 
     public String getOtp() {

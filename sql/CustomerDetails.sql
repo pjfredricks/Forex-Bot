@@ -14,5 +14,5 @@ CREATE TABLE customer_details (
 	is_active bool NULL DEFAULT true,
 	deleted_by varchar(255) NULL DEFAULT NULL::character varying,
 	CONSTRAINT customer_details_pkey PRIMARY KEY (id),
-	CONSTRAINT uk_fxwdb2od8kuwiy586xj0ycwk6 UNIQUE (customer_id)
+	CONSTRAINT uk_customer_id UNIQUE (customer_id)
 );

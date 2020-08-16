@@ -9,5 +9,5 @@ CREATE TABLE otp_data (
 	retry_count int4 NULL,
 	text_local_response text NULL DEFAULT 'empty'::text,
 	CONSTRAINT otp_data_pkey PRIMARY KEY (id),
-	CONSTRAINT uk_66rum967lv50l5505r014js6p UNIQUE (mobile_num)
+	CONSTRAINT uk_mobile_num UNIQUE (mobile_num)
 );

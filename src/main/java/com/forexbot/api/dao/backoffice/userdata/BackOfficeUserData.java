@@ -29,7 +29,7 @@ public class BackOfficeUserData {
     private String userName;
 
     @NotNull
-    @Column(name = "isActive", columnDefinition = "boolean default true")
+    @Column(name = "isActive")
     private boolean isActive;
 
     @NotNull
@@ -79,6 +79,7 @@ public class BackOfficeUserData {
 
     public BackOfficeUserData() {
         super();
+        this.isActive = true;
     }
 
     public String getUserId() {

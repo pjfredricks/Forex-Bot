@@ -35,7 +35,7 @@ public class CustomerData {
     private String emailId;
 
     @NotNull
-    @Column(name = "isEmailVerified", columnDefinition = "boolean default false")
+    @Column(name = "isEmailVerified")
     private boolean isEmailVerified;
 
     @NotNull
@@ -43,11 +43,11 @@ public class CustomerData {
     private String mobileNum;
 
     @NotNull
-    @Column(name = "isMobileVerified", columnDefinition = "boolean default false")
+    @Column(name = "isMobileVerified")
     private boolean isMobileVerified;
 
     @NotNull
-    @Column(name = "isActive", columnDefinition = "boolean default true")
+    @Column(name = "isActive")
     private boolean isActive;
 
     @NotNull
@@ -74,6 +74,9 @@ public class CustomerData {
 
     public CustomerData() {
         super();
+        this.isActive = true;
+        this.isMobileVerified = false;
+        this.isEmailVerified = false;
     }
 
     public int getId() {

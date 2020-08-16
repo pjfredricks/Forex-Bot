@@ -51,6 +51,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List<CustomerDataResponse> getAllCustomers() {
         List<CustomerData> customerDataList = customerRepository.findAll();
+        customerDataList.removeIf(customerData -> !customerData.isActive());
         return customerDataList.stream()
                 .map(customerData -> convertDataToDataResponse(customerData))
                 .collect(Collectors.toList());
@@ -58,7 +59,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public CustomerResponse signUpCustomer(CustomerRequest customerRequest) {
+    public CustomerResponse signUpCustomer(CustomerRequest customerRequest) throws IllegalAccessException {
+        if (isOldDataActive(customerRequest)) {
+            throw new IllegalAccessException("Old Data is still active for email and mobileNum");
+        }
+
         CustomerData customerData = mapRequestToData(customerRequest);
         OtpData otpData = otpDataRepository.findOtpDataByMobileNum(customerRequest.getMobileNum());
         if (ObjectUtils.isNotEmpty(otpData) && otpData.isOtpVerified()) {
@@ -263,5 +268,15 @@ public class CustomerServiceImpl implements CustomerService {
         response.setMobileNum(customerData.getMobileNum());
         response.setName(customerData.getName());
         return response;
+    }
+
+    private boolean isOldDataActive(CustomerRequest customerRequest) {
+        CustomerData customerData = customerRepository
+                .getCustomerDataByEmailIdOrMobileNum(customerRequest.getEmailId(),
+                        customerRequest.getMobileNum());
+        if (ObjectUtils.isNotEmpty(customerData)) {
+            return customerData.isActive();
+        }
+        return false;
     }
 }

@@ -16,7 +16,7 @@ CREATE TABLE back_office_user_data (
 	vendor_id varchar(255) NULL,
 	deleted_by varchar(255) NULL DEFAULT NULL::character varying,
 	CONSTRAINT back_office_user_data_pkey PRIMARY KEY (id),
-	CONSTRAINT uk_cpuksnbxl7i5t0h77shuu5wgj UNIQUE (address_id),
-	CONSTRAINT uk_cuj075rmgj0vc0kcg3o4q8vrn UNIQUE (user_id),
-	CONSTRAINT uk_cyylbqmg29qp0g0t9apemtt5h UNIQUE (vendor_id)
+	CONSTRAINT uk_address_id UNIQUE (address_id),
+	CONSTRAINT uk_user_id UNIQUE (user_id),
+	CONSTRAINT uk_vendor_id UNIQUE (vendor_id)
 );
