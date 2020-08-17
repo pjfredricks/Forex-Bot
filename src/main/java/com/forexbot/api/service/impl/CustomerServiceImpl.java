@@ -118,7 +118,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerData getCustomerDataByEmailIdOrMobileNum(String emailId, String mobileNum) {
-        return customerRepository.getCustomerDataByEmailIdOrMobileNumAndIsActive(emailId, mobileNum, true);
+        return customerRepository.getCustomerDataByEmailIdOrMobileNumAndActive(emailId, mobileNum, true);
     }
 
     @Override
