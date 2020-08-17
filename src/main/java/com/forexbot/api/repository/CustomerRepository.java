@@ -2,6 +2,8 @@ package com.forexbot.api.repository;
 
 import com.forexbot.api.dao.customer.CustomerData;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,7 +20,8 @@ public interface CustomerRepository extends JpaRepository<CustomerData, Integer>
 
     CustomerData getCustomerDataByEmailIdOrMobileNum(String emailId, String mobileNum);
 
-    CustomerData getCustomerDataByEmailIdOrMobileNumAndActive(String emailId, String mobileNum, boolean isActive);
+    @Query(value = "SELECT cd FROM customerDetails cd WHERE (cd.emailId = :emailId or cd.mobileNum = :mobileNum) and cd.isActive = true", nativeQuery = true)
+    CustomerData getCustomerDataByEmailIdOrMobileNumAndIsActive(@Param("emailId") String emailId, @Param("mobileNum") String mobileNum);
 
     CustomerData getCustomerDataByCustomerId(UUID customerId);
 
