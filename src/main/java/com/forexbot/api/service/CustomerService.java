@@ -17,7 +17,7 @@ public interface CustomerService {
 
 	CustomerData getCustomerDataByEmailIdOrMobileNum(String emailId, String mobileNum);
 
-	CustomerResponse login(CustomerRequest customerRequest);
+	CustomerResponse login(CustomerRequest customerRequest) throws IllegalAccessException;
 
 	CustomerDataResponse getCustomerIdDetailsById(UUID customerId);
 

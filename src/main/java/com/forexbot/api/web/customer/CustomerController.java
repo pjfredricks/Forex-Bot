@@ -59,7 +59,7 @@ public class CustomerController {
         }
         return new ResponseEntity<>(new ResponseWrapper(
                 ERROR,
-                "Incorrect Credentials",
+                "Incorrect Credentials or Inactive Customer",
                 null), HttpStatus.OK);
     }
 

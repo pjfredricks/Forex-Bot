@@ -20,7 +20,7 @@ public interface CustomerRepository extends JpaRepository<CustomerData, Integer>
 
     CustomerData getCustomerDataByEmailIdOrMobileNum(String emailId, String mobileNum);
 
-    @Query(value = "SELECT cd FROM customerDetails cd WHERE (cd.emailId = :emailId or cd.mobileNum = :mobileNum) and cd.isActive = true", nativeQuery = true)
+    @Query(value = "SELECT * FROM customer_details cd WHERE (cd.email_id = :emailId or cd.mobile_num = :mobileNum) and cd.is_active = true", nativeQuery = true)
     CustomerData getCustomerDataByEmailIdOrMobileNumAndIsActive(@Param("emailId") String emailId, @Param("mobileNum") String mobileNum);
 
     CustomerData getCustomerDataByCustomerId(UUID customerId);

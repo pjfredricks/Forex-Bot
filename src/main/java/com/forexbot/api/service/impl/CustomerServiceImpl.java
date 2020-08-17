@@ -79,9 +79,9 @@ public class CustomerServiceImpl implements CustomerService {
         CustomerData customerData = null;
 
         if (customerRequest.getEmailId().contains("@")) {
-            customerData = getCustomerDataByEmailIdOrMobileNum(customerRequest.getEmailId(), null);
+            customerData = getCustomerDataByEmailIdOrMobileNum(customerRequest.getEmailId(), "");
         } else {
-            customerData = getCustomerDataByEmailIdOrMobileNum(null, customerRequest.getEmailId());
+            customerData = getCustomerDataByEmailIdOrMobileNum("", customerRequest.getEmailId());
         }
 
         if (ObjectUtils.isNotEmpty(customerData) && checkPasswordsMatch(customerRequest.getPassword(), customerData.getPassword())) {
