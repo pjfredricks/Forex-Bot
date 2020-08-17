@@ -42,7 +42,15 @@ public class CustomerController {
 
     @PostMapping(path = "/login")
     public ResponseEntity<ResponseWrapper> login(@RequestBody CustomerRequest customerRequest) {
-        CustomerResponse customerResponse = customerService.login(customerRequest);
+        CustomerResponse customerResponse = null;
+        try {
+            customerResponse = customerService.login(customerRequest);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ResponseWrapper(
+                    ERROR,
+                    "Error logging in: " + e.getMessage(),
+                    null), HttpStatus.OK);
+        }
         if (customerResponse != null) {
             return new ResponseEntity<>(new ResponseWrapper(
                     SUCCESS,

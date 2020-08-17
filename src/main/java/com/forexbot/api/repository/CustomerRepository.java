@@ -18,6 +18,8 @@ public interface CustomerRepository extends JpaRepository<CustomerData, Integer>
 
     CustomerData getCustomerDataByEmailIdOrMobileNum(String emailId, String mobileNum);
 
+    CustomerData getCustomerDataByEmailIdOrMobileNumAndIsActive(String emailId, String mobileNum, boolean isActive);
+
     CustomerData getCustomerDataByCustomerId(UUID customerId);
 
     List<CustomerData> findAll();
