@@ -6,7 +6,7 @@ import com.forexbot.api.dao.backoffice.vendor.VendorData;
 
 public class BackOfficeUserResponse {
 
-    private String creatorUserId;
+    private String createdBy;
     private String userId;
     private String userName;
     private UserCategory userCategory;
@@ -20,12 +20,12 @@ public class BackOfficeUserResponse {
         super();
     }
 
-    public String getCreatorUserId() {
-        return creatorUserId;
+    public String getCreatedBy() {
+        return createdBy;
     }
 
-    public void setCreatorUserId(String creatorUserId) {
-        this.creatorUserId = creatorUserId;
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
     public String getUserId() {
