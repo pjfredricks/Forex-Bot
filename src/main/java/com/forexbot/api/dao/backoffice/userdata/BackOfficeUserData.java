@@ -53,8 +53,8 @@ public class BackOfficeUserData {
     @Column(name = "addressId", unique = true)
     private String addressId;
 
-    @Column(name = "vendorId", unique = true)
-    private String vendorId;
+    @Column(name = "vendorAgentId", unique = true)
+    private String vendorAgentId;
 
     @NotNull
     @ApiModelProperty(hidden = true)
@@ -155,11 +155,11 @@ public class BackOfficeUserData {
     }
 
     public String getVendorAgentId() {
-        return vendorId;
+        return vendorAgentId;
     }
 
     public void setVendorAgentId(String vendorAgentId) {
-        this.vendorId = vendorAgentId;
+        this.vendorAgentId = vendorAgentId;
     }
 
     public String getCreateDate() {

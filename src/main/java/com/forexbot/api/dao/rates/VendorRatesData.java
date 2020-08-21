@@ -6,9 +6,9 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-@Table(name = "tempRatesData")
+@Table(name = "vendorRatesData")
 @Entity
-public class TempRatesData {
+public class VendorRatesData {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -17,8 +17,12 @@ public class TempRatesData {
     private int id;
 
     @NotNull
-    @Column(name = "vendorAgentId")
+    @Column(name = "vendorAgentId", unique = true)
     private String vendorAgentId;
+
+    @NotNull
+    @Column(name = "vendorName")
+    private String vendorName;
 
     @NotNull
     @Column(name = "ratesData", columnDefinition = "text", length = 25000)
@@ -32,12 +36,12 @@ public class TempRatesData {
     private String modifiedDate;
 
     @NotNull
-    @Column(name = "isApproved")
-    private boolean isApproved;
+    @Column(name = "isLocked")
+    private boolean locked;
 
-    public TempRatesData() {
+    public VendorRatesData() {
         super();
-        this.isApproved = false;
+        this.locked = false;
     }
 
     public String getVendorAgentId() {
@@ -46,6 +50,14 @@ public class TempRatesData {
 
     public void setVendorAgentId(String vendorAgentId) {
         this.vendorAgentId = vendorAgentId;
+    }
+
+    public String getVendorName() {
+        return vendorName;
+    }
+
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
     }
 
     public String getRatesData() {
@@ -72,11 +84,11 @@ public class TempRatesData {
         this.modifiedDate = modifiedDate;
     }
 
-    public boolean isApproved() {
-        return isApproved;
+    public boolean isLocked() {
+        return locked;
     }
 
-    public void setApproved(boolean approved) {
-        isApproved = approved;
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 }

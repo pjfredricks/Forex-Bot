@@ -21,15 +21,19 @@ public class VendorData {
     private String vendorAgentId;
 
     @NotNull
-    @Column(name = "gstNumber", unique = true)
+    @Column(name = "vendorName")
+    private String vendorName;
+
+    @NotNull
+    @Column(name = "gstNumber")
     private String gstNumber;
 
     @NotNull
-    @Column(name = "rbiagentId", unique = true)
+    @Column(name = "rbiagentId")
     private String rbiagentId;
 
     @NotNull
-    @Column(name = "panNumber", unique = true)
+    @Column(name = "panNumber")
     private String panNumber;
 
     public VendorData() {
@@ -42,6 +46,14 @@ public class VendorData {
 
     public void setVendorAgentId(String vendorAgentId) {
         this.vendorAgentId = vendorAgentId;
+    }
+
+    public String getVendorName() {
+        return vendorName;
+    }
+
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
     }
 
     public String getGstNumber() {

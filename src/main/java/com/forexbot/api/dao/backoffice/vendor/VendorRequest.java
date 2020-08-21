@@ -2,12 +2,21 @@ package com.forexbot.api.dao.backoffice.vendor;
 
 public class VendorRequest {
 
+    private String vendorName;
     private String gstNumber;
     private String rbiagentId;
     private String panNumber;
 
     public VendorRequest() {
         super();
+    }
+
+    public String getVendorName() {
+        return vendorName;
+    }
+
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
     }
 
     public String getGstNumber() {

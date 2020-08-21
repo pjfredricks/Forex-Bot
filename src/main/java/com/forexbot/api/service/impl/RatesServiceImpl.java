@@ -169,7 +169,7 @@ public class RatesServiceImpl implements RatesService {
     private void saveTempRates(String approvedBy) {
         if (!tempRatesDataList.isEmpty()) {
             tempRatesDataList.forEach(ratesData -> {
-                ratesData.setApprovedBy(approvedBy);
+                ratesData.setApproved(true);
                 ratesData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
                 //tempRatesRepository.save(ratesData);
             });
