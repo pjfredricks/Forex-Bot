@@ -20,11 +20,11 @@ public interface VendorRatesService {
 
     Object goLive();
 
-    List<VendorRatesData> getRatesByVendorId(String vendorAgentId);
+    List<VendorRatesDTO> getRatesByVendorId(String vendorAgentId);
 
-    List<VendorRatesData> getRatesByVendorIdAndDate(String vendorAgentId, LocalDate date);
+    List<VendorRatesDTO> getRatesByVendorIdAndDate(String vendorAgentId, LocalDate date);
 
-    List<VendorRatesData> getVendorRates();
+    List<VendorRatesDTO> getVendorRates();
 
     VendorRatesData getUnlockedRatesByVendorId(String vendorAgentId);
 }

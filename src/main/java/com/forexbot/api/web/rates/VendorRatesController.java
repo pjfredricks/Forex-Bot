@@ -23,22 +23,6 @@ public class VendorRatesController {
         this.vendorRatesService = vendorRatesService;
     }
 
-    @PostMapping(path = "/lockRates/{vendorAgentId}")
-    public ResponseEntity<ResponseWrapper> lockRates(@PathVariable String vendorAgentId) {
-        try {
-            vendorRatesService.lockRates(vendorAgentId);
-        } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    ERROR,
-                    e.getMessage(),
-                    null), HttpStatus.OK);
-        }
-        return new ResponseEntity<>(new ResponseWrapper(
-                SUCCESS,
-                "Rates have been locked",
-                null), HttpStatus.OK);
-    }
-
     @PostMapping(path = "/saveVendorRates")
     public ResponseEntity<ResponseWrapper> saveRates(@RequestBody VendorRatesDTO vendorRates) {
         try {

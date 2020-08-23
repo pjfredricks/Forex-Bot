@@ -21,6 +21,10 @@ public class TempRatesData {
     private String vendorAgentId;
 
     @NotNull
+    @Column(name = "vendorName")
+    private String vendorName;
+
+    @NotNull
     @Column(name = "ratesData", columnDefinition = "text", length = 25000)
     private String ratesData;
 
@@ -46,6 +50,14 @@ public class TempRatesData {
 
     public void setVendorAgentId(String vendorAgentId) {
         this.vendorAgentId = vendorAgentId;
+    }
+
+    public String getVendorName() {
+        return vendorName;
+    }
+
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
     }
 
     public String getRatesData() {

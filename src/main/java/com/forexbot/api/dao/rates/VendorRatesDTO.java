@@ -1,12 +1,22 @@
 package com.forexbot.api.dao.rates;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.annotations.ApiModelProperty;
+
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class VendorRatesDTO {
 
     private String vendorAgentId;
     private String vendorName;
     private List<ForexRequest> forexRequests;
+    @ApiModelProperty(hidden = true)
+    private String createDate;
+    @ApiModelProperty(hidden = true)
+    private String modifiedDate;
+    @ApiModelProperty(hidden = true)
+    private boolean locked;
 
     public VendorRatesDTO() {
         super();
@@ -34,5 +44,29 @@ public class VendorRatesDTO {
 
     public void setForexRequests(List<ForexRequest> forexRequests) {
         this.forexRequests = forexRequests;
+    }
+
+    public String getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(String createDate) {
+        this.createDate = createDate;
+    }
+
+    public String getModifiedDate() {
+        return modifiedDate;
+    }
+
+    public void setModifiedDate(String modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 }

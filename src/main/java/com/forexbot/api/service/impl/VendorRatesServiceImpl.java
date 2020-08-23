@@ -1,6 +1,7 @@
 package com.forexbot.api.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forexbot.api.dao.rates.ForexRates;
 import com.forexbot.api.dao.rates.VendorRatesDTO;
@@ -8,6 +9,7 @@ import com.forexbot.api.dao.rates.VendorRatesData;
 import com.forexbot.api.repository.VendorRatesRepository;
 import com.forexbot.api.service.VendorRatesService;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,20 +77,23 @@ public class VendorRatesServiceImpl implements VendorRatesService {
     }
 
     @Override
-    public List<VendorRatesData> getRatesByVendorId(String vendorAgentId) {
-        return vendorRatesRepository.getByVendorAgentId(vendorAgentId);
+    public List<VendorRatesDTO> getRatesByVendorId(String vendorAgentId) {
+        List<VendorRatesData> vendorRatesData = vendorRatesRepository.getByVendorAgentId(vendorAgentId);
+        return mapToResponse(vendorRatesData);
     }
 
     @Override
-    public List<VendorRatesData> getRatesByVendorIdAndDate(String vendorAgentId, LocalDate date) {
-        return vendorRatesRepository.getVendorRatesByDate(vendorAgentId,
+    public List<VendorRatesDTO> getRatesByVendorIdAndDate(String vendorAgentId, LocalDate date) {
+        List<VendorRatesData> vendorRatesData = vendorRatesRepository.getVendorRatesByDate(vendorAgentId,
                 date.atStartOfDay().toString(),
                 date.atTime(LocalTime.MAX).truncatedTo(ChronoUnit.SECONDS).toString());
+        return mapToResponse(vendorRatesData);
     }
 
     @Override
-    public List<VendorRatesData> getVendorRates() {
-        return vendorRatesRepository.findAll();
+    public List<VendorRatesDTO> getVendorRates() {
+        List<VendorRatesData> vendorRatesData = vendorRatesRepository.findAll();
+        return mapToResponse(vendorRatesData);
     }
 
     @Override
@@ -124,5 +129,22 @@ public class VendorRatesServiceImpl implements VendorRatesService {
         vendorRatesData.setVendorName(vendorRatesDTO.getVendorName());
 
         return vendorRatesData;
+    }
+
+    private List<VendorRatesDTO> mapToResponse(List<VendorRatesData> vendorRates) {
+        List<VendorRatesDTO> vendorRatesDTOS = new ArrayList<>();
+        vendorRates.forEach(vendorRateData -> {
+            VendorRatesDTO vendorRatesDTO = new VendorRatesDTO();
+            BeanUtils.copyProperties(vendorRateData, vendorRatesDTO, "forexRequests");
+            try {
+                vendorRatesDTO.setForexRequests(mapper.readValue(vendorRateData.getRatesData(), new TypeReference<>() {
+                }));
+            } catch (JsonProcessingException e) {
+                vendorRatesDTO.setForexRequests(new ArrayList<>());
+            }
+            vendorRatesDTOS.add(vendorRatesDTO);
+        });
+
+        return vendorRatesDTOS;
     }
 }
