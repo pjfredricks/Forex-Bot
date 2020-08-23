@@ -4,16 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forexbot.api.dao.order.OrderType;
 import com.forexbot.api.dao.rates.RatesData;
-import com.forexbot.api.dao.rates.TempRatesData;
 import com.forexbot.api.dao.rates.ForexRates;
 import com.forexbot.api.dao.rates.ForexRequest;
 import com.forexbot.api.repository.RatesRepository;
-import com.forexbot.api.repository.TempRatesRepository;
 import com.forexbot.api.service.RatesService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -50,14 +47,11 @@ public class RatesServiceImpl implements RatesService {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static Map<String, Number> currencyValues = new HashMap<>();
     private List<ForexRates> exchangeRates = new ArrayList<>();
-    private List<TempRatesData> tempRatesDataList = new ArrayList<>();
 
     private final RatesRepository ratesRepository;
-    private final TempRatesRepository tempRatesRepository;
 
-    public RatesServiceImpl(RatesRepository ratesRepository, TempRatesRepository tempRatesRepository) {
+    public RatesServiceImpl(RatesRepository ratesRepository) {
         this.ratesRepository = ratesRepository;
-        this.tempRatesRepository = tempRatesRepository;
     }
 
     @PostConstruct
@@ -86,7 +80,6 @@ public class RatesServiceImpl implements RatesService {
     public void updateRates(String approvedBy) {
         // Removes old values from both collections
         currencyValues.clear();
-        tempRatesDataList.clear();
 
         // Updates latest forex currency values
         getCurrencyForexValues();
@@ -103,8 +96,6 @@ public class RatesServiceImpl implements RatesService {
                 .sorted(Comparator.comparing(ForexRates::getCountryName))
                 .collect(Collectors.toList());
 
-        updateTempRates();
-        saveTempRates(approvedBy);
         saveFinalRates(approvedBy);
     }
 
@@ -117,14 +108,12 @@ public class RatesServiceImpl implements RatesService {
                 forexRates.setSellRate(updatedRates.getSellRate());
             }
         }));
-        updateTempRates();
-        saveTempRates(approvedBy);
         saveFinalRates(approvedBy);
     }
 
     @Override
     public List<ForexRates> getExchangeRates() {
-        if (exchangeRates.isEmpty() || tempRatesDataList.isEmpty()) {
+        if (exchangeRates.isEmpty()) {
             updateRates("Api call");
         }
         return exchangeRates;
@@ -154,26 +143,6 @@ public class RatesServiceImpl implements RatesService {
     @Scheduled(cron = "0 0 11 * * *")
     public void deleteTempRates() {
         saveFinalRates("End of time");
-        tempRatesRepository.deleteAll();
-        tempRatesDataList.clear();
-    }
-
-    private void updateTempRates() {
-        exchangeRates.forEach(exchangeRate -> {
-            TempRatesData tempRatesData = new TempRatesData();
-            BeanUtils.copyProperties(exchangeRate, tempRatesData);
-            tempRatesDataList.add(tempRatesData);
-        });
-    }
-
-    private void saveTempRates(String approvedBy) {
-        if (!tempRatesDataList.isEmpty()) {
-            tempRatesDataList.forEach(ratesData -> {
-                ratesData.setApproved(true);
-                ratesData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
-                //tempRatesRepository.save(ratesData);
-            });
-        }
     }
 
     private void saveFinalRates(String approvedBy) {
@@ -182,7 +151,7 @@ public class RatesServiceImpl implements RatesService {
         ratesData.setCreateDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
 
         try {
-            ratesData.setRatesDetails(mapper.writeValueAsString(tempRatesDataList));
+            ratesData.setRatesDetails(mapper.writeValueAsString(exchangeRates));
         } catch (JsonProcessingException e) {
             ratesData.setRatesDetails("");
         }
