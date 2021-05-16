@@ -168,7 +168,8 @@ public class RatesServiceImpl implements RatesService {
         if (noCarouselCountryList.contains(forexRate.getCountryCode())) {
             forexRate.setCarousel(false);
         }
-        if(ObjectUtils.isNotEmpty(currencyValues.get(forexRate.getCountryCode()))) {
+
+        if(null != currencyValues.get(forexRate.getCountryCode())) {
             forexRate.setBuyRate(
                     calculateBuyRate(currencyValues.get(forexRate.getCountryCode()).doubleValue()));
             forexRate.setSellRate(

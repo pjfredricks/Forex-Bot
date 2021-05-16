@@ -3,7 +3,6 @@ package com.forexbot.api.service.impl;
 import com.forexbot.api.dao.customer.CustomerData;
 import com.forexbot.api.repository.CustomerRepository;
 import com.forexbot.api.service.EmailService;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;

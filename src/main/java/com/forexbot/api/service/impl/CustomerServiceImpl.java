@@ -12,7 +12,6 @@ import com.forexbot.api.repository.BackOfficeRepository;
 import com.forexbot.api.repository.OtpDataRepository;
 import com.forexbot.api.repository.CustomerRepository;
 import com.forexbot.api.service.CustomerService;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -87,7 +86,7 @@ public class CustomerServiceImpl implements CustomerService {
             customerData = getCustomerDataByEmailIdOrMobileNum("", customerRequest.getEmailId());
         }
 
-        if (ObjectUtils.isNotEmpty(customerData) && checkPasswordsMatch(customerRequest.getPassword(), customerData.getPassword())) {
+        if (null != customerData && checkPasswordsMatch(customerRequest.getPassword(), customerData.getPassword())) {
             return mapDataToResponse(customerData);
         }
         return null;
@@ -107,7 +106,7 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerResponse resetCustomerPassword(CustomerRequest resetRequest) throws IllegalAccessException {
         CustomerData customerData = customerRepository.getCustomerDataByCustomerId(UUID.fromString(resetRequest.getCustomerId()));
 
-        if (ObjectUtils.isNotEmpty(customerData)) {
+        if (null != customerData) {
             customerData.setHexData(String.valueOf(Hex.encode(resetRequest.getPassword().getBytes())));
             customerData.setPassword(bCryptPasswordEncoder.encode(resetRequest.getPassword()));
             customerData.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
@@ -130,7 +129,7 @@ public class CustomerServiceImpl implements CustomerService {
         boolean isAdmin = backOfficeRepository.existsByUserId(updateRequest.getModifiedBy());
         CustomerData customerData = customerRepository.getCustomerDataByCustomerId(UUID.fromString(updateRequest.getCustomerId()));
 
-        if (ObjectUtils.isNotEmpty(customerData)) {
+        if (null != customerData) {
             if (isAdmin) {
                 customerData.setEmailId(updateRequest.getEmailId());
                 customerData.setMobileNum(updateRequest.getMobileNum());
@@ -276,7 +275,7 @@ public class CustomerServiceImpl implements CustomerService {
         CustomerData customerData = customerRepository
                 .getCustomerDataByEmailIdOrMobileNum(customerRequest.getEmailId(),
                         customerRequest.getMobileNum());
-        if (ObjectUtils.isNotEmpty(customerData)) {
+        if (null != customerData) {
             return customerData.isActive();
         }
         return false;

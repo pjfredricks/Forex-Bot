@@ -6,7 +6,6 @@ import com.forexbot.api.repository.OrderRepository;
 import com.forexbot.api.repository.CustomerRepository;
 import com.forexbot.api.service.OrderService;
 import com.forexbot.api.service.RatesService;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;

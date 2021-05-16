@@ -124,7 +124,7 @@ public class BackOfficeServiceImpl implements BackOfficeService {
                 .getBackOfficeUserDataByUserNameAndEmailIdAndMobileNum(signInRequest.getUserName(),
                                                                        signInRequest.getEmailId(),
                                                                        signInRequest.getMobileNum());
-        if (ObjectUtils.isNotEmpty(userData)) {
+        if (null != userData) {
             return userData.isActive();
         }
         return false;
