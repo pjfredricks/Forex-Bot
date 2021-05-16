@@ -15,7 +15,6 @@ import com.forexbot.api.service.CustomerService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.codec.Hex;
 import org.springframework.stereotype.Service;
@@ -24,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -55,7 +55,7 @@ public class CustomerServiceImpl implements CustomerService {
         List<CustomerData> customerDataList = customerRepository.findAll();
         customerDataList.removeIf(customerData -> !customerData.isActive());
         return customerDataList.stream()
-                .map(customerData -> convertDataToDataResponse(customerData))
+                .map(this::convertDataToDataResponse)
                 .collect(Collectors.toList());
     }
 
@@ -67,8 +67,9 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         CustomerData customerData = mapRequestToData(customerRequest);
-        OtpData otpData = otpDataRepository.findOtpDataByMobileNum(customerRequest.getMobileNum());
-        if (ObjectUtils.isNotEmpty(otpData) && otpData.isOtpVerified()) {
+        Optional<OtpData> otpDataOptional = otpDataRepository.findOtpDataByMobileNum(customerRequest.getMobileNum());
+
+        if (otpDataOptional.isPresent() && otpDataOptional.get().isOtpVerified()) {
             customerData.setMobileVerified(true);
         }
         customerRepository.save(customerData);
@@ -154,34 +155,31 @@ public class CustomerServiceImpl implements CustomerService {
         String otp = RandomStringUtils.randomNumeric(6);
         isNewCustomer(otpRequest);
 
-        OtpData otpData = otpDataRepository.findOtpDataByMobileNumAndOtpType(otpRequest.getMobileNum(),
+        Optional<OtpData> otpDataOptional = otpDataRepository.findOtpDataByMobileNumAndOtpType(otpRequest.getMobileNum(),
                 OtpType.valueOf(otpRequest.getOtpType()));
 
-        otpData = constructOtpData(otpData, otp, otpRequest);
-
-        otpDataRepository.save(otpData);
+        otpDataRepository.save(constructOtpData(otpDataOptional, otp, otpRequest));
         return otp;
     }
 
     @Override
     @Transactional
     public boolean verifyOtp(OtpRequest otpRequest) throws IllegalAccessException {
-        OtpData otpData = otpDataRepository.findOtpDataByMobileNumAndOtpType(otpRequest.getMobileNum(),
+        Optional<OtpData> otpDataOptional = otpDataRepository.findOtpDataByMobileNumAndOtpType(otpRequest.getMobileNum(),
                 OtpType.valueOf(otpRequest.getOtpType()));
 
-        if (ObjectUtils.isEmpty(otpData)) {
+        if (otpDataOptional.isEmpty()) {
             throw new IllegalAccessException("Invalid emailId or Otp Type");
         }
 
-        if (otpRequest.getOtpType() != 0) {
-            if (ObjectUtils.isEmpty(customerRepository.getCustomerDataByCustomerId(UUID.fromString(otpRequest.getCustomerId())))) {
-                throw new IllegalAccessException("No customer found for customerId: " + otpRequest.getCustomerId());
-            }
+        if (otpRequest.getOtpType() != 0
+                && null == customerRepository.getCustomerDataByCustomerId(UUID.fromString(otpRequest.getCustomerId()))) {
+            throw new IllegalAccessException("No customer found for customerId: " + otpRequest.getCustomerId());
         }
 
-        if (bCryptPasswordEncoder.matches(otpRequest.getOtp(), otpData.getOtp())) {
-            otpData.setOtpVerified(true);
-            otpDataRepository.save(otpData);
+        if (bCryptPasswordEncoder.matches(otpRequest.getOtp(), otpDataOptional.get().getOtp())) {
+            otpDataOptional.get().setOtpVerified(true);
+            otpDataRepository.save(otpDataOptional.get());
             return true;
         }
 
@@ -192,7 +190,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional
     public void verifyEmail(CustomerRequest customerRequest) throws IllegalAccessException {
         CustomerData customerData = customerRepository.getCustomerDataByCustomerId(UUID.fromString(customerRequest.getCustomerId()));
-        if (ObjectUtils.isEmpty(customerData)) {
+        if (null == customerData) {
             throw new IllegalAccessException("No customer found for customerId: " + customerRequest.getCustomerId());
         }
         customerData.setEmailVerified(true);
@@ -215,13 +213,15 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
-    private OtpData constructOtpData(OtpData otpData, String otp, OtpRequest otpRequest) {
-        if (ObjectUtils.isNotEmpty(otpData)) {
+    private OtpData constructOtpData(Optional<OtpData> otpDataOptional, String otp, OtpRequest otpRequest) {
+        OtpData otpData = new OtpData();
+
+        if (otpDataOptional.isPresent()) {
+            otpData = otpDataOptional.get();
             otpData.setOtp(bCryptPasswordEncoder.encode(otp));
             otpData.setModifiedDate(LocalDateTime.now(ZoneId.of(ZONE)).toString());
             otpData.setRetryCount(otpData.getRetryCount() + 1);
         } else {
-            otpData = new OtpData();
             otpData.setOtp(bCryptPasswordEncoder.encode(otp));
             otpData.setMobileNum(otpRequest.getMobileNum());
             otpData.setOtpType(OtpType.valueOf(otpRequest.getOtpType()));

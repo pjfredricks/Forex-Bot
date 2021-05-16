@@ -9,7 +9,6 @@ import java.util.List;
 
 @Repository
 public interface VendorRatesRepository extends JpaRepository<VendorRatesData, Integer> {
-
     List<VendorRatesData> getByVendorAgentId(String vendorAgentId);
 
     @Query(value = "SELECT * FROM vendor_rates_data v " +

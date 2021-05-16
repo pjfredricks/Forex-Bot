@@ -5,7 +5,6 @@ import com.forexbot.api.service.BackOfficeService;
 import com.forexbot.api.web.utils.ResponseWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +29,7 @@ public class UserController {
     @GetMapping(path = "/users/{userId}")
     public ResponseEntity<ResponseWrapper> getUserByUserId(@PathVariable String userId) {
         BackOfficeUserResponse response = backOfficeService.getUserByUserId(userId);
-        if (ObjectUtils.isEmpty(response)) {
+        if (null == response) {
             return ResponseEntity.ok(
                     buildErrorResponse("No Users exist for Id: " + userId, response)
             );

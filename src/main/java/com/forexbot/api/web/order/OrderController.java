@@ -8,7 +8,6 @@ import com.forexbot.api.service.OrderService;
 import com.forexbot.api.web.utils.ResponseWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -101,7 +100,7 @@ public class OrderController {
             if (request.getForexAmount() < 0) {
                 throw new IllegalArgumentException("Amount not valid");
             }
-            if (ObjectUtils.isEmpty(OrderType.valueOf(request.getOrderType()))) {
+            if (null == OrderType.valueOf(request.getOrderType())) {
                 throw new IllegalArgumentException("OrderType not valid");
             }
             if (null == request.getCouponCode()) {

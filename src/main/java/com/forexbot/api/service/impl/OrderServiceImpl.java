@@ -52,7 +52,7 @@ public class OrderServiceImpl implements OrderService {
         CustomerData customerData = customerRepository.getCustomerDataByCustomerId(UUID.fromString(request.getCustomerId()));
 
         OrderResponse orderResponse = new OrderResponse();
-        if (ObjectUtils.isEmpty(customerData)) {
+        if (null == customerData) {
             return orderResponse;
         }
         orderResponse.setCustomerExists(true);

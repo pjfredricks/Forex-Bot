@@ -5,12 +5,11 @@ import com.forexbot.api.dao.otp.OtpType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OtpDataRepository extends JpaRepository<OtpData, Integer> {
+    Optional<OtpData> findOtpDataByMobileNumAndOtpType(String mobileNum, OtpType otpType);
 
-    OtpData findOtpDataByMobileNumAndOtpType(String mobileNum, OtpType otpType);
-
-    OtpData findOtpDataByMobileNum(String mobileNum);
+    Optional<OtpData> findOtpDataByMobileNum(String mobileNum);
 }

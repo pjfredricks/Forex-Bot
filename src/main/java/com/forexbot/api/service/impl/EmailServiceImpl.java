@@ -31,7 +31,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendEmail(String emailId, EmailType type) throws MessagingException, IOException, IllegalAccessException {
         CustomerData customerData = customerRepository.getCustomerDataByEmailId(emailId);
 
-        if (ObjectUtils.isEmpty(customerData)) {
+        if (null == customerData) {
             throw new IllegalAccessException("No User registered with email " + emailId);
         }
 

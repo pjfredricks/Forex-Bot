@@ -2,10 +2,16 @@ package com.forexbot.api.dao.rates;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "ratesData")
 @Entity
 public class RatesData {
@@ -31,37 +37,5 @@ public class RatesData {
     @NotNull
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private RatesStatus status;
-
-    public String getRatesDetails() {
-        return ratesDetails;
-    }
-
-    public void setRatesDetails(String ratesDetails) {
-        this.ratesDetails = ratesDetails;
-    }
-
-    public String getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(String createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getApprovedBy() {
-        return approvedBy;
-    }
-
-    public void setApprovedBy(String approvedBy) {
-        this.approvedBy = approvedBy;
-    }
-
-    public RatesStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(RatesStatus status) {
-        this.status = status;
-    }
+    private RatesStatus status = RatesStatus.OPEN;
 }

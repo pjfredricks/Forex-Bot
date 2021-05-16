@@ -7,7 +7,6 @@ import com.forexbot.api.repository.OrderRepository;
 import com.forexbot.api.repository.OtpDataRepository;
 import com.forexbot.api.repository.CustomerRepository;
 import com.forexbot.api.service.SmsService;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -16,6 +15,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @Service
 public class SmsServiceImpl implements SmsService {
@@ -89,10 +89,10 @@ public class SmsServiceImpl implements SmsService {
         }
         rd.close();
 
-        OtpData otpData = otpDataRepository.findOtpDataByMobileNum(mobileNum);
-        if (ObjectUtils.isNotEmpty(otpData)) {
-            otpData.setTextLocalResponse(builder.toString());
-            otpDataRepository.save(otpData);
+        Optional<OtpData> otpData = otpDataRepository.findOtpDataByMobileNum(mobileNum);
+        if (otpData.isPresent()) {
+            otpData.get().setTextLocalResponse(builder.toString());
+            otpDataRepository.save(otpData.get());
         }
     }
 }

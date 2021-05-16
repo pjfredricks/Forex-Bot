@@ -8,9 +8,7 @@ import com.forexbot.api.dao.rates.RatesData;
 import com.forexbot.api.dao.rates.RatesStatus;
 import com.forexbot.api.repository.RatesRepository;
 import com.forexbot.api.service.RatesServiceV2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,28 +16,14 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.forexbot.api.web.utils.Constants.ZONE;
 
+@Slf4j
 @Service
 public class RatesServiceV2Impl implements RatesServiceV2 {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(RatesServiceV2Impl.class);
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-    private static final Set<String> countryList = Stream.of("INR", "USD", "AUD", "GBP", "EUR", "CAD",
-            "CNY", "SAR", "SGD", "MYR", "THB",
-            "IDR", "ILS", "JPY", "KRW", "CHF",
-            "PHP", "FJD", "HKD", "ZAR", "SEK",
-            "NOK", "DKK", "NZD", "BHD", "OMR",
-            "KWD").collect(Collectors.toSet());
-    private static final Set<String> noCarouselCountryList = Stream.of("INR", "ILS", "JPY", "KRW", "CHF",
-            "PHP", "FJD", "HKD", "ZAR",
-            "SEK", "NOK", "DKK", "NZD",
-            "BHD", "OMR", "KWD").collect(Collectors.toSet());
 
     private final ObjectMapper mapper;
     private List<ForexRates> forexRates;
@@ -64,7 +48,7 @@ public class RatesServiceV2Impl implements RatesServiceV2 {
                     mapper.getTypeFactory()
                             .constructCollectionType(List.class, ForexRates.class));
         } catch (IOException e) {
-            LOGGER.error("Unable to read country details json");
+            log.error("Unable to read country details json");
             forexRates = new ArrayList<>();
         }
     }

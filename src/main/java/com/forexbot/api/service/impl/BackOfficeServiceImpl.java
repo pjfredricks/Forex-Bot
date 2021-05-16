@@ -46,7 +46,7 @@ public class BackOfficeServiceImpl implements BackOfficeService {
 
     @Override
     public BackOfficeLoginResponse login(BackOfficeLoginRequest loginRequest) throws Exception {
-        BackOfficeUserData userData = backOfficeRepository.getBackOfficeUserDataByEmailIdAndIsActive(loginRequest.getEmailId(), true);
+        BackOfficeUserData userData = backOfficeRepository.getBackOfficeUserDataByEmailIdAndActive(loginRequest.getEmailId(), true);
 
         String vendorAgentId = userData.getVendorAgentId() != null ? userData.getVendorAgentId() : "";
         VendorData vendorData = vendorRepository.getVendorDataByVendorAgentId(vendorAgentId);

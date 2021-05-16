@@ -9,7 +9,6 @@ import com.forexbot.api.repository.OrderRepository;
 import com.forexbot.api.repository.OtpDataRepository;
 import com.forexbot.api.repository.CustomerRepository;
 import com.forexbot.api.service.BackupService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,9 +16,9 @@ import java.util.List;
 @Service
 public class BackupServiceImpl implements BackupService {
 
-    private OrderRepository orderRepository;
-    private CustomerRepository customerRepository;
-    private OtpDataRepository otpDataRepository;
+    private final OrderRepository orderRepository;
+    private final CustomerRepository customerRepository;
+    private final OtpDataRepository otpDataRepository;
     private final ObjectMapper mapper;
 
     public BackupServiceImpl(OrderRepository orderRepository,

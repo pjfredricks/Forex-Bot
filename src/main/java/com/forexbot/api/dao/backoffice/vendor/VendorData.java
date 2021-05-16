@@ -2,10 +2,16 @@ package com.forexbot.api.dao.backoffice.vendor;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "vendorData")
 @Entity
 public class VendorData {
@@ -35,48 +41,4 @@ public class VendorData {
     @NotNull
     @Column(name = "panNumber")
     private String panNumber;
-
-    public VendorData() {
-        super();
-    }
-
-    public String getVendorAgentId() {
-        return vendorAgentId;
-    }
-
-    public void setVendorAgentId(String vendorAgentId) {
-        this.vendorAgentId = vendorAgentId;
-    }
-
-    public String getVendorName() {
-        return vendorName;
-    }
-
-    public void setVendorName(String vendorName) {
-        this.vendorName = vendorName;
-    }
-
-    public String getGstNumber() {
-        return gstNumber;
-    }
-
-    public void setGstNumber(String gstNumber) {
-        this.gstNumber = gstNumber;
-    }
-
-    public String getRbiagentId() {
-        return rbiagentId;
-    }
-
-    public void setRbiagentId(String rbiagentId) {
-        this.rbiagentId = rbiagentId;
-    }
-
-    public String getPanNumber() {
-        return panNumber;
-    }
-
-    public void setPanNumber(String panNumber) {
-        this.panNumber = panNumber;
-    }
 }

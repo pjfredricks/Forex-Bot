@@ -2,10 +2,16 @@ package com.forexbot.api.dao.rates;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "vendorRatesData")
 @Entity
 public class VendorRatesData {
@@ -37,58 +43,5 @@ public class VendorRatesData {
 
     @NotNull
     @Column(name = "isLocked")
-    private boolean locked;
-
-    public VendorRatesData() {
-        super();
-        this.locked = false;
-    }
-
-    public String getVendorAgentId() {
-        return vendorAgentId;
-    }
-
-    public void setVendorAgentId(String vendorAgentId) {
-        this.vendorAgentId = vendorAgentId;
-    }
-
-    public String getVendorName() {
-        return vendorName;
-    }
-
-    public void setVendorName(String vendorName) {
-        this.vendorName = vendorName;
-    }
-
-    public String getRatesData() {
-        return ratesData;
-    }
-
-    public void setRatesData(String ratesData) {
-        this.ratesData = ratesData;
-    }
-
-    public String getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(String createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getModifiedDate() {
-        return modifiedDate;
-    }
-
-    public void setModifiedDate(String modifiedDate) {
-        this.modifiedDate = modifiedDate;
-    }
-
-    public boolean isLocked() {
-        return locked;
-    }
-
-    public void setLocked(boolean locked) {
-        this.locked = locked;
-    }
+    private boolean locked = false;
 }

@@ -3,10 +3,16 @@ package com.forexbot.api.dao.backoffice.userdata;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.forexbot.api.dao.backoffice.UserCategory;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+@Getter
+@Setter
+@NoArgsConstructor
 @Table(name = "backOfficeUserData")
 @Entity
 public class BackOfficeUserData {
@@ -30,7 +36,7 @@ public class BackOfficeUserData {
 
     @NotNull
     @Column(name = "isActive")
-    private boolean isActive;
+    private boolean isActive = true;
 
     @NotNull
     @Column(name = "userCategory")
@@ -76,129 +82,4 @@ public class BackOfficeUserData {
     @ApiModelProperty(hidden = true)
     @Column(name = "hexData")
     private String hexData;
-
-    public BackOfficeUserData() {
-        super();
-        this.isActive = true;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
-    }
-
-    public UserCategory getUserCategory() {
-        return userCategory;
-    }
-
-    public void setUserCategory(UserCategory userCategory) {
-        this.userCategory = userCategory;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getEmailId() {
-        return emailId;
-    }
-
-    public void setEmailId(String emailId) {
-        this.emailId = emailId;
-    }
-
-    public String getMobileNum() {
-        return mobileNum;
-    }
-
-    public void setMobileNum(String mobileNum) {
-        this.mobileNum = mobileNum;
-    }
-
-    public String getAddressId() {
-        return addressId;
-    }
-
-    public void setAddressId(String addressId) {
-        this.addressId = addressId;
-    }
-
-    public String getVendorAgentId() {
-        return vendorAgentId;
-    }
-
-    public void setVendorAgentId(String vendorAgentId) {
-        this.vendorAgentId = vendorAgentId;
-    }
-
-    public String getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(String createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getModifiedDate() {
-        return modifiedDate;
-    }
-
-    public void setModifiedDate(String modifiedDate) {
-        this.modifiedDate = modifiedDate;
-    }
-
-    public String getModifiedBy() {
-        return modifiedBy;
-    }
-
-    public void setModifiedBy(String modifiedBy) {
-        this.modifiedBy = modifiedBy;
-    }
-
-    public String getDeletedBy() {
-        return deletedBy;
-    }
-
-    public void setDeletedBy(String deletedBy) {
-        this.deletedBy = deletedBy;
-    }
-
-    public String getHexData() {
-        return hexData;
-    }
-
-    public void setHexData(String hexData) {
-        this.hexData = hexData;
-    }
 }

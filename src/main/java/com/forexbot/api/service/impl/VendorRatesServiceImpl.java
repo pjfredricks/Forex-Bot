@@ -8,9 +8,7 @@ import com.forexbot.api.dao.rates.VendorRatesDTO;
 import com.forexbot.api.dao.rates.VendorRatesData;
 import com.forexbot.api.repository.VendorRatesRepository;
 import com.forexbot.api.service.VendorRatesService;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,7 +64,7 @@ public class VendorRatesServiceImpl implements VendorRatesService {
     @Transactional
     public void lockRates(String vendorAgentId) throws NoSuchFieldException {
         VendorRatesData vendorRatesData = getUnlockedRatesByVendorId(vendorAgentId);
-        if (ObjectUtils.isEmpty(vendorRatesData)) {
+        if (null == vendorRatesData) {
             throw new NoSuchFieldException("Rates already locked");
         }
         vendorRatesData.setLocked(true);
@@ -123,7 +121,7 @@ public class VendorRatesServiceImpl implements VendorRatesService {
         VendorRatesData vendorRatesData = new VendorRatesData();
 
         try {
-            vendorRatesData.setRatesData(mapper.writeValueAsString(vendorRatesDTO.getForexRequests()));
+            vendorRatesData.setRatesData(mapper.writeValueAsString(vendorRatesDTO.getForexData()));
         } catch (JsonProcessingException e) {
             throw new InvalidPropertiesFormatException("Error fetching rates from request");
         }
@@ -139,10 +137,10 @@ public class VendorRatesServiceImpl implements VendorRatesService {
             VendorRatesDTO vendorRatesDTO = new VendorRatesDTO();
             BeanUtils.copyProperties(vendorRateData, vendorRatesDTO, "forexRequests");
             try {
-                vendorRatesDTO.setForexRequests(mapper.readValue(vendorRateData.getRatesData(), new TypeReference<>() {
+                vendorRatesDTO.setForexData(mapper.readValue(vendorRateData.getRatesData(), new TypeReference<>() {
                 }));
             } catch (JsonProcessingException e) {
-                vendorRatesDTO.setForexRequests(new ArrayList<>());
+                vendorRatesDTO.setForexData(new ArrayList<>());
             }
             vendorRatesDTOS.add(vendorRatesDTO);
         });
