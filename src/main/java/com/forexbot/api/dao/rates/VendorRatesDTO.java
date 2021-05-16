@@ -10,7 +10,7 @@ public class VendorRatesDTO {
 
     private String vendorAgentId;
     private String vendorName;
-    private List<ForexRequest> forexRequests;
+    private List<ForexData> forexData;
     @ApiModelProperty(hidden = true)
     private String createDate;
     @ApiModelProperty(hidden = true)
@@ -38,12 +38,12 @@ public class VendorRatesDTO {
         this.vendorName = vendorName;
     }
 
-    public List<ForexRequest> getForexRequests() {
-        return forexRequests;
+    public List<ForexData> getForexRequests() {
+        return forexData;
     }
 
-    public void setForexRequests(List<ForexRequest> forexRequests) {
-        this.forexRequests = forexRequests;
+    public void setForexRequests(List<ForexData> forexData) {
+        this.forexData = forexData;
     }
 
     public String getCreateDate() {

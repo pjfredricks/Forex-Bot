@@ -10,10 +10,6 @@ import java.util.List;
 @Repository
 public interface OtpDataRepository extends JpaRepository<OtpData, Integer> {
 
-    List<OtpData> findAll();
-
-    OtpData save(OtpData otpData);
-
     OtpData findOtpDataByMobileNumAndOtpType(String mobileNum, OtpType otpType);
 
     OtpData findOtpDataByMobileNum(String mobileNum);

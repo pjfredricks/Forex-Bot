@@ -28,6 +28,11 @@ public class RatesData {
     @Column(name = "approvedBy")
     private String approvedBy;
 
+    @NotNull
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private RatesStatus status;
+
     public String getRatesDetails() {
         return ratesDetails;
     }
@@ -50,5 +55,13 @@ public class RatesData {
 
     public void setApprovedBy(String approvedBy) {
         this.approvedBy = approvedBy;
+    }
+
+    public RatesStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(RatesStatus status) {
+        this.status = status;
     }
 }

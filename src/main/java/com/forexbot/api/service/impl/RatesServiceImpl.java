@@ -5,12 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forexbot.api.dao.order.OrderType;
 import com.forexbot.api.dao.rates.RatesData;
 import com.forexbot.api.dao.rates.ForexRates;
-import com.forexbot.api.dao.rates.ForexRequest;
+import com.forexbot.api.dao.rates.ForexData;
 import com.forexbot.api.repository.RatesRepository;
 import com.forexbot.api.service.RatesService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -29,6 +30,7 @@ import java.util.stream.Stream;
 import static com.forexbot.api.web.utils.Constants.ZONE;
 
 @Service
+@Deprecated
 public class RatesServiceImpl implements RatesService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RatesServiceImpl.class);
@@ -44,14 +46,16 @@ public class RatesServiceImpl implements RatesService {
             "SEK", "NOK", "DKK", "NZD",
             "BHD", "OMR", "KWD").collect(Collectors.toSet());
 
-    private static final ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper;
     private static Map<String, Number> currencyValues = new HashMap<>();
     private List<ForexRates> exchangeRates = new ArrayList<>();
 
     private final RatesRepository ratesRepository;
 
-    public RatesServiceImpl(RatesRepository ratesRepository) {
+    public RatesServiceImpl(RatesRepository ratesRepository,
+                            ObjectMapper mapper) {
         this.ratesRepository = ratesRepository;
+        this.mapper = mapper;
     }
 
     @PostConstruct
@@ -77,8 +81,14 @@ public class RatesServiceImpl implements RatesService {
     }
 
     @Override
+    @Scheduled(cron = "0 0 11 * * *")
+    public void deleteTempRates() {
+        saveFinalRates("End of time");
+    }
+
+    @Override
     public void updateRates(String approvedBy) {
-        // Removes old values from both collections
+        // Removes old values from collection
         currencyValues.clear();
 
         // Updates latest forex currency values
@@ -100,7 +110,7 @@ public class RatesServiceImpl implements RatesService {
     }
 
     @Override
-    public void updateRates(List<ForexRequest> ratesRequest, String approvedBy) {
+    public void updateRates(List<ForexData> ratesRequest, String approvedBy) {
         ratesRequest.forEach(updatedRates -> exchangeRates
                 .forEach(forexRates -> {
             if (forexRates.getCountryCode().equals(updatedRates.getCountryCode())) {
@@ -137,12 +147,6 @@ public class RatesServiceImpl implements RatesService {
             default:
                 return 0.00d;
         }
-    }
-
-    @Override
-    @Scheduled(cron = "0 0 11 * * *")
-    public void deleteTempRates() {
-        saveFinalRates("End of time");
     }
 
     private void saveFinalRates(String approvedBy) {
@@ -214,7 +218,7 @@ public class RatesServiceImpl implements RatesService {
     private void getCurrencyForexValues() {
         try {
             currencyValues = (Map<String, Number>) new RestTemplate()
-                    .getForEntity("http://data.fixer.io/api/latest?access_key=4c29457e83b0090604057f85b8e874e3&format=1", LinkedHashMap.class)
+                    .getForEntity("https://api.exchangerate-api.com/v4/latest/INR", LinkedHashMap.class)
                     .getBody()
                     .get("rates");
         } catch (Exception e) {

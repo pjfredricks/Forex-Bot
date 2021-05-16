@@ -1,6 +1,6 @@
 FROM openjdk:11-jre-slim
 
-ADD target/api-1.0.0.jar app.jar
+ADD target/forexbot.jar app.jar
 
 EXPOSE 8080
 

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VendorRepository extends JpaRepository<VendorData, Integer> {
-    VendorData save(VendorData vendorData);
 
     VendorData getVendorDataByVendorAgentId(String vendorAgentId);
 }

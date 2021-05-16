@@ -10,6 +10,7 @@ import com.forexbot.api.repository.VendorRatesRepository;
 import com.forexbot.api.service.VendorRatesService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +35,10 @@ public class VendorRatesServiceImpl implements VendorRatesService {
 
     private final VendorRatesRepository vendorRatesRepository;
 
-    public VendorRatesServiceImpl(VendorRatesRepository vendorRatesRepository) {
+    public VendorRatesServiceImpl(VendorRatesRepository vendorRatesRepository,
+                                  ObjectMapper mapper) {
         this.vendorRatesRepository = vendorRatesRepository;
-        mapper = new ObjectMapper();
+        this.mapper = mapper;
         exchangeRates = new ArrayList<>();
     }
 

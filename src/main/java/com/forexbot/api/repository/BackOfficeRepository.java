@@ -11,10 +11,6 @@ public interface BackOfficeRepository extends JpaRepository<BackOfficeUserData, 
 
     boolean existsByUserId(String userId);
 
-    List<BackOfficeUserData> findAll();
-
-    BackOfficeUserData save(BackOfficeUserData adminData);
-
     BackOfficeUserData getBackOfficeUserDataByEmailIdAndIsActive(String emailId, boolean isActive);
 
     BackOfficeUserData getBackOfficeUserDataByUserId(String userId);

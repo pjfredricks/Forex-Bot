@@ -1,41 +1,30 @@
 package com.forexbot.api.web.utils;
 
-public class ResponseWrapper {
+import lombok.Builder;
+import lombok.Data;
 
+import static com.forexbot.api.web.utils.Constants.*;
+
+@Data
+@Builder
+public class ResponseWrapper {
     private String status;
     private String message;
     private Object data;
 
-    public ResponseWrapper() {
+    public static ResponseWrapper buildSuccessResponse(String message, Object data) {
+        return buildResponse(SUCCESS, message, data);
     }
 
-    public ResponseWrapper(String status, String message, Object data) {
-        this.status = status;
-        this.message = message;
-        this.data = data;
+    public static ResponseWrapper buildErrorResponse(String message, Object data) {
+        return buildResponse(ERROR, message, data);
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Object getData() {
-        return data;
-    }
-
-    public void setData(Object data) {
-        this.data = data;
+    public static ResponseWrapper buildResponse(String status, String message, Object data) {
+        return ResponseWrapper.builder()
+                .status(status)
+                .message(message)
+                .data(data)
+                .build();
     }
 }

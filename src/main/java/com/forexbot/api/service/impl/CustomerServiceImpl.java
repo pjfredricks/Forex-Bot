@@ -15,6 +15,7 @@ import com.forexbot.api.service.CustomerService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.codec.Hex;
 import org.springframework.stereotype.Service;
@@ -40,12 +41,13 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerServiceImpl(CustomerRepository customerRepository,
                                BCryptPasswordEncoder bCryptPasswordEncoder,
                                BackOfficeRepository backOfficeRepository,
-                               OtpDataRepository otpDataRepository) {
+                               OtpDataRepository otpDataRepository,
+                               ObjectMapper mapper) {
         this.customerRepository = customerRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.otpDataRepository = otpDataRepository;
         this.backOfficeRepository = backOfficeRepository;
-        this.mapper = new ObjectMapper();
+        this.mapper = mapper;
     }
 
     @Override

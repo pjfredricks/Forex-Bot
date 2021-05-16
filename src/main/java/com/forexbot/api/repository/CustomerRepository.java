@@ -24,8 +24,4 @@ public interface CustomerRepository extends JpaRepository<CustomerData, Integer>
     CustomerData getCustomerDataByEmailIdOrMobileNumAndIsActive(@Param("emailId") String emailId, @Param("mobileNum") String mobileNum);
 
     CustomerData getCustomerDataByCustomerId(UUID customerId);
-
-    List<CustomerData> findAll();
-
-    CustomerData save(CustomerData customerData);
 }

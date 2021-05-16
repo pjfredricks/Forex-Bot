@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface RatesRepository extends JpaRepository<RatesData, Integer> {
-    List<RatesData> findAll();
 
     RatesData findAllByCreateDate(String date);
 }

@@ -1,11 +1,11 @@
 package com.forexbot.api.dao.rates;
 
-public class ForexRequest {
+public class ForexData {
     private String countryCode;
     private double buyRate;
     private double sellRate;
 
-    public ForexRequest() {
+    public ForexData() {
         super();
     }
 

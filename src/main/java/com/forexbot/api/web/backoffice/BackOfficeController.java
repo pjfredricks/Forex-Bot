@@ -3,36 +3,34 @@ package com.forexbot.api.web.backoffice;
 import com.forexbot.api.dao.backoffice.userdata.*;
 import com.forexbot.api.service.BackOfficeService;
 import com.forexbot.api.web.utils.ResponseWrapper;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.forexbot.api.web.utils.Constants.ERROR;
-import static com.forexbot.api.web.utils.Constants.SUCCESS;
+import static com.forexbot.api.web.utils.ResponseWrapper.*;
 
+@Slf4j
 @RestController
 @RequestMapping("api/v1")
+@RequiredArgsConstructor
 public class BackOfficeController {
 
     private final BackOfficeService backOfficeService;
-
-    public BackOfficeController(BackOfficeService backOfficeService) {
-        this.backOfficeService = backOfficeService;
-    }
 
     @PostMapping(path = "/backOfficeLogin")
     public ResponseEntity<ResponseWrapper> loginVendor(@RequestBody BackOfficeLoginRequest loginRequest) {
         try {
             BackOfficeLoginResponse response = backOfficeService.login(loginRequest);
-            return new ResponseEntity<>(new ResponseWrapper(
-                    SUCCESS,
-                    "Login success",
-                    response), HttpStatus.OK);
+            return ResponseEntity.ok(
+                    buildSuccessResponse("Login success", response)
+            );
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    ERROR,
-                    "Incorrect Credentials, Error:" + e.getMessage(),
-                    null), HttpStatus.OK);
+            String message = "Incorrect Credentials, Error:" + e.getMessage();
+            log.error(message);
+            return ResponseEntity.ok(
+                    buildErrorResponse(message, null)
+            );
         }
     }
 
@@ -40,15 +38,15 @@ public class BackOfficeController {
     public ResponseEntity<ResponseWrapper> createAdmin(@RequestBody BackOfficeSignInRequest signInRequest) {
         try {
             BackOfficeUserData responseData = backOfficeService.createAdmin(signInRequest);
-            return new ResponseEntity<>(new ResponseWrapper(
-                    SUCCESS,
-                    "Admin created successfully for user: " + responseData.getUserName(),
-                    responseData), HttpStatus.OK);
+            return ResponseEntity.ok(
+                    buildSuccessResponse("Admin created successfully for user: " + responseData.getUserName(),
+                            responseData)
+            );
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    ERROR,
-                    "Admin already registered, Error: " + e.getMessage(),
-                    null), HttpStatus.OK);
+            log.error(e.getMessage());
+            return ResponseEntity.ok(
+                    buildErrorResponse("Admin already registered, Error: " + e.getMessage(), null)
+            );
         }
     }
 
@@ -57,15 +55,15 @@ public class BackOfficeController {
 
         try {
             BackOfficeUserData responseData = backOfficeService.createVendor(signInRequest);
-            return new ResponseEntity<>(new ResponseWrapper(
-                    SUCCESS,
-                    "Vendor registered successfully for id: " + responseData.getVendorAgentId(),
-                    responseData), HttpStatus.OK);
+            return ResponseEntity.ok(
+                    buildSuccessResponse("Vendor registered successfully for id: " + responseData.getVendorAgentId(),
+                            responseData)
+            );
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    ERROR,
-                    "Vendor already registered, Error:" + e.getMessage(),
-                    null), HttpStatus.OK);
+            log.error(e.getMessage());
+            return ResponseEntity.ok(
+                    buildErrorResponse("Vendor already registered, Error:" + e.getMessage(), null)
+            );
         }
     }
 
@@ -74,15 +72,15 @@ public class BackOfficeController {
                                                   @PathVariable String userId) {
         try {
             BackOfficeUserResponse responseData = backOfficeService.update(signInRequest, userId);
-            return new ResponseEntity<>(new ResponseWrapper(
-                    SUCCESS,
-                    "Details updated successfully for user: " + responseData.getUserName(),
-                    responseData), HttpStatus.OK);
+            return ResponseEntity.ok(
+                    buildSuccessResponse("Details updated successfully for user: " + responseData.getUserName(),
+                            responseData)
+            );
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    ERROR,
-                    "Error updating details, Error:" + e.getMessage(),
-                    null), HttpStatus.OK);
+            log.error(e.getMessage());
+            return ResponseEntity.ok(
+                    buildErrorResponse("Error updating details, Error:" + e.getMessage(), null)
+            );
         }
     }
 }

@@ -4,5 +4,6 @@ CREATE TABLE rates_data
     approved_by   varchar(255) NULL,
     create_date   varchar(255) NULL,
     rates_details text         NULL,
+    status        varchar(255) NULL,
     CONSTRAINT rates_data_pkey PRIMARY KEY (id)
 );

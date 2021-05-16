@@ -1,10 +1,11 @@
 package com.forexbot.api.web.customer;
 
 import com.forexbot.api.dao.customer.CustomerRequest;
-import com.forexbot.api.service.EmailService;
 import com.forexbot.api.service.CustomerService;
+import com.forexbot.api.service.EmailService;
 import com.forexbot.api.web.utils.ResponseWrapper;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,20 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.mail.MessagingException;
 import java.io.IOException;
 
-import static com.forexbot.api.web.utils.Constants.ERROR;
-import static com.forexbot.api.web.utils.Constants.SUCCESS;
+import static com.forexbot.api.web.utils.ResponseWrapper.*;
 
+@Slf4j
 @RestController
 @RequestMapping("api/v1")
+@RequiredArgsConstructor
 public class EmailController {
 
     private final EmailService emailService;
     private final CustomerService customerService;
-
-    public EmailController(EmailService emailService, CustomerService customerService) {
-        this.emailService = emailService;
-        this.customerService = customerService;
-    }
 
     @PostMapping(path = "/sendResetEmail")
     public ResponseEntity<ResponseWrapper> sendResetEmail(@RequestBody CustomerRequest customerRequest) throws IOException, MessagingException {
@@ -54,29 +51,27 @@ public class EmailController {
         try {
             customerService.verifyEmail(customerRequest);
         } catch (Exception e) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    ERROR,
-                    e.getMessage(),
-                    null), HttpStatus.OK);
+            log.error(e.getMessage());
+            return ResponseEntity.ok(
+                    buildErrorResponse(e.getMessage(), null)
+            );
         }
-        return new ResponseEntity<>(new ResponseWrapper(
-                SUCCESS,
-                "Email verified successfully",
-                null), HttpStatus.OK);
+        return ResponseEntity.ok(
+                buildSuccessResponse("Email verified successfully", null)
+        );
     }
 
     private ResponseEntity<ResponseWrapper> sendEmail(String emailId, EmailService.EmailType emailType) throws IOException, MessagingException {
         try {
             emailService.sendEmail(emailId, emailType);
         } catch (IllegalAccessException ex) {
-            return new ResponseEntity<>(new ResponseWrapper(
-                    ERROR,
-                    ex.getMessage(),
-                    null), HttpStatus.OK);
+            log.error(ex.getMessage());
+            return ResponseEntity.ok(
+                    buildErrorResponse(ex.getMessage(), null)
+            );
         }
-        return new ResponseEntity<>(new ResponseWrapper(
-                SUCCESS,
-                "Email sent successfully",
-                null), HttpStatus.OK);
+        return ResponseEntity.ok(
+                buildSuccessResponse("Email sent successfully", null)
+        );
     }
 }

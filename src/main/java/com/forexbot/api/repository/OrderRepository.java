@@ -13,8 +13,4 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     Order getOrderByCustomerIdOrTrackingIdOrCouponCode(UUID customerId, String trackingId, String couponCode);
 
     Order getOrderByTrackingId(String trackingId);
-
-    Order save(Order order);
-
-    List<Order> findAll();
 }
