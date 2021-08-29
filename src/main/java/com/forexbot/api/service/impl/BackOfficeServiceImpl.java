@@ -10,7 +10,6 @@ import com.forexbot.api.repository.AddressRepository;
 import com.forexbot.api.repository.BackOfficeRepository;
 import com.forexbot.api.repository.VendorRepository;
 import com.forexbot.api.service.BackOfficeService;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

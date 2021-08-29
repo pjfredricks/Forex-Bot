@@ -35,8 +35,8 @@ public class BackOfficeUserData {
     private String userName;
 
     @NotNull
-    @Column(name = "isActive")
-    private boolean isActive = true;
+    @Column(name = "active")
+    private boolean active = true;
 
     @NotNull
     @Column(name = "userCategory")
